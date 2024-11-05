@@ -1,9 +1,19 @@
 package com.iamkaf.amber.api.inventory;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ItemHelper {
@@ -41,5 +51,58 @@ public class ItemHelper {
                 .collect(Collectors.joining(", "));
 
         return "One of " + itemNames + ", etc...";
+    }
+
+    /**
+     * Adds an attribute modifier to an {@code ItemStack} respecting default and already existing modifiers.
+     *
+     * @param stack     The {@code ItemStack} to add the modifier to.
+     * @param attribute Which {@code Attribute} to add the modifier to.
+     * @param modifier  Your attribute modifier.
+     * @param slotGroup The {@code EquipmentSlotGroup} the modifier is applicable for.
+     * @see Attribute
+     * @see AttributeModifier
+     * @see EquipmentSlotGroup
+     */
+    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier,
+            EquipmentSlotGroup slotGroup) {
+        DataComponentType<ItemAttributeModifiers> attributeModifiersComponent =
+                net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS;
+        var extraModifiers = stack.get(attributeModifiersComponent);
+        assert extraModifiers != null;
+        var attributeBuilder = ItemAttributeModifiers.builder();
+        var defaultModifiers = ((ArmorItem) stack.getItem()).getDefaultAttributeModifiers();
+        Set<ResourceLocation> added = new HashSet<>();
+        for (var mod : defaultModifiers.modifiers()) {
+            if (!added.contains(mod.modifier().id())) {
+                attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
+                added.add(mod.modifier().id());
+            }
+        }
+        for (var mod : extraModifiers.modifiers()) {
+            if (mod.modifier().id().equals(modifier.id())) {
+                // skipping so it can be overwritten
+                continue;
+            }
+            // prevents duplicates
+            if (!added.contains(mod.modifier().id())) {
+                attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
+                added.add(mod.modifier().id());
+            }
+        }
+        attributeBuilder.add(attribute, modifier, slotGroup);
+        stack.set(attributeModifiersComponent, attributeBuilder.build());
+    }
+
+    /**
+     * Checks if an {@code ItemStack} has an attribute modifier with the specified id.
+     * @param stack The {@code ItemStack} to check.
+     * @param id The {@code ResourceLocation} to check.
+     * @return {@code} true if the modifier with the id is present.
+     */
+    public static boolean hasModifier(ItemStack stack, ResourceLocation id) {
+        var list = stack.get(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS);
+        assert list != null;
+        return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));
     }
 }

@@ -1,6 +1,7 @@
 package com.iamkaf.amber.api.item;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -13,18 +14,13 @@ import java.util.List;
  * key presses or modifier keys.
  */
 public class SmartTooltip {
-    // The player instance used to check key states.
-    private final Player player;
     // List of tooltip components to display.
     private final List<Component> tooltipComponents = new ArrayList<>();
 
     /**
-     * Constructs a SmartTooltip for a given player.
-     *
-     * @param player The player whose input is checked for generating tooltips.
+     * Constructs a SmartTooltip.
      */
-    public SmartTooltip(Player player) {
-        this.player = player;
+    public SmartTooltip() {
     }
 
     /**
@@ -45,7 +41,7 @@ public class SmartTooltip {
      * @return The current SmartTooltip instance for method chaining.
      */
     public SmartTooltip shift(Component component) {
-        if (player.isShiftKeyDown()) {
+        if (Screen.hasShiftDown()) {
             tooltipComponents.add(component);
         }
         return this;
@@ -73,7 +69,7 @@ public class SmartTooltip {
      * @return The current SmartTooltip instance for method chaining.
      */
     public SmartTooltip shiftKeybind(KeyMapping keybind, Component component) {
-        if (player.isShiftKeyDown() && keybind.isDown()) {
+        if (Screen.hasShiftDown() && keybind.isDown()) {
             tooltipComponents.add(component);
         }
         return this;
