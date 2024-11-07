@@ -29,11 +29,12 @@ public abstract class CommandFactory {
             subCommands = subCommandHolder;
         }
 
-        public void addSubcommand(SubCommand command) {
+        public CommandParent addSubcommand(SubCommand command) {
             subCommands.add(command);
+            return this;
         }
 
-        public void register() {
+        public CommandParent register() {
             CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {
                 LiteralArgumentBuilder<CommandSourceStack> main = Commands.literal(mainCommand);
                 // show commands list
@@ -41,6 +42,7 @@ public abstract class CommandFactory {
                 // register subcommands
                 subCommands.get().forEach(cmd -> dispatcher.register(cmd.register(main)));
             });
+            return this;
         }
 
         private int displayInfo(CommandContext<CommandSourceStack> context) {
