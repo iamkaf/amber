@@ -6,7 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -64,14 +63,14 @@ public class ItemHelper {
      * @see AttributeModifier
      * @see EquipmentSlotGroup
      */
-    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier,
-            EquipmentSlotGroup slotGroup) {
+    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier
+            , EquipmentSlotGroup slotGroup) {
         DataComponentType<ItemAttributeModifiers> attributeModifiersComponent =
                 net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS;
         var extraModifiers = stack.get(attributeModifiersComponent);
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
-        var defaultModifiers = ((ArmorItem) stack.getItem()).getDefaultAttributeModifiers();
+        var defaultModifiers = stack.getItem().getDefaultAttributeModifiers();
         Set<ResourceLocation> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
             if (!added.contains(mod.modifier().id())) {
@@ -96,8 +95,9 @@ public class ItemHelper {
 
     /**
      * Checks if an {@code ItemStack} has an attribute modifier with the specified id.
+     *
      * @param stack The {@code ItemStack} to check.
-     * @param id The {@code ResourceLocation} to check.
+     * @param id    The {@code ResourceLocation} to check.
      * @return {@code} true if the modifier with the id is present.
      */
     public static boolean hasModifier(ItemStack stack, ResourceLocation id) {
@@ -105,4 +105,6 @@ public class ItemHelper {
         assert list != null;
         return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));
     }
+
+    // TODO: add removeModifier method.
 }
