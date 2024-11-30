@@ -1,4 +1,4 @@
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/v0/fabric.gradle"
+apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/1.20.1_amber/fabric.gradle"
 
 dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.

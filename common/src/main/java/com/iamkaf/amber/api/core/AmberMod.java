@@ -10,6 +10,6 @@ public class AmberMod {
     }
 
     public ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ID, path);
+        return new ResourceLocation(ID, path);
     }
 }

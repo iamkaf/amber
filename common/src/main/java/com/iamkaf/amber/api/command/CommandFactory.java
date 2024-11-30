@@ -34,6 +34,7 @@ public abstract class CommandFactory {
             return this;
         }
 
+        @SuppressWarnings("removal")
         public CommandParent register() {
             CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {
                 LiteralArgumentBuilder<CommandSourceStack> main = Commands.literal(mainCommand);
@@ -45,6 +46,7 @@ public abstract class CommandFactory {
             return this;
         }
 
+        @SuppressWarnings("removal")
         private int displayInfo(CommandContext<CommandSourceStack> context) {
             var version = Platform.getMod(modId).getVersion();
             var amberVersion = Platform.getMod("amber").getVersion();

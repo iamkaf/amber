@@ -37,7 +37,11 @@ public class Chance {
      * @param percent The raw probability input.
      * @return A clamped probability value from 0 to 1.
      */
-    private static float clamped(float percent) {
-        return Math.abs(Math.clamp(percent, 0, 1) - 1);
+    public static float clamped(float percent) {
+        return Math.abs(clamp(percent, 0, 1) - 1);
+    }
+
+    private static float clamp(float val, float min, float max) {
+        return Math.max(min, Math.min(max, val));
     }
 }

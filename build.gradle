@@ -6,7 +6,7 @@ plugins {
 
 println("Mod Resources: ${System.getenv("MOD_RESOURCES")}")
 
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/v0/main.gradle"
+apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/1.20.1_amber/main.gradle"
 
 subprojects {
     // Configure Maven publishing.

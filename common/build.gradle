@@ -1,2 +1,2 @@
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/main/gradle/v0/common.gradle"
+apply from: "https://raw.githubusercontent.com/iamkaf/modresources/main/gradle/1.20.1_amber/common.gradle"
 
