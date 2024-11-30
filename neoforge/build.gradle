@@ -1,4 +1,4 @@
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/${minecraft_version}/neoforge.gradle"
+apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/v0/neoforge.gradle"
 
 //dependencies {
 //
