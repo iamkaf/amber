@@ -6,7 +6,6 @@ See the full changelog at ...
 
 - maintenance update
 - port to 1.20.1
-- port to 1.21.4
 
 ## 1.0.0-alpha.1
 
