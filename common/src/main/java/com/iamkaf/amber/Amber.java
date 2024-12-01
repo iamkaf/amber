@@ -1,6 +1,5 @@
 package com.iamkaf.amber;
 
-import com.iamkaf.amber.init.Events;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -10,9 +9,7 @@ public final class Amber {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static void init() {
-        LOGGER.info("Everlasting Amber Dreams.");
-
-        Events.init();
+        LOGGER.info("Everlasting Amber Dreams!");
     }
 
     /**
