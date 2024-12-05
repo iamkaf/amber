@@ -53,9 +53,10 @@ public abstract class CommandFactory {
                             false
                     );
 
-            subCommands.get()
+            subCommands.getSet()
                     .forEach(cmd -> context.getSource()
-                            .sendSuccess(() -> Component.literal(String.format("/%s %s - %s", mainCommand,
+                            .sendSuccess(() -> Component.literal(String.format("/%s %s - %s",
+                                    mainCommand,
                                     cmd.getName(),
                                     cmd.getDescription()
                             )), false));

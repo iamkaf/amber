@@ -2,10 +2,12 @@ package com.iamkaf.amber.api.inventory;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -38,7 +40,9 @@ public class ItemHelper {
      * @return A string containing the display name(s) of the ingredient's items.
      */
     public static String getIngredientDisplayName(Ingredient ingredient) {
-        ItemStack[] items = ingredient.getItems();
+        ItemStack[] items = (ItemStack[]) ingredient.items()
+                .map(itemHolder -> itemHolder.value().getDefaultInstance())
+                .toArray();
 
         if (items.length == 1) {
             return items[0].getDisplayName().getString();
@@ -70,7 +74,7 @@ public class ItemHelper {
         var extraModifiers = stack.get(attributeModifiersComponent);
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
-        var defaultModifiers = stack.getItem().getDefaultAttributeModifiers();
+        var defaultModifiers = getDefaultAttributeModifiers(stack);
         Set<ResourceLocation> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
             if (!added.contains(mod.modifier().id())) {
@@ -107,4 +111,12 @@ public class ItemHelper {
     }
 
     // TODO: add removeModifier method.
+
+    public static ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+        Item item = stack.getItem();
+
+        ItemStack defaultInstance = item.getDefaultInstance();
+
+        return defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+    }
 }

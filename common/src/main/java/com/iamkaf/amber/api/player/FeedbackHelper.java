@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class FeedbackHelper {
     public static void message(Player player, Component component) {
-        player.sendSystemMessage(component);
+        player.displayClientMessage(component, false);
     }
 
     public static void actionBarMessage(Player player, Component component) {
