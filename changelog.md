@@ -2,6 +2,10 @@
 
 See the full changelog at https://github.com/iamkaf/amber/commits
 
+## 2.1.0
+
+- add a few more inventory methods
+
 ## 2.0.0-beta.3
 
 - port to 1.21.4
