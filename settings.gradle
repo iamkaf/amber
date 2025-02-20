@@ -11,6 +11,5 @@ pluginManagement {
 include 'common'
 include 'fabric'
 include 'neoforge'
-//include 'quilt'
 
 apply from: "https://raw.githubusercontent.com/iamkaf/modresources/main/gradle/v0/settings.gradle"
