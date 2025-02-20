@@ -9,8 +9,6 @@ It is built on top of Architectury API and is available for Fabric and NeoForge.
 [![Discord](https://img.shields.io/discord/1207469438719492176?style=for-the-badge&logo=discord&label=DISCORD&color=%235865F2)](https://discord.gg/HV5WgTksaB)
 [![KoFi](https://img.shields.io/badge/KoFi-iamkaf?style=for-the-badge&logo=kofi&logoColor=%2330d1e3&label=Support%20Me&color=%2330d1e3)](https://ko-fi.com/iamkaffe)
 
-Requires [Architectury API](https://modrinth.com/mod/architectury-api).
-
 ### How To Use It
 
 Just install it and the mods that require it will be good to go!

@@ -1,7 +1,9 @@
 package com.iamkaf.amber;
 
+import com.iamkaf.amber.event.AmberEventSetup;
+import com.iamkaf.amber.util.Env;
+import com.iamkaf.amber.util.EnvExecutor;
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 
 public final class Amber {
@@ -10,12 +12,8 @@ public final class Amber {
 
     public static void init() {
         LOGGER.info("Everlasting Amber Dreams.");
-    }
 
-    /**
-     * Creates resource location in the mod namespace with the given path.
-     */
-    public static ResourceLocation resource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+        AmberEventSetup.registerCommon();
+        EnvExecutor.runInEnv(Env.CLIENT, () -> AmberEventSetup::registerClient);
     }
 }
