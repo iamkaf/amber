@@ -146,16 +146,4 @@ publisher {
     // Add supported java versions. Currently only used by CurseForge
     // Supports anything that can be parsed using JavaVersion.toVersion()
     setJavaVersions(List.of(JavaVersion.VERSION_21))
-
-    if (mod_modrinth_depends?.trim()) {
-        modrinthDepends {
-            required(mod_modrinth_depends.split(','))
-        }
-    }
-
-    if (mod_curse_depends?.trim()) {
-        curseDepends {
-            required(mod_curse_depends.split(','))
-        }
-    }
 }
