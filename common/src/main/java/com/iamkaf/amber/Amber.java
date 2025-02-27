@@ -1,6 +1,5 @@
 package com.iamkaf.amber;
 
-import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.event.AmberEventSetup;
 import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
@@ -16,9 +15,5 @@ public final class Amber {
 
         AmberEventSetup.registerCommon();
         EnvExecutor.runInEnv(Env.CLIENT, () -> AmberEventSetup::registerClient);
-
-        EntityEvent.AFTER_DAMAGE.register((livingEntity, damageSource, damageTaken, damageDealt, blocked) -> {
-            LOGGER.info("EntityEvent.AFTER_DAMAGE: {} {} {} {} {}", livingEntity, damageSource, damageTaken, damageDealt, blocked);
-        });
     }
 }
