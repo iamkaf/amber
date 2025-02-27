@@ -1,5 +1,0 @@
-plugins {
-    id "com.hypherionmc.modutils.modpublisher" version "2.1.6"
-}
-
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/1.20.1_amber/quilt.gradle"

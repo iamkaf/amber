@@ -24,13 +24,13 @@
     ]
   },
   "mixins": [
-    "${mod_id}.mixins.json"
+    "${mod_id}.mixins.json",
+    "${mod_id}.fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "minecraft": "1.20.1",
     "java": ">=17",
-    "architectury": ">=${architectury_api_version}",
     "fabric-api": "*"
   }
 }
