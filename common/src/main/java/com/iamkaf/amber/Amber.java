@@ -16,9 +16,5 @@ public final class Amber {
 
         AmberEventSetup.registerCommon();
         EnvExecutor.runInEnv(Env.CLIENT, () -> AmberEventSetup::registerClient);
-
-        EntityEvent.AFTER_DAMAGE.register((livingEntity, damageSource, damageTaken, damageDealt, blocked) -> {
-            LOGGER.info("EntityEvent.AFTER_DAMAGE: {} {} {} {} {}", livingEntity, damageSource, damageTaken, damageDealt, blocked);
-        });
     }
 }
