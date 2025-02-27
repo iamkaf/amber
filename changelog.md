@@ -2,6 +2,13 @@
 
 See the full changelog at https://github.com/iamkaf/amber/commits
 
+## 3.0.0
+
+- feat: add event system
+- feat: add platform helpers
+- feat: add json file reader
+- feat: remove architectury dependency
+
 ## 2.1.0
 
 - add a few more inventory methods

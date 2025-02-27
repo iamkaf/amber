@@ -7,10 +7,6 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 
 public class AmberEventSetupImpl {
     public static void registerCommon() {
-        ServerLivingEntityEvents.AFTER_DAMAGE.register((livingEntity, damageSource, v, v1, b) -> {
-            EntityEvent.AFTER_DAMAGE.invoker().afterDamage(livingEntity, damageSource, v, v1, b);
-        });
-
         LootTableEvents.MODIFY.register((resourceKey, builder, lootTableSource, provider) -> {
             LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);
         });
