@@ -17,15 +17,12 @@ public abstract class LivingEntityMixin {
     @Shadow
     public abstract boolean isDeadOrDying();
 
-    @Shadow
-    public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
-
     @Inject(method = "hurtServer", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void amber$afterDamage(ServerLevel level, DamageSource source, float amount,
             CallbackInfoReturnable<Boolean> cir, float f) {
         if (!isDeadOrDying()) {
             EntityEvent.AFTER_DAMAGE.invoker()
-                    .afterDamage((LivingEntity) (Object) this, source, f, amount, this.isDamageSourceBlocked(source));
+                    .afterDamage((LivingEntity) (Object) this, source, f, amount, ((LivingEntity) (Object) this).isBlocking());
         }
     }
 }
