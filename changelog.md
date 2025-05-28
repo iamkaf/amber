@@ -2,6 +2,10 @@
 
 See the full changelog at https://github.com/iamkaf/amber/commits
 
+## 4.1.0
+
+- feat: updated SmartTooltip to the new system
+
 ## 4.0.1
 
 - feat: ported to 1.21.5

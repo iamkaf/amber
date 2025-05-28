@@ -3,10 +3,14 @@ package com.iamkaf.amber.api.item;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A utility class for building smart tooltips that respond to player input.
@@ -78,9 +82,12 @@ public class SmartTooltip {
     /**
      * Appends all accumulated components in this SmartTooltip to an external tooltip list.
      *
-     * @param tooltipComponents The list to which the components are added.
+     * @param tooltipAdder A consumer that accepts a Component and adds it to the tooltip list.
+     * @see net.minecraft.world.item.Item#appendHoverText(ItemStack, Item.TooltipContext, TooltipDisplay, Consumer, TooltipFlag)
      */
-    public void into(List<Component> tooltipComponents) {
-        tooltipComponents.addAll(this.tooltipComponents);
+    public void into(Consumer<Component> tooltipAdder) {
+        for (Component component : tooltipComponents) {
+            tooltipAdder.accept(component);
+        }
     }
 }
