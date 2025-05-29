@@ -2,6 +2,10 @@
 
 See the full changelog at https://github.com/iamkaf/amber/commits
 
+## 4.2.0
+
+- feat: add PlayerEvents for player interactions
+
 ## 4.1.0
 
 - feat: updated SmartTooltip to the new system
