@@ -2,6 +2,10 @@
 
 See the full changelog at https://github.com/iamkaf/amber/commits
 
+## 4.2.1
+
+- fix: fix a crash when using a mod that depends on the old SmartTooltip api
+
 ## 4.2.0
 
 - feat: add PlayerEvents for player interactions

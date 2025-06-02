@@ -90,4 +90,12 @@ public class SmartTooltip {
             tooltipAdder.accept(component);
         }
     }
+
+    /**
+     * @deprecated Use {@link #into(Consumer)} instead. This is only here so mods that use
+     * SmartTooltip can still compile.
+     */
+    public void into(List<Component> tooltipAdder) {
+        tooltipAdder.addAll(tooltipComponents);
+    }
 }
