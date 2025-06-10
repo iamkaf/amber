@@ -25,6 +25,10 @@ public class EventHandlerCommon {
 
         var side = event.getSide();
 
+        if (result.equals(InteractionResult.PASS)) {
+            return;
+        }
+
         // These checks make sure the event handling is equivalent to Fabric's.
         if (side.isClient()) {
             if (result == SUCCESS) {
@@ -35,10 +39,6 @@ public class EventHandlerCommon {
                 event.setCanceled(true);
             } else {
                 // If the result is FAIL or any other value, cancel the event
-                event.setCanceled(true);
-            }
-        } else {
-            if (result != InteractionResult.PASS) {
                 event.setCanceled(true);
             }
         }
