@@ -3,6 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
+import com.iamkaf.amber.platform.services.IRegistrarManager;
 
 import java.util.ServiceLoader;
 
@@ -20,6 +21,9 @@ public class Services {
     // client, and server event handlers in a platform-agnostic way. The actual implementation will vary depending on the
     // platform (Forge, Fabric, etc.) but the interface remains the same.
     public static final IAmberEventSetup AMBER_EVENT_SETUP = load(IAmberEventSetup.class);
+
+    // Platform specific registrar manager implementation
+    public static final IRegistrarManager REGISTRAR_MANAGER = load(IRegistrarManager.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.
