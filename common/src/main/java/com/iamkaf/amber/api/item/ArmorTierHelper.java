@@ -5,6 +5,10 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.function.Supplier;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class ArmorTierHelper {
     public static Supplier<Ingredient> repair(Supplier<Item> item) {
         return () -> Ingredient.of(item.get());

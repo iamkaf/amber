@@ -22,6 +22,7 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Deprecated
 
 - AmberMod is now deprecated in favor of AmberInitializer.
+- All unversioned API helper classes have been deprecated in preparation for versioned packages.
 
 ### Removed
 

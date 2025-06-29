@@ -8,6 +8,10 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class LevelHelper {
 
     /**

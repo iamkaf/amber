@@ -17,6 +17,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class ItemHelper {
     /**
      * Repairs the item by the given percentage of its maximum durability.

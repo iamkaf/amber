@@ -2,6 +2,10 @@ package com.iamkaf.amber.api.util;
 
 import java.util.HashSet;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class LiteralSetHolder<T> {
     private final HashSet<T> set = new HashSet<>();
 

@@ -12,6 +12,10 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public final class BoundingBoxMerger {
     private static final Long2ObjectMap<Direction> DIRECTION_LOOKUP = Arrays.stream(Direction.values())
             .collect(Collectors.toMap(dir -> new BlockPos(dir.getUnitVec3i()).asLong(),
