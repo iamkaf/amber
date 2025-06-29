@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -21,12 +22,15 @@ import java.util.function.Supplier;
  *         DeferredRegister.create("examplemod", Registries.ITEM);
  *
  * public static final RegistrySupplier<Item> TEST_ITEM =
- *         ITEMS.register("test_item", () -> new Item(new Item.Properties()));
+ *         ITEMS.register("test_item", key -> new Item(new Item.Properties().setId(key)));
  *
  * public static void init() {
  *     ITEMS.register(); // registers all queued items
  * }
  * }</pre>
+ *
+ * <p>The {@code ResourceKey} parameter can be used to set the id on any
+ * {@code Properties} instance that requires it.</p>
  */
 public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     private final Supplier<RegistrarManager> managerSupplier;
@@ -52,6 +56,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
 
     /**
      * Registers a supplier with an id under the mod namespace.
+     * Use this when the entry's {@code Properties} already have the id set.
      */
     public <R extends T> RegistrySupplier<R> register(String id, Supplier<? extends R> supplier) {
         if (modId == null) {
@@ -61,7 +66,19 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     }
 
     /**
-     * Registers a supplier with a full id.
+     * Registers a supplier that receives the entry {@link ResourceKey}. This is useful for
+     * automatically setting the id on {@code Properties} objects.
+     */
+    public <R extends T> RegistrySupplier<R> register(String id, Function<ResourceKey<T>, ? extends R> supplier) {
+        if (modId == null) {
+            throw new NullPointerException("DeferredRegister created without mod id");
+        }
+        return register(new ResourceLocation(modId, id), supplier);
+    }
+
+    /**
+     * Registers a supplier with a full id. Use when the constructed entry already
+     * has its {@code Properties} id set.
      */
     @SuppressWarnings("unchecked")
     public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
@@ -72,6 +89,16 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             entry.value = registrar.register(entry.id, entry.supplier);
         }
         return (RegistrySupplier<R>) entry;
+    }
+
+    /**
+     * Registers a supplier that receives the entry {@link ResourceKey}.
+     *
+     * @param id       the full identifier of the entry
+     * @param supplier a factory taking the entry key
+     */
+    public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Function<ResourceKey<T>, ? extends R> supplier) {
+        return register(id, (Supplier<? extends R>) () -> supplier.apply(ResourceKey.create(this.key, id)));
     }
 
     /**
