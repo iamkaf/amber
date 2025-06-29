@@ -1,15 +1,12 @@
-package com.iamkaf.amber.registry.v1;
+package com.iamkaf.amber.api.registry.v1;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,7 +35,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     private final List<Entry<T>> entries = new ArrayList<>();
     private final List<RegistrySupplier<T>> entryView = Collections.unmodifiableList(entries);
     private boolean registered = false;
-    private String modId;
+    private final String modId;
 
     private DeferredRegister(Supplier<RegistrarManager> managerSupplier, ResourceKey<Registry<T>> key, String modId) {
         this.managerSupplier = Objects.requireNonNull(managerSupplier);
@@ -62,7 +59,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(new ResourceLocation(modId, id), supplier);
+        return register(ResourceLocation.fromNamespaceAndPath(modId, id), supplier);
     }
 
     /**
@@ -73,7 +70,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(new ResourceLocation(modId, id), supplier);
+        return register(ResourceLocation.fromNamespaceAndPath(modId, id), supplier);
     }
 
     /**
@@ -116,7 +113,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     }
 
     @Override
-    public Iterator<RegistrySupplier<T>> iterator() {
+    public @NotNull Iterator<RegistrySupplier<T>> iterator() {
         return entryView.iterator();
     }
 
@@ -128,7 +125,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         return managerSupplier.get().get(key);
     }
 
-    private static class Entry<R> implements RegistrySupplier<R> {
+    private class Entry<R> implements RegistrySupplier<R> {
         private final ResourceLocation id;
         private final Supplier<R> supplier;
         private RegistrySupplier<R> value;

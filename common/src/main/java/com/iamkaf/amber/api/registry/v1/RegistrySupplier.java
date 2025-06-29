@@ -1,4 +1,4 @@
-package com.iamkaf.amber.registry.v1;
+package com.iamkaf.amber.api.registry.v1;
 
 import java.util.function.Consumer;
 

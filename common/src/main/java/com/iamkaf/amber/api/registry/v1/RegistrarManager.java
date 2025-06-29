@@ -1,5 +1,6 @@
-package com.iamkaf.amber.registry.v1;
+package com.iamkaf.amber.api.registry.v1;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -7,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -55,7 +57,8 @@ public final class RegistrarManager {
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
-            return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());
+//            return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location()).get();
+            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());
         }
 
         @Override
@@ -64,7 +67,7 @@ public final class RegistrarManager {
         }
 
         @Override
-        public T get(ResourceLocation id) {
+        public Optional<Holder.Reference<T>> get(ResourceLocation id) {
             return registry().get(id);
         }
     }

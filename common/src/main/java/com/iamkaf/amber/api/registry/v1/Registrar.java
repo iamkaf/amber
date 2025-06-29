@@ -1,9 +1,11 @@
-package com.iamkaf.amber.registry.v1;
+package com.iamkaf.amber.api.registry.v1;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -23,5 +25,5 @@ public interface Registrar<T> {
     /**
      * Retrieves an already registered value.
      */
-    T get(ResourceLocation id);
+    Optional<Holder.Reference<T>> get(ResourceLocation id);
 }
