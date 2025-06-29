@@ -58,5 +58,6 @@ dependencyResolutionManagement {
 rootProject.name = mod_name
 include('common')
 include('fabric')
-include('neoforge')
+// Temporarily disable NeoForge build as dependencies are unavailable
+// include('neoforge')
 include('forge')
