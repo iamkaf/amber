@@ -8,12 +8,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -22,12 +23,15 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
 
     @SuppressWarnings("unchecked")
     private <T> DeferredRegister<T> getRegister(String modId, ResourceKey<Registry<T>> key) {
-        Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> map = registers.computeIfAbsent(modId, m -> new HashMap<>());
-        return (DeferredRegister<T>) map.computeIfAbsent(key, k -> {
-            DeferredRegister<T> reg = DeferredRegister.create(key, modId);
-            reg.register(FMLJavaModLoadingContext.get().getModEventBus());
-            return reg;
-        });
+        Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> map =
+                registers.computeIfAbsent(modId, m -> new HashMap<>());
+        return (DeferredRegister<T>) map.computeIfAbsent(
+                key, k -> {
+                    DeferredRegister<T> reg = DeferredRegister.create(key, modId);
+                    reg.register(Objects.requireNonNull(ModLoadingContext.get().getActiveContainer().getEventBus()));
+                    return reg;
+                }
+        );
     }
 
     @Override
@@ -46,8 +50,8 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
 
         @Override
         public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
-            RegistryObject<R> obj = register.register(id.getPath(), supplier);
-            return new NeoForgeRegistrySupplier<>(key.location(), id, obj);
+            DeferredHolder<T, R> holder = register.register(id.getPath(), supplier);
+            return new NeoForgeRegistrySupplier<>(key.location(), id, holder);
         }
 
         @Override
@@ -66,25 +70,25 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
     }
 
-    private static class NeoForgeRegistrySupplier<R> implements RegistrySupplier<R> {
+    private static class NeoForgeRegistrySupplier<T, R extends T> implements RegistrySupplier<R> {
         private final ResourceLocation registryId;
         private final ResourceLocation id;
-        private final RegistryObject<R> obj;
+        private final DeferredHolder<T, R> holder;
 
-        NeoForgeRegistrySupplier(ResourceLocation registryId, ResourceLocation id, RegistryObject<R> obj) {
+        NeoForgeRegistrySupplier(ResourceLocation registryId, ResourceLocation id, DeferredHolder<T, R> holder) {
             this.registryId = registryId;
             this.id = id;
-            this.obj = obj;
+            this.holder = holder;
         }
 
         @Override
         public boolean isPresent() {
-            return obj.isPresent();
+            return holder.isBound();
         }
 
         @Override
         public R get() {
-            return obj.get();
+            return holder.get();
         }
 
         @Override
