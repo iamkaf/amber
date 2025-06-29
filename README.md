@@ -2,7 +2,7 @@
 
 Amber is a library api of common code utilized by iamkaf mods.
 
-It is built on top of Architectury API and is available for Fabric and NeoForge.
+It is available for Fabric, NeoForge and Forge.
 
 [![Amber](https://img.shields.io/badge/Amber-iamkaf?style=for-the-badge&label=Requires&color=%23ebb134)](https://modrinth.com/mod/amber)
 [![Issues](https://img.shields.io/github/issues/iamkaf/mod-issues?style=for-the-badge&color=%23eee)](https://github.com/iamkaf/mod-issues)
