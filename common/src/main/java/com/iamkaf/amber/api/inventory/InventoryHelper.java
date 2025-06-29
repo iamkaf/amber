@@ -9,6 +9,10 @@ import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Consumer;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class InventoryHelper {
     /**
      * Checks if the inventory contains the item and shrinks the stack by one.

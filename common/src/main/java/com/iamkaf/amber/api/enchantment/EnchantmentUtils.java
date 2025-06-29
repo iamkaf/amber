@@ -3,6 +3,10 @@ package com.iamkaf.amber.api.enchantment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class EnchantmentUtils {
     public static boolean containsEnchantment(ItemStack stack, ResourceLocation enchantment) {
         if (!stack.isEnchanted() || stack.getEnchantments().isEmpty()) {

@@ -17,6 +17,10 @@ import java.util.function.Consumer;
  * This class allows adding tooltip components conditionally based on player
  * key presses or modifier keys.
  */
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class SmartTooltip {
     // List of tooltip components to display.
     private final List<Component> tooltipComponents = new ArrayList<>();

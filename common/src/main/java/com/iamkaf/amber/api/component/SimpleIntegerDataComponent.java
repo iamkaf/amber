@@ -2,10 +2,12 @@ package com.iamkaf.amber.api.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 /**
  * A simple record class that represents an integer-based data component.
+ *
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
  */
+@Deprecated
 public record SimpleIntegerDataComponent(int value) {
 
     /**

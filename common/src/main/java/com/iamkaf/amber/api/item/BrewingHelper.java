@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class BrewingHelper {
     private static List<Consumer<PotionBrewing.Builder>> listeners = new ArrayList<>();
 

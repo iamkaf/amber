@@ -2,6 +2,10 @@ package com.iamkaf.amber.api.math;
 
 import java.util.Random;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class Chance {
     /**
      * Simulates a random event occurring with a specified probability.

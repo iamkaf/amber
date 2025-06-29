@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * @deprecated Use {@link com.iamkaf.amber.api.core.v2.AmberInitializer} instead.
  */
+@Deprecated
 public class AmberMod {
     private final String ID;
 

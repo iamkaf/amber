@@ -7,6 +7,10 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 
+/**
+ * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ */
+@Deprecated
 public class SoundHelper {
     public static void sendClientSound(Player player, SoundEvent sound) {
         sendClientSound(player, sound, SoundSource.PLAYERS, 1f, 1f);
