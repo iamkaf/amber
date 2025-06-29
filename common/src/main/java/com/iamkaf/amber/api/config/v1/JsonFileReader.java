@@ -1,7 +1,7 @@
 package com.iamkaf.amber.api.config.v1;
 
 import com.google.gson.*;
-import com.iamkaf.amber.Amber;
+import com.iamkaf.amber.Constants;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -60,7 +60,7 @@ public class JsonFileReader<T> {
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write(gson.toJson(defaultValues));
             } catch (Exception e) {
-                Amber.LOGGER.error(e.getLocalizedMessage());
+                Constants.LOG.error(e.getLocalizedMessage());
                 return data;
             }
         }
@@ -72,7 +72,7 @@ public class JsonFileReader<T> {
                 data.put(entry.getKey(), gson.fromJson(entry.getValue(), type));
             }
         } catch (Exception e) {
-            Amber.LOGGER.error(e.getLocalizedMessage());
+            Constants.LOG.error(e.getLocalizedMessage());
         }
 
         return data;
@@ -142,7 +142,7 @@ public class JsonFileReader<T> {
                     writer.write(buffer, 0, bytesRead);
                 }
             } catch (Exception e) {
-                Amber.LOGGER.error(e.getLocalizedMessage());
+                Constants.LOG.error(e.getLocalizedMessage());
             }
         }
     }
@@ -164,7 +164,7 @@ public class JsonFileReader<T> {
                 }
             }
         } catch (Exception e) {
-            Amber.LOGGER.error(e.getLocalizedMessage());
+            Constants.LOG.error(e.getLocalizedMessage());
             return false;
         }
 

@@ -83,7 +83,7 @@ public class SmartTooltip {
      * Appends all accumulated components in this SmartTooltip to an external tooltip list.
      *
      * @param tooltipAdder A consumer that accepts a Component and adds it to the tooltip list.
-     * @see net.minecraft.world.item.Item#appendHoverText(ItemStack, Item.TooltipContext, TooltipDisplay, Consumer, TooltipFlag)
+     * @see Item#appendHoverText(ItemStack, Item.TooltipContext, TooltipDisplay, Consumer, TooltipFlag)
      */
     public void into(Consumer<Component> tooltipAdder) {
         for (Component component : tooltipComponents) {

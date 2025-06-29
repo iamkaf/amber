@@ -21,12 +21,12 @@ public class PlayerEvents {
      * entity’s own interaction logic is executed.
      * </p>
      *
-     * <p>On the logical server, the return values have the following meaning:
-     * * <ul>
-     * *     <li>PASS falls back to further processing.</li>
-     * *     <li>Any other value cancels further processing.</li>
-     * * </ul>
-     * </p>
+     * <p>On the logical server, the return values have the following meaning:</p>
+     *  <ul>
+     *      <li>PASS falls back to further processing.</li>
+     *      <li>Any other value cancels further processing.</li>
+     *  </ul>
+     *
      * If every listener returns {@code PASS}, vanilla behaviour proceeds unchanged.
      */
     public static final Event<EntityInteract> ENTITY_INTERACT = EventFactory.createArrayBacked(

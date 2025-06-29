@@ -20,8 +20,7 @@ public class SoundHelper {
         sendClientSound(player, sound, source, volume, 1f);
     }
 
-    public static void sendClientSound(Player player, SoundEvent sound, SoundSource source, float volume,
-            float pitch) {
+    public static void sendClientSound(Player player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSoundPacket(
                     Holder.direct(sound),

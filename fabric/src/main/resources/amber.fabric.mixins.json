@@ -1,14 +1,15 @@
 {
   "required": true,
-  "package": "${mod_group}.mixin",
-  "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
+  "package": "com.iamkaf.amber.mixin",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
   "client": [
   ],
-  "mixins": [
-    "LivingEntityMixin"
-  ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }
 }
+  

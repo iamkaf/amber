@@ -1,12 +1,11 @@
 plugins {
-    id 'dev.architectury.loom' version '1.10-SNAPSHOT' apply false
-    id 'architectury-plugin' version '3.4-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    // see https://fabricmc.net/develop/ for new versions
+    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '2.0.62-beta' apply false
+
+    id "com.hypherionmc.modutils.modpublisher" version "2.1.6" apply false
 }
-
-println("Mod Resources: ${System.getenv("MOD_RESOURCES")}")
-
-apply from: "https://raw.githubusercontent.com/iamkaf/modresources/refs/heads/main/gradle/v0/main.gradle"
 
 /**
  * Extracts:
@@ -29,29 +28,4 @@ static String extractHeaderLatestFooterFromChangelog(String completeChangelog) {
     def footer = (completeChangelog =~ /(?ms)^## Types of changes[\s\S]*/)[0]
 
     return header + latest + footer
-}
-
-subprojects {
-    // Configure Maven publishing.
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                groupId = "${mod_group}"
-                artifactId = "${mod_id}-${project.name}"
-                from components.java
-            }
-        }
-
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-        repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
-            maven {
-                // change to point to your repo, e.g. http://my.org/repo
-                url = file(System.getenv("MOD_RESOURCES").concat(File.separator).concat("maven"))
-            }
-        }
-    }
 }

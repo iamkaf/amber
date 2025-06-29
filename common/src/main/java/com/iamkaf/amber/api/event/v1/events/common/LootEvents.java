@@ -8,9 +8,12 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import java.util.function.Consumer;
 
 public class LootEvents {
-    public static final Event<LootEvents.ModifyLootTable> MODIFY = EventFactory.createArrayBacked(
-            LootEvents.ModifyLootTable.class, callbacks -> (ResourceLocation lootTable, Consumer<LootPool.Builder> add) -> {
-                for (LootEvents.ModifyLootTable callback : callbacks) {
+    /**
+     * An event that is called to modify a loot table before it is loaded.
+     */
+    public static final Event<ModifyLootTable> MODIFY = EventFactory.createArrayBacked(
+            ModifyLootTable.class, callbacks -> (ResourceLocation lootTable, Consumer<LootPool.Builder> add) -> {
+                for (ModifyLootTable callback : callbacks) {
                     callback.modify(lootTable, add);
                 }
             }

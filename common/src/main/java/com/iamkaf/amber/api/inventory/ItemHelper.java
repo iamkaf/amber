@@ -40,9 +40,8 @@ public class ItemHelper {
      * @return A string containing the display name(s) of the ingredient's items.
      */
     public static String getIngredientDisplayName(Ingredient ingredient) {
-        ItemStack[] items = (ItemStack[]) ingredient.items()
-                .map(itemHolder -> itemHolder.value().getDefaultInstance())
-                .toArray();
+        ItemStack[] items =
+                (ItemStack[]) ingredient.items().map(itemHolder -> itemHolder.value().getDefaultInstance()).toArray();
 
         if (items.length == 1) {
             return items[0].getDisplayName().getString();
@@ -67,10 +66,9 @@ public class ItemHelper {
      * @see AttributeModifier
      * @see EquipmentSlotGroup
      */
-    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier
-            , EquipmentSlotGroup slotGroup) {
-        DataComponentType<ItemAttributeModifiers> attributeModifiersComponent =
-                net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS;
+    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier,
+            EquipmentSlotGroup slotGroup) {
+        DataComponentType<ItemAttributeModifiers> attributeModifiersComponent = DataComponents.ATTRIBUTE_MODIFIERS;
         var extraModifiers = stack.get(attributeModifiersComponent);
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
@@ -105,7 +103,7 @@ public class ItemHelper {
      * @return {@code} true if the modifier with the id is present.
      */
     public static boolean hasModifier(ItemStack stack, ResourceLocation id) {
-        var list = stack.get(net.minecraft.core.component.DataComponents.ATTRIBUTE_MODIFIERS);
+        var list = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         assert list != null;
         return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));
     }

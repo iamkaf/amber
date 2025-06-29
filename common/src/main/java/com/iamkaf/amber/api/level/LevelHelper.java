@@ -7,8 +7,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 public class LevelHelper {
 
@@ -63,8 +61,7 @@ public class LevelHelper {
      */
     public static void dropItem(Level level, ItemStack stack, Vec3 pos, Vec3 delta) {
         if (level == null) return;
-        var itemEntity =
-                new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack, delta.x(), delta.y(), delta.z());
+        var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack, delta.x(), delta.y(), delta.z());
         level.addFreshEntity(itemEntity);
     }
 
