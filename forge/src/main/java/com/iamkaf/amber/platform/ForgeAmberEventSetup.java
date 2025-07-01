@@ -1,10 +1,14 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
@@ -18,11 +22,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     public void registerCommon() {
         LootTableLoadEvent.BUS.addListener(EventHandlerCommon::onLootTableEvent);
         PlayerInteractEvent.EntityInteract.BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
+        RegisterCommandsEvent.BUS.addListener(EventHandlerCommon::onCommandRegistration);
     }
 
     @Override
     public void registerClient() {
-
+        RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
     }
 
     @Override
@@ -62,5 +67,21 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
             return false;
         }
+
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static void onCommandRegistration(RegisterCommandsEvent event) {
+            CommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        }
+    }
+
+    static public class EventHandlerClient {
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static void onCommandRegistration(RegisterClientCommandsEvent event) {
+            ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext());
+        }
+    }
+
+    static public class EventHandlerServer {
+
     }
 }

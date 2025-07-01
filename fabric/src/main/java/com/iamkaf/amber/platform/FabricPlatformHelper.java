@@ -1,10 +1,12 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.util.Env;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -52,5 +54,18 @@ public class FabricPlatformHelper implements IPlatformHelper {
                 .map(ModContainer::getMetadata)
                 .map(ModMetadata::getId)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public @Nullable ModInfo getModInfo(String modId) {
+        return FabricLoader.getInstance().getModContainer(modId).map(mod -> {
+            ModMetadata metadata = mod.getMetadata();
+            return new ModInfo(
+                    metadata.getId(),
+                    metadata.getName(),
+                    metadata.getVersion().getFriendlyString(),
+                    metadata.getDescription()
+            );
+        }).orElse(null);
     }
 }

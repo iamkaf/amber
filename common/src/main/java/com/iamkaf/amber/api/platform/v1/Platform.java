@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.platform.v1;
 
 import com.iamkaf.amber.platform.Services;
 import com.iamkaf.amber.util.Env;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -84,5 +85,15 @@ public class Platform {
      */
     public static boolean isDevelopmentEnvironment() {
         return Services.PLATFORM.isDevelopmentEnvironment();
+    }
+
+    /**
+     * Gets information about a mod.
+     * This includes the mod ID, name, version, and description.
+     *
+     * @return a ModInfo object containing the mod's details
+     */
+    public static @Nullable ModInfo getModInfo(String modId) {
+        return Services.PLATFORM.getModInfo(modId);
     }
 }

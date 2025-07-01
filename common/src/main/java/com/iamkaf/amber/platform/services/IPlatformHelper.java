@@ -1,6 +1,8 @@
 package com.iamkaf.amber.platform.services;
 
+import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.util.Env;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -47,13 +49,22 @@ public interface IPlatformHelper {
 
     /**
      * Gets the current environment type.
+     *
      * @return The current environment type.
      */
     Env getEnvironment();
 
     /**
      * Gets the IDs of all loaded mods.
+     *
      * @return A collection of mod IDs.
      */
     Collection<String> getModIds();
+
+    /**
+     * Gets the mod information for a mod.
+     *
+     * @return The mod information.
+     */
+    @Nullable ModInfo getModInfo(String modId);
 }

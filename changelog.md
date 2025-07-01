@@ -15,6 +15,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added a DeferredRegister system to allow for registering items, blocks, and entities in a more structured way.
 - Added a new AmberInitializer class to init mods.
 - Added a new JSON config system.
+- Added events to register commands.
 
 ### Changed
 

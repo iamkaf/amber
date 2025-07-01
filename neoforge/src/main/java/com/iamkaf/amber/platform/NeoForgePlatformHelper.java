@@ -1,11 +1,13 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.util.Env;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforgespi.language.IModInfo;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -53,5 +55,15 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public Collection<String> getModIds() {
         return ModList.get().getMods().stream().map(IModInfo::getModId).collect(Collectors.toList());
+    }
+
+    @Override
+    public @Nullable ModInfo getModInfo(String modId) {
+        return ModList.get().getModContainerById(modId).map(container -> new ModInfo(
+                container.getModId(),
+                container.getModInfo().getDisplayName(),
+                container.getModInfo().getVersion().toString(),
+                container.getModInfo().getDescription()
+        )).orElse(null);
     }
 }
