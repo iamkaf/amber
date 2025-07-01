@@ -17,13 +17,12 @@ Just install it and the mods that require it will be good to go!
 
 **Q: Where can I ask something that is not listed here?**
 
-A: Make an issue [here](https://github.com/iamkaf/mod-issues) or join the [Discord](https://discord.gg/HV5WgTksaB) and shoot me a message.
-
+A: Make an issue [here](https://github.com/iamkaf/mod-issues) or join the [Discord](https://discord.gg/HV5WgTksaB) and
+shoot me a message.
 
 **Q: Can you port it to [MC version/Mod loader]?**
 
 A: If enough people request it I'll give it some time, but this really is a 1-man team so it might take a while.
-
 
 **Q: Can I include it in my modpack?**
 
@@ -35,8 +34,18 @@ A: Yes, no need to give credit or ask.
 
 Let me know if you find any issues.
 
+## Maintained Versions
+
+While Amber is available for multiple versions, only these versions are considered "green" and will receive new
+features:
+
+- Latest Version of Minecraft
+- Minecraft 1.21.1
+- Minecraft 1.20.1
+
 ## Credits & Acknowledgements
 
 - Architectury for the inspiration.
-- The event system is derived from Fabric API under the [Apache 2.0 License](https://github.com/FabricMC/fabric/blob/1.21.4/LICENSE).
+- The event system is derived from Fabric API under
+  the [Apache 2.0 License](https://github.com/FabricMC/fabric/blob/1.21.4/LICENSE).
 - And most importantly, **Aris**, for always being there for me.
