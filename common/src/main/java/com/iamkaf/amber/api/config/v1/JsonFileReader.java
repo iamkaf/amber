@@ -20,7 +20,10 @@ import java.util.function.Function;
  * It can also create a backup of the JSON file in the specified directory.
  *
  * @param <T> The type of values stored in the JSON file.
+ *
+ * @deprecated Use {@link com.iamkaf.amber.api.config.v1.JsonConfigManager} instead.
  */
+@Deprecated(since = "6.0.1")
 public class JsonFileReader<T> {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final Type type;

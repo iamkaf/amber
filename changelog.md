@@ -11,9 +11,10 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
+- Added support for Forge.
 - Added a DeferredRegister system to allow for registering items, blocks, and entities in a more structured way.
 - Added a new AmberInitializer class to init mods.
-- Added support for Forge.
+- Added a new JSON config system.
 
 ### Changed
 
@@ -23,6 +24,7 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - AmberMod is now deprecated in favor of AmberInitializer.
 - All unversioned API helper classes have been deprecated in preparation for versioned packages.
+- JsonFileReader is now deprecated in favor of a new JSON system.
 
 ### Removed
 
