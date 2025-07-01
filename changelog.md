@@ -33,6 +33,7 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Fixed
 
 - Fixed a bug where the mod would not load properly on some platforms.
+- FORGE: Fixed a bug preventing interactions with entities.
 
 ## 5.0.0
 

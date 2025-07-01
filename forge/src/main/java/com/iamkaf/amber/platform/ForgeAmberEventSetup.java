@@ -43,6 +43,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
             LogicalSide side = event.getSide();
 
+            if (result.equals(InteractionResult.PASS)) {
+                return false;
+            }
+
             // These checks make sure the event handling is equivalent to Fabric's.
             if (side.isClient()) {
                 if (result == SUCCESS) {
