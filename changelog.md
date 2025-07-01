@@ -16,6 +16,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added a new AmberInitializer class to init mods.
 - Added a new JSON config system.
 - Added events to register commands.
+- Added SimpleCommands helper to register commands easily.
 
 ### Changed
 
