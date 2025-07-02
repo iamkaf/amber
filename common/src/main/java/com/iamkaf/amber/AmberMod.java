@@ -3,6 +3,7 @@ package com.iamkaf.amber;
 import com.iamkaf.amber.api.commands.v1.SimpleCommands;
 import com.iamkaf.amber.api.core.v2.AmberModInfo;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
+import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.api.registry.v1.DeferredRegister;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
 import com.iamkaf.amber.platform.Services;
@@ -10,6 +11,7 @@ import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -30,6 +32,7 @@ public class AmberMod {
      */
     public static void init() {
         Constants.LOG.info("Initializing Everlasting Amber Dreams on {}...", Services.PLATFORM.getPlatformName());
+
         Services.AMBER_EVENT_SETUP.registerCommon();
         EnvExecutor.runInEnv(Env.CLIENT, () -> Services.AMBER_EVENT_SETUP::registerClient);
         EnvExecutor.runInEnv(Env.SERVER, () -> Services.AMBER_EVENT_SETUP::registerServer);
@@ -40,5 +43,23 @@ public class AmberMod {
             Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
             dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID));
         });
+    }
+
+    /**
+     * Gets the event bus for a specific Amber mod on Forge and NeoForge.
+     *
+     * @param modId the ID of the mod to get the event bus for
+     * @return the event bus for the mod, or null if not found or on Fabric.
+     */
+    public static @Nullable Object getEventBus(String modId) {
+        if (Platform.getPlatformName().equals("Fabric")) {
+            return null;
+        }
+
+        return AMBER_MODS.stream()
+                .filter(mod -> mod.id().equals(modId))
+                .findFirst()
+                .map(AmberModInfo::eventBus)
+                .orElse(null);
     }
 }

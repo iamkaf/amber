@@ -1,15 +1,20 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.AmberMod;
+import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
+import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -28,6 +33,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerClient() {
         RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
+        RegisterKeyMappingsEvent.getBus((BusGroup) AmberMod.getEventBus(Constants.MOD_ID))
+                .addListener(EventHandlerClient::onKeybindRegistration);
     }
 
     @Override
@@ -70,7 +77,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         @SubscribeEvent(priority = Priority.HIGH)
         public static void onCommandRegistration(RegisterCommandsEvent event) {
-            CommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+            CommandEvents.EVENT.invoker()
+                    .register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
         }
     }
 
@@ -78,6 +86,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = Priority.HIGH)
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext());
+        }
+
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static void onKeybindRegistration(RegisterKeyMappingsEvent event) {
+            Constants.LOG.info("Registering Amber keybindings for Forge...");
+            for (var keyMapping : KeybindHelper.getKeybindings()) {
+                event.register(keyMapping);
+            }
+            KeybindHelper.forgeEventAlreadyFired = true;
         }
     }
 

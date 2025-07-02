@@ -17,6 +17,16 @@ import java.util.Collection;
 public class Platform {
 
     /**
+     * Gets the name of the current platform.
+     * This is usually "Forge", "Fabric", or "NeoForge".
+     *
+     * @return the name of the current platform
+     */
+    public static String getPlatformName() {
+        return Services.PLATFORM.getPlatformName();
+    }
+
+    /**
      * Gets the main Minecraft game folder path.
      * This is usually the ".minecraft" folder on your computer.
      *

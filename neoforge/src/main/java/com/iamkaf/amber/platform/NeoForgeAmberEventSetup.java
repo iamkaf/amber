@@ -1,15 +1,20 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.AmberMod;
+import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
+import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -21,20 +26,26 @@ import static net.minecraft.world.InteractionResult.SUCCESS;
 public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerCommon() {
-        NeoForge.EVENT_BUS.register(EventHandlerCommon.class);
+        NeoForge.EVENT_BUS.register(EventHandlerCommonNeoForge.class);
+//        IEventBus bus = (IEventBus) AmberMod.getEventBus(Constants.MOD_ID);
+//        assert bus != null;
+//        bus.register(EventHandlerCommonNeoForge.EventHandlerCommonMod.class);
     }
 
     @Override
     public void registerClient() {
-        NeoForge.EVENT_BUS.register(EventHandlerClient.class);
+        NeoForge.EVENT_BUS.register(EventHandlerClientNeoForge.class);
+        IEventBus bus = (IEventBus) AmberMod.getEventBus(Constants.MOD_ID);
+        assert bus != null;
+        bus.register(EventHandlerClientMod.class);
     }
 
     @Override
     public void registerServer() {
-        NeoForge.EVENT_BUS.register(EventHandlerServer.class);
+//        NeoForge.EVENT_BUS.register(EventHandlerServer.class);
     }
 
-    static public class EventHandlerCommon {
+    static public class EventHandlerCommonNeoForge {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void event(LootTableLoadEvent event) {
             LootEvents.MODIFY.invoker().modify(event.getName(), lootPool -> event.getTable().addPool(lootPool.build()));
@@ -68,14 +79,30 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onCommandRegistration(RegisterCommandsEvent event) {
-            CommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+            CommandEvents.EVENT.invoker()
+                    .register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        }
+
+        static public class EventHandlerCommonMod {
+            // TODO: Implement mod-specific event handling if needed
         }
     }
 
-    static public class EventHandlerClient {
+    static public class EventHandlerClientNeoForge {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext());
+        }
+    }
+
+    static public class EventHandlerClientMod {
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onKeyMappingRegistration(RegisterKeyMappingsEvent event) {
+            Constants.LOG.info("Registering Amber keybindings for NeoForge...");
+            for (var keyMapping : KeybindHelper.getKeybindings()) {
+                event.register(keyMapping);
+            }
+            KeybindHelper.forgeEventAlreadyFired = true;
         }
     }
 

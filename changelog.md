@@ -17,6 +17,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added a new JSON config system.
 - Added events to register commands.
 - Added SimpleCommands helper to register commands easily.
+- Added a KeybindHelper to register keybinds.
 
 ### Changed
 

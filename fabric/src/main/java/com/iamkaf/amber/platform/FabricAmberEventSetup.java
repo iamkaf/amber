@@ -33,6 +33,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
+
     }
 
     @Override
