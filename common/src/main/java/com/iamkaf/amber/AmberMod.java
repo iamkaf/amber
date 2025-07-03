@@ -1,10 +1,8 @@
 package com.iamkaf.amber;
 
 import com.iamkaf.amber.api.commands.v1.SimpleCommands;
-import com.iamkaf.amber.api.common.client.CommonClientUtils;
 import com.iamkaf.amber.api.core.v2.AmberModInfo;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
-import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.api.registry.v1.DeferredRegister;
@@ -13,7 +11,6 @@ import com.iamkaf.amber.platform.Services;
 import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
 import com.mojang.brigadier.Command;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -22,7 +19,6 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Common entry point for the Amber mod.
