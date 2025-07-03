@@ -9,7 +9,6 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
