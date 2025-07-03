@@ -117,7 +117,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     static public class EventHandlerClientMod {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onKeyMappingRegistration(RegisterKeyMappingsEvent event) {
-            Constants.LOG.info("Registering Amber keybindings for NeoForge...");
             for (var keyMapping : KeybindHelper.getKeybindings()) {
                 event.register(keyMapping);
             }

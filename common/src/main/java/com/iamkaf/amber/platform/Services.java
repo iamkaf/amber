@@ -1,4 +1,5 @@
 package com.iamkaf.amber.platform;
+import com.iamkaf.amber.platform.services.IKeybindRegister;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
@@ -37,4 +38,5 @@ public class Services {
         Constants.LOG.debug("Loaded {} for service {}", loadedService, clazz);
         return loadedService;
     }
+    public static IKeybindRegister KEYBIND_REGISTER = load(IKeybindRegister.class);
 }

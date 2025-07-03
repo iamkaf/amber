@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.keymapping;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.platform.v1.Platform;
+import com.iamkaf.amber.platform.Services;
 import com.iamkaf.amber.util.Env;
 import net.minecraft.client.KeyMapping;
 
@@ -35,6 +36,11 @@ public class KeybindHelper {
         }
 
         KEYBINDINGS.add(keybind);
+
+        if (Platform.getPlatformName().equals("Fabric")) {
+            Services.KEYBIND_REGISTER.register(keybind);
+        }
+
         return keybind;
     }
 

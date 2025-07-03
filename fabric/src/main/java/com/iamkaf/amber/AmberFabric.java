@@ -20,22 +20,5 @@ public class AmberFabric implements ModInitializer {
         assert info != null;
         AmberInitializer.initialize(info.id(), info.name(), info.version(), AmberModInfo.AmberModSide.COMMON, null);
         AmberMod.init();
-
-        registerKeybinds();
-    }
-
-    private static void registerKeybinds() {
-        EnvExecutor.runInEnv(
-                Env.CLIENT, () -> () -> {
-                    Constants.LOG.info("Registering Amber keybindings for Fabric...");
-                    KeybindHelper.getKeybindings().forEach(key -> {
-                        try {
-                            KeyBindingHelper.registerKeyBinding(key);
-                        } catch (IllegalArgumentException e) {
-                            Constants.LOG.error("Failed to register keybind: {}", key.getName(), e);
-                        }
-                    });
-                }
-        );
     }
 }

@@ -96,7 +96,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         @SubscribeEvent(priority = Priority.HIGH)
         public static void onKeybindRegistration(RegisterKeyMappingsEvent event) {
-            Constants.LOG.info("Registering Amber keybindings for Forge...");
             for (var keyMapping : KeybindHelper.getKeybindings()) {
                 event.register(keyMapping);
             }
