@@ -18,6 +18,8 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added events to register commands.
 - Added SimpleCommands helper to register commands easily.
 - Added a KeybindHelper to register keybinds.
+- Added events to render to the HUD.
+- Added the `/amber doctor` command to diagnose issues with the mod.
 
 ### Changed
 

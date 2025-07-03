@@ -1,13 +1,14 @@
 package com.iamkaf.amber.platform;
 
-import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
@@ -33,7 +34,9 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
-
+        HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
+            HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta);
+        });
     }
 
     @Override
