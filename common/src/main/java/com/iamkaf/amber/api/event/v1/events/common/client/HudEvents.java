@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.ApiStatus;
 
 public class HudEvents {
-    /* * This event is called after rendering the whole hud, which is displayed in game, in a world.
+    /** This event is called after rendering the whole hud, which is displayed in game, in a world.
      * It allows you to render custom elements on the HUD.
      * <p>
      * Note: This event is not called during the loading screen.
