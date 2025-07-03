@@ -6,6 +6,7 @@ import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.client.Minecraft;
@@ -14,6 +15,7 @@ import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.Priority;
@@ -37,6 +39,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         // mod bus events
         RegisterKeyMappingsEvent.getBus((BusGroup) AmberMod.getEventBus(Constants.MOD_ID))
                 .addListener(EventHandlerClient::onKeybindRegistration);
+        TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
+        TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
     }
 
     @Override
@@ -97,6 +101,14 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 event.register(keyMapping);
             }
             KeybindHelper.forgeEventAlreadyFired = true;
+        }
+
+        public static void onClientTickEventPre(TickEvent.ClientTickEvent.Pre pre) {
+            ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
+        }
+
+        public static void onClientTickEventPost(TickEvent.ClientTickEvent.Post post) {
+            ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
     }
 

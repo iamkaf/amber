@@ -6,6 +6,7 @@ import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
@@ -14,6 +15,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
@@ -99,6 +101,16 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void eventRenderGameOverlayEvent(RenderGuiEvent.Post event) {
             HudEvents.RENDER_HUD.invoker().onHudRender(event.getGuiGraphics(), event.getPartialTick());
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onClientTickEventPre(ClientTickEvent.Pre event) {
+            ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onClientTickEventPost(ClientTickEvent.Post event) {
+            ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
     }
 

@@ -8,6 +8,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -36,6 +37,12 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
         HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta);
+        });
+        ClientTickEvents.START_CLIENT_TICK.register(minecraft -> {
+            com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
+        });
+        ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
+            com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         });
     }
 
