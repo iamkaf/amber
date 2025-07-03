@@ -67,7 +67,7 @@ public class AmberMod {
                                     MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
                                             .append(" - Version: " + modInfo.version() + "\n")
                                             .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                                            .append(" - Minecraft: 1.21.6" + "\n\n")
+                                            .append(" - Minecraft: 1.21.7" + "\n\n")
                                             .append("Mixins: \n");
                                     for (String mixin : AMBER_MIXINS) {
                                         message.append(Component.literal(mixin + "\n")
@@ -87,20 +87,6 @@ public class AmberMod {
                         );
                         return Command.SINGLE_SUCCESS;
                     })));
-        });
-
-        HudEvents.RENDER_HUD.register((guiGraphics, tickCounter) -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.options.hideGui) {
-                return;
-            }
-
-            var writer = new CommonClientUtils.TextWriter(guiGraphics, mc.font);
-            writer.writeLine(Component.literal(String.format(
-                    "Amber v%s",
-                    Objects.requireNonNull(Platform.getModInfo(Constants.MOD_ID)).version()
-            )));
-            writer.writeLine(Component.literal("Everlasting Amber Dreams"));
         });
     }
 

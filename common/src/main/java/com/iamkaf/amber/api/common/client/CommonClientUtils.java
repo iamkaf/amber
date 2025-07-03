@@ -91,7 +91,7 @@ public class CommonClientUtils {
      * Helper class for writing text to the screen with a cursor position.
      * Maintains an internal cursor and supports writing at specific positions or sequential lines.
      *
-     * <h3>Usage Examples</h3>
+     * <h2>Usage Examples</h2>
      * <pre><code>
      * // Example 1: Start at (20, 40) and write two lines
      * CommonClientUtils.TextWriter writer = new CommonClientUtils.TextWriter(graphics, font, 20, 40);
