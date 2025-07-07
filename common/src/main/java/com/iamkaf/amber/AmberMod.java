@@ -1,20 +1,16 @@
 package com.iamkaf.amber;
 
-import com.iamkaf.amber.api.commands.v1.SimpleCommands;
+import com.iamkaf.amber.api.core.v2.AmberInitializer;
 import com.iamkaf.amber.api.core.v2.AmberModInfo;
-import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
-import com.iamkaf.amber.api.platform.v1.ModInfo;
+import com.iamkaf.amber.command.AmberCommands;
+import com.iamkaf.amber.networking.v1.AmberNetworking;
 import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.api.registry.v1.DeferredRegister;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
 import com.iamkaf.amber.platform.Services;
 import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
-import com.mojang.brigadier.Command;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,47 +40,13 @@ public class AmberMod {
         EnvExecutor.runInEnv(Env.SERVER, () -> Services.AMBER_EVENT_SETUP::registerServer);
 
         ITEMS.register();
-
-        // TODO: Move this somewhere neat
-        CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
-            Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
-            dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID)
-                    .then(Commands.literal("doctor").executes(commandContext -> {
-                        ModInfo modInfo = Platform.getModInfo(Constants.MOD_ID);
-
-                        // wat??
-                        if (modInfo == null) {
-                            commandContext.getSource().sendFailure(Component.literal("Mod info not found!"));
-                            return Command.SINGLE_SUCCESS;
-                        }
-
-                        commandContext.getSource().sendSuccess(
-                                () -> {
-                                    MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
-                                            .append(" - Version: " + modInfo.version() + "\n")
-                                            .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                                            .append(" - Minecraft: 1.21.7" + "\n\n")
-                                            .append("Mixins: \n");
-                                    for (String mixin : AMBER_MIXINS) {
-                                        message.append(Component.literal(mixin + "\n")
-                                                .withStyle(style -> style.withColor(0xFFAA00)));
-                                    }
-                                    message.append("\n").append("Amber Mods: \n");
-                                    for (AmberModInfo amberMod : AMBER_MODS) {
-                                        message.append(Component.literal(String.format(
-                                                        "%s - %s\n",
-                                                        amberMod.name(),
-                                                        amberMod.version()
-                                                ))
-                                                .withStyle(style -> style.withColor(0x00AAFF)));
-                                    }
-                                    return message;
-                                }, true
-                        );
-                        return Command.SINGLE_SUCCESS;
-                    })));
-        });
+        
+        // Initialize Amber's internal networking system
+        AmberNetworking.initialize();
+        // Register commands
+        AmberCommands.initialize();
     }
+
 
     /**
      * Gets the event bus for a specific Amber mod on Forge and NeoForge.
@@ -97,10 +59,6 @@ public class AmberMod {
             return null;
         }
 
-        return AMBER_MODS.stream()
-                .filter(mod -> mod.id().equals(modId))
-                .findFirst()
-                .map(AmberModInfo::eventBus)
-                .orElse(null);
+        return AmberInitializer.getEventBus(modId);
     }
 }

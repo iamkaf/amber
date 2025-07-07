@@ -3,6 +3,7 @@ import com.iamkaf.amber.platform.services.IKeybindRegister;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import com.iamkaf.amber.platform.services.INetworkingService;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.platform.services.IRegistrarManager;
 
@@ -25,6 +26,10 @@ public class Services {
 
     // Platform specific registrar manager implementation
     public static final IRegistrarManager REGISTRAR_MANAGER = load(IRegistrarManager.class);
+
+    
+    // Platform specific networking service implementation
+    public static final INetworkingService NETWORKING = load(INetworkingService.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.

@@ -11,15 +11,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class AmberForge {
 
     public AmberForge(FMLJavaModLoadingContext ctx) {
-        ModInfo info = Platform.getModInfo(Constants.MOD_ID);
-        assert info != null;
-        AmberInitializer.initialize(
-                info.id(),
-                info.name(),
-                info.version(),
-                AmberModInfo.AmberModSide.COMMON,
-                ctx.getModBusGroup()
-        );
+        AmberInitializer.initialize(Constants.MOD_ID);
+        // Store the event bus internally for Amber's use
+        AmberInitializer.setEventBus(Constants.MOD_ID, ctx.getModBusGroup());
         AmberMod.init();
     }
 }

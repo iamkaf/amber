@@ -16,9 +16,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 public class AmberFabric implements ModInitializer {
     @Override
     public void onInitialize() {
-        ModInfo info = Platform.getModInfo(Constants.MOD_ID);
-        assert info != null;
-        AmberInitializer.initialize(info.id(), info.name(), info.version(), AmberModInfo.AmberModSide.COMMON, null);
+        AmberInitializer.initialize(Constants.MOD_ID);
         AmberMod.init();
     }
 }

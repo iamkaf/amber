@@ -21,6 +21,11 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added events to render to the HUD.
 - Added the `/amber doctor` command to diagnose issues with the mod.
 - Added client tick events.
+- Added unified networking API (`com.iamkaf.amber.api.networking.v1`) supporting Fabric, Forge, and NeoForge.
+- Added internal networking system for connectivity testing and latency measurement.
+- Added `/amber ping` command for manual network connectivity testing.
+- Added `/amber reset-stats` command to reset networking statistics.
+- Added networking diagnostics to `/amber doctor` command (initialization status, ping count, average latency).
 
 ### Changed
 
