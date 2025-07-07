@@ -163,16 +163,14 @@ import com.iamkaf.amber.api.platform.v1.Platform;
 
 public class PlatformExample {
     public static void printPlatformInfo() {
-        Platform platform = Platform.getInstance();
-        
-        System.out.println("Platform: " + platform.getPlatformName());
-        System.out.println("Is Client: " + platform.isClient());
-        System.out.println("Is Server: " + platform.isDedicatedServer());
-        System.out.println("Is Development: " + platform.isDevelopmentEnvironment());
+        System.out.println("Platform: " + Platform.getPlatformName());
+        System.out.println("Is Client: " + Platform.isClient());
+        System.out.println("Is Server: " + Platform.isServer());
+        System.out.println("Is Development: " + Platform.isDevelopmentEnvironment());
         
         // Get platform-specific paths
-        System.out.println("Game Directory: " + platform.getGameFolder());
-        System.out.println("Config Directory: " + platform.getConfigFolder());
+        System.out.println("Game Directory: " + Platform.getGameFolder());
+        System.out.println("Config Directory: " + Platform.getConfigFolder());
     }
 }
 ```
@@ -195,9 +193,10 @@ public class MyModConfig {
     
     public static void init() {
         configManager = new JsonConfigManager<>(
-            "mymod",           // Config name
-            MyModConfig.class, // Config class
-            MyModConfig::new   // Default config supplier
+            "mymod",           // Mod ID
+            new MyModConfig(), // Initial config instance
+            null,              // Config path (null = default)
+            null               // Header comment (optional)
         );
         
         instance = configManager.getConfig();
@@ -227,7 +226,7 @@ import net.minecraft.world.item.Item;
 public class MyItems {
     // Create a deferred register for items
     public static final DeferredRegister<Item> ITEMS = 
-        DeferredRegister.create(Registries.ITEM, MyMod.MOD_ID);
+        DeferredRegister.create(MyMod.MOD_ID, Registries.ITEM);
     
     // Register your items
     public static final RegistrySupplier<Item> MY_ITEM = ITEMS.register("my_item", 
@@ -341,7 +340,7 @@ public class MyModConfig {
     private static JsonConfigManager<MyModConfig> manager;
     
     public static void init() {
-        manager = new JsonConfigManager<>("mymod", MyModConfig.class, MyModConfig::new);
+        manager = new JsonConfigManager<>("mymod", new MyModConfig(), null, null);
         instance = manager.getConfig();
     }
     
@@ -351,7 +350,7 @@ public class MyModConfig {
 // MyItems.java - Item registration
 public class MyItems {
     public static final DeferredRegister<Item> ITEMS = 
-        DeferredRegister.create(Registries.ITEM, MyMod.MOD_ID);
+        DeferredRegister.create(MyMod.MOD_ID, Registries.ITEM);
     
     public static final RegistrySupplier<Item> MAGIC_WAND = ITEMS.register("magic_wand",
         () -> new Item(new Item.Properties().stacksTo(1)));

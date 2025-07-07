@@ -56,9 +56,10 @@ public class MyMod {
     public static void init() {
         // Create the config manager
         configManager = new JsonConfigManager<>(
-            "mymod",                    // Config file name (creates mymod.json)
-            MyModConfig.class,          // Configuration class
-            MyModConfig::new            // Default config supplier
+            "mymod",                    // Mod ID
+            new MyModConfig(),          // Initial config instance
+            null,                       // Config path (null = default)
+            null                        // Header comment (optional)
         );
         
         // Load the configuration
@@ -74,7 +75,7 @@ public class MyMod {
     
     // Method to save configuration changes
     public static void saveConfig() {
-        configManager.save();
+        configManager.saveConfig();
     }
 }
 ```
@@ -234,13 +235,14 @@ public class ValidatedConfigManager {
     public static void init() {
         JsonConfigManager<ValidatedConfig> manager = new JsonConfigManager<>(
             "validated_config",
-            ValidatedConfig.class,
-            ValidatedConfig::new
+            new ValidatedConfig(),
+            null,
+            null
         );
         
         ValidatedConfig config = manager.getConfig();
         config.validate(); // Validate after loading
-        manager.save(); // Save cleaned config
+        manager.saveConfig(); // Save cleaned config
     }
 }
 ```
@@ -325,9 +327,10 @@ public class EnvironmentConfigManager {
     
     public static void init() {
         JsonConfigManager<EnvironmentConfig> manager = new JsonConfigManager<>(
-            Platform.getInstance().isClient() ? "mymod_client" : "mymod_server",
-            EnvironmentConfig.class,
-            EnvironmentConfig::new
+            Platform.isClient() ? "mymod_client" : "mymod_server",
+            new EnvironmentConfig(),
+            null,
+            null
         );
         
         config = manager.getConfig();
@@ -355,7 +358,7 @@ public class DynamicConfigManager {
     private static MyModConfig config;
     
     public static void init() {
-        manager = new JsonConfigManager<>("mymod", MyModConfig.class, MyModConfig::new);
+        manager = new JsonConfigManager<>("mymod", new MyModConfig(), null, null);
         config = manager.getConfig();
     }
     
@@ -380,7 +383,7 @@ public class DynamicConfigManager {
         }
         
         // Save changes immediately
-        manager.save();
+        manager.saveConfig();
         
         // Notify other systems of the change
         notifyConfigChange(key, value);
@@ -572,9 +575,9 @@ public class PerformantConfig {
 
 2. **Values not persisting**
    ```java
-   // Make sure to call save() after changes
+   // Make sure to call saveConfig() after changes
    config.maxEnergy = 2000;
-   configManager.save(); // Don't forget this!
+   configManager.saveConfig(); // Don't forget this!
    ```
 
 3. **Parsing errors**
@@ -596,7 +599,7 @@ public class RobustConfigManager {
     public static MyModConfig loadConfig() {
         try {
             JsonConfigManager<MyModConfig> manager = new JsonConfigManager<>(
-                "mymod", MyModConfig.class, MyModConfig::new);
+                "mymod", new MyModConfig(), null, null);
             return manager.getConfig();
         } catch (Exception e) {
             System.err.println("Failed to load config, using defaults: " + e.getMessage());
@@ -611,8 +614,8 @@ public class RobustConfigManager {
     
     private static void backupCorruptedConfig() {
         // Move corrupted config to backup file
-        Path configFile = Platform.getInstance().getConfigFolder().resolve("mymod.json");
-        Path backupFile = Platform.getInstance().getConfigFolder().resolve("mymod.json.backup");
+        Path configFile = Platform.getConfigFolder().resolve("mymod.json");
+        Path backupFile = Platform.getConfigFolder().resolve("mymod.json.backup");
         
         try {
             Files.move(configFile, backupFile, StandardCopyOption.REPLACE_EXISTING);

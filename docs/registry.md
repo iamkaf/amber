@@ -28,16 +28,16 @@ public class MyRegistries {
     
     // Deferred registers for different object types
     public static final DeferredRegister<Item> ITEMS = 
-        DeferredRegister.create(Registries.ITEM, MOD_ID);
+        DeferredRegister.create(MOD_ID, Registries.ITEM);
     
     public static final DeferredRegister<Block> BLOCKS = 
-        DeferredRegister.create(Registries.BLOCK, MOD_ID);
+        DeferredRegister.create(MOD_ID, Registries.BLOCK);
     
     public static final DeferredRegister<EntityType<?>> ENTITIES = 
-        DeferredRegister.create(Registries.ENTITY_TYPE, MOD_ID);
+        DeferredRegister.create(MOD_ID, Registries.ENTITY_TYPE);
     
     public static final DeferredRegister<SoundEvent> SOUNDS = 
-        DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID);
+        DeferredRegister.create(MOD_ID, Registries.SOUND_EVENT);
     
     // Initialize all registers
     public static void init() {
@@ -402,7 +402,7 @@ Add your items to creative tabs:
 ```java
 public class MyCreativeTabs {
     public static final RegistrySupplier<CreativeModeTab> MY_TAB = 
-        DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID)
+        DeferredRegister.create(MOD_ID, Registries.CREATIVE_MODE_TAB)
             .register("my_tab", () -> CreativeModeTab.builder()
                 .icon(() -> new ItemStack(MyItems.RUBY.get()))
                 .title(Component.translatable("itemGroup.mymod.my_tab"))
@@ -471,7 +471,7 @@ public static final RegistryObject<Item> MY_ITEM = ITEMS.register("my_item",
 
 // New Amber way (very similar!)
 public static final DeferredRegister<Item> ITEMS = 
-    DeferredRegister.create(Registries.ITEM, MOD_ID);
+    DeferredRegister.create(MOD_ID, Registries.ITEM);
 public static final RegistrySupplier<Item> MY_ITEM = ITEMS.register("my_item",
     () -> new Item(new Item.Properties()));
 ```
