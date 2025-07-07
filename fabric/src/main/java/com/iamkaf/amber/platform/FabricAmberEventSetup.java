@@ -1,6 +1,7 @@
 package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -11,9 +12,11 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.InteractionResult;
 
 public class FabricAmberEventSetup implements IAmberEventSetup {
     @Override
@@ -26,6 +29,15 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
             CommandEvents.EVENT.invoker().register(commandDispatcher, commandBuildContext, commandSelection);
+        });
+        
+        // Entity lifecycle events
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+            EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(entity, source);
+        });
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(entity, source, amount);
+            return result == InteractionResult.PASS; // Only allow damage if PASS is returned
         });
     }
 

@@ -3,6 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -22,6 +23,9 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 import static net.minecraft.world.InteractionResult.CONSUME;
@@ -85,6 +89,24 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
                     .register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+            EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(event.getEntity(), event.getLevel());
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onLivingDeath(LivingDeathEvent event) {
+            EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(event.getEntity(), event.getSource());
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
+            InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(event.getEntity(), event.getSource(), event.getAmount());
+            if (result != InteractionResult.PASS) {
+                event.setCanceled(true); // Cancel damage if not PASS
+            }
         }
 
         static public class EventHandlerCommonMod {

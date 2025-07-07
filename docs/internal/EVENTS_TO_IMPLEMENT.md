@@ -10,6 +10,9 @@ These events are already available in Amber:
 - ✅ **ClientTickEvents** - Client tick start/end
 - ✅ **HudEvents.RENDER_HUD** - HUD rendering
 - ✅ **LootEvents.MODIFY** - Loot table modification
+- ✅ **EntityEvent.ENTITY_SPAWN** - When entities spawn in the world
+- ✅ **EntityEvent.ENTITY_DEATH** - When living entities die
+- ✅ **EntityEvent.ENTITY_DAMAGE** - When entities take damage
 
 ---
 
@@ -18,15 +21,15 @@ These events are already available in Amber:
 ### 🔥 **Phase 1: Essential Player & Entity Events** (High Priority)
 
 #### 💀 **Entity Lifecycle Events**
-- [ ] **EntitySpawnEvent** - When entities spawn in the world
-  - *Fabric:* Not directly available
+- [x] **EntitySpawnEvent** - When entities spawn in the world ✅ **IMPLEMENTED**
+  - *Fabric:* Not directly available (skipped for now)
   - *Forge:* `EntityJoinLevelEvent`
   - *NeoForge:* `EntityJoinLevelEvent`, `FinalizeSpawnEvent`
-- [ ] **EntityDeathEvent** - When living entities die
+- [x] **EntityDeathEvent** - When living entities die ✅ **IMPLEMENTED**
   - *Fabric:* `ServerLivingEntityEvents.AFTER_DEATH`
   - *Forge:* `LivingDeathEvent`
-  - *NeoForge:* Not directly listed but fundamental
-- [ ] **EntityDamageEvent** - When entities take damage
+  - *NeoForge:* `LivingDeathEvent`
+- [x] **EntityDamageEvent** - When entities take damage ✅ **IMPLEMENTED**
   - *Fabric:* `ServerLivingEntityEvents.ALLOW_DAMAGE`, `AFTER_DAMAGE`
   - *Forge:* `LivingDamageEvent`, `LivingAttackEvent`
   - *NeoForge:* `LivingIncomingDamageEvent`
@@ -204,6 +207,98 @@ These events are already available in Amber:
 4. **Cancellable Events** - Support event cancellation where appropriate
 5. **Performance** - Minimal overhead when events aren't being used
 
+## ⚠️ **CRITICAL: Cross-Platform Behavior Consistency**
+
+**🚨 MANDATORY REQUIREMENT: Event behavior MUST be identical across all 3 loaders (Fabric, Forge, NeoForge).**
+
+**Inconsistencies in event behavior between loaders will be the death of Amber.** Mod developers must be able to trust that their code will work identically regardless of which loader they're running on.
+
+### **Examples of Required Consistency:**
+
+#### **Event Cancellation & Return Values**
+Events must handle cancellation and return values identically:
+```java
+// ✅ GOOD: Forge implementation that matches Fabric behavior
+if (result.equals(InteractionResult.PASS)) {
+    return false; // Don't cancel, let other handlers run
+}
+
+// Complex platform-specific logic ensures Forge behaves like Fabric
+if (side.isClient()) {
+    if (result == SUCCESS) {
+        event.setCancellationResult(SUCCESS);
+        return true; // Cancel with SUCCESS
+    } else if (result == CONSUME) {
+        event.setCancellationResult(CONSUME);
+        return true; // Cancel with CONSUME
+    } else {
+        return true; // Cancel with FAIL
+    }
+}
+```
+
+#### **Event Timing**
+Events must fire at the exact same game phases:
+- **BEFORE** events fire before the action happens
+- **AFTER** events fire after the action completes
+- **Cancellable** events must allow prevention of the action
+
+#### **Event Data**
+Event parameters must contain identical information:
+- Same entity references
+- Same world/level references  
+- Same damage values, interaction results, etc.
+- Same side (client/server) behavior
+
+### **Multiloader Event Implementation Process:**
+
+When implementing a new event in Amber's multiloader system, follow this process:
+
+#### **1. Event Analysis Phase**
+- **Check Platform Availability**: Verify if equivalent events exist in all 3 loaders (Fabric, Forge, NeoForge)
+- **Document Platform Events**: Record the exact event names and signatures for each platform
+- **Identify Gaps**: Note which platforms are missing the event
+
+#### **2. Implementation Strategy**
+- **✅ All Platforms Have Event**: Create a loader-agnostic callback interface and register platform-specific handlers
+- **❌ Missing Platform Event**: Investigate source code of other platforms to understand implementation, then:
+  - Use Mixins to hook into the appropriate game methods
+  - Create custom event triggers that match the other platforms' behavior
+  - **🚨 CRITICAL**: Ensure 100% consistent behavior across all platforms
+
+#### **2.1 Behavior Consistency Requirements**
+- **Event Timing**: Events must fire at identical game phases across all loaders
+- **Cancellation Logic**: Event cancellation must work identically (see `onPlayerEntityInteract` in ForgeAmberEventSetup.java for complex example)
+- **Return Values**: Same return value handling and semantics
+- **Side Effects**: Identical side effects (client/server behavior, world modifications, etc.)
+- **Parameter Data**: Exact same data passed to event callbacks
+- **Error Handling**: Consistent error states and exception handling
+
+#### **3. Code Structure**
+1. **Common Event Interface**: Define in `common/src/main/java/com/iamkaf/amber/api/event/v1/events/common/`
+2. **Platform Implementations**: 
+   - `fabric/src/main/java/com/iamkaf/amber/platform/FabricAmberEventSetup.java`
+   - `forge/src/main/java/com/iamkaf/amber/platform/ForgeAmberEventSetup.java`
+   - `neoforge/src/main/java/com/iamkaf/amber/platform/NeoForgeAmberEventSetup.java`
+3. **Event Registration**: Use platform-specific event buses and registration patterns
+
+#### **4. Testing & Validation**
+- **Compilation Test**: Run `./gradlew compileJava` to verify code compiles across all platforms
+- **🚨 CRITICAL - Behavior Consistency Testing**: 
+  - **Event Timing**: Verify events fire at identical game phases across all loaders
+  - **Cancellation Behavior**: Test event cancellation works identically on all platforms
+  - **Return Value Handling**: Ensure return values produce same effects across loaders
+  - **Parameter Consistency**: Verify identical data is passed to callbacks
+  - **Side Effect Validation**: Confirm identical world/entity state changes
+  - **Client/Server Parity**: Test both client and server-side behavior matches
+- **Performance**: Verify minimal overhead when events are not used
+- **Cross-Platform Integration Testing**: Run identical test scenarios on all 3 loaders to verify behavior
+
+#### **5. Documentation**
+- **Update Event Lists**: Mark events as implemented in this document
+- **API Documentation**: Add Javadoc comments explaining event behavior and parameters
+- **Usage Examples**: Provide code examples for common use cases
+
 ### **Event Categories:**
 - **Player Events** - Player lifecycle, interactions, and state changes
 - **Entity Events** - Entity spawning, death, damage, and behavior
@@ -250,3 +345,21 @@ For developers implementing these events, here are essential documentation links
 
 *Last Updated: 2025-01-07*  
 *Event Data Sources: [iamkaf/modresources](https://github.com/iamkaf/modresources/tree/main/docs)*
+
+## 📝 **Recent Implementation History**
+
+### **2025-01-07 - Entity Lifecycle Events**
+- ✅ **EntityEvent.ENTITY_SPAWN** - Implemented using `EntityJoinLevelEvent` (Forge/NeoForge), skipped Fabric (no direct equivalent)
+- ✅ **EntityEvent.ENTITY_DEATH** - Implemented using `ServerLivingEntityEvents.AFTER_DEATH` (Fabric), `LivingDeathEvent` (Forge/NeoForge)  
+- ✅ **EntityEvent.ENTITY_DAMAGE** - Implemented using `ServerLivingEntityEvents.ALLOW_DAMAGE` (Fabric), `LivingAttackEvent` (Forge), `LivingIncomingDamageEvent` (NeoForge)
+
+**Technical Notes:**
+- Fabric EntitySpawn event was skipped due to lack of direct equivalent - would require Mixin implementation
+- All platforms use consistent callback interfaces: `EntitySpawn`, `EntityDeath`, `EntityDamage`
+- Events follow Amber's established patterns with platform-specific registration in `*AmberEventSetup` classes
+- **⚠️ BEHAVIOR CONSISTENCY**: Entity events have simple void callbacks, making cross-platform consistency easier to maintain
+
+**Cross-Platform Behavior Validation:**
+- ✅ **EntityEvent.ENTITY_DEATH**: Consistent timing and parameters across Fabric/Forge/NeoForge
+- ✅ **EntityEvent.ENTITY_DAMAGE**: Consistent damage values and source information 
+- ⚠️ **EntityEvent.ENTITY_SPAWN**: Forge/NeoForge only - Fabric implementation needed for full consistency

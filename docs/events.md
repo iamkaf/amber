@@ -10,6 +10,15 @@ The event system allows you to:
 - Control event flow with return values
 - Handle events with proper timing and thread safety
 
+### 🎯 Cross-Platform Consistency
+
+**Critical**: Amber's event system guarantees **identical behavior** across all platforms (Fabric, Forge, NeoForge). Events fire at the same times, with the same data, and handle cancellation identically. This allows you to write event handlers once and trust they'll work the same everywhere.
+
+- ✅ **Same timing** - Events fire at identical game phases
+- ✅ **Same data** - Identical parameters across platforms
+- ✅ **Same cancellation** - `InteractionResult` works consistently
+- ✅ **Same performance** - Minimal overhead on all platforms
+
 ## Event Registration
 
 ### Basic Event Handling
@@ -17,28 +26,37 @@ The event system allows you to:
 Register event listeners during mod initialization:
 
 ```java
-import com.iamkaf.amber.api.event.v1.*;
+import com.iamkaf.amber.api.event.v1.events.common.*;
+import com.iamkaf.amber.api.event.v1.events.common.client.*;
+import com.iamkaf.amber.api.platform.v1.Platform;
+import net.minecraft.world.InteractionResult;
 
 public class MyEventHandlers {
     public static void init() {
         // Player interaction events
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             if (player.getItemInHand(hand).is(MyItems.MAGIC_WAND.get())) {
                 castSpell(player, entity);
-                return true; // Cancel default interaction
+                return InteractionResult.SUCCESS; // Cancel default interaction
             }
-            return false; // Allow default interaction
+            return InteractionResult.PASS; // Allow default interaction
         });
         
         // Command registration events  
-        CommandEvents.REGISTER.register((dispatcher, context, selection) -> {
+        CommandEvents.EVENT.register((dispatcher, context, selection) -> {
             MyCommands.register(dispatcher);
         });
         
+        // Entity lifecycle events
+        EntityEvent.ENTITY_DEATH.register((entity, source) -> {
+            // Handle entity death
+            System.out.println("Entity died: " + entity.getType());
+        });
+        
         // Client-side events
-        if (Platform.getInstance().isClient()) {
-            ClientEvents.CLIENT_TICK_END.register(client -> {
-                handleClientTick(client);
+        if (Platform.isClient()) {
+            ClientTickEvents.END_CLIENT_TICK.register(() -> {
+                handleClientTick();
             });
         }
     }
@@ -56,32 +74,42 @@ public class MyEventHandlers {
 
 ### Event Return Values
 
-Many events support return values to control game behavior:
+Events use `InteractionResult` return values to control game behavior:
 
 ```java
 public class InteractionHandlers {
     public static void init() {
-        // Return true to cancel/override default behavior
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        // Entity interactions use InteractionResult
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             if (entity instanceof Cow && player.getItemInHand(hand).is(Items.DIAMOND)) {
                 // Custom cow interaction
-                return true; // Prevents default interaction
+                return InteractionResult.SUCCESS; // Cancels default interaction
             }
-            return false; // Allows default interaction
+            return InteractionResult.PASS; // Allows default interaction
         });
         
-        // Some events use different return patterns
-        PlayerEvents.INTERACT_BLOCK.register((player, level, hand, hit) -> {
-            Block block = level.getBlockState(hit.getBlockPos()).getBlock();
-            if (block == MyBlocks.MAGIC_BLOCK.get()) {
-                handleMagicBlock(player, hit.getBlockPos());
-                return InteractionResult.SUCCESS; // Specific result type
+        // Entity damage events support cancellation
+        EntityEvent.ENTITY_DAMAGE.register((entity, source, amount) -> {
+            if (entity.hasCustomName() && entity.getCustomName().getString().equals("Protected")) {
+                return InteractionResult.FAIL; // Cancel damage completely
             }
-            return InteractionResult.PASS; // Let other handlers try
+            if (amount > 10.0f) {
+                // Custom logic for high damage
+                return InteractionResult.CONSUME; // Cancel with custom handling
+            }
+            return InteractionResult.PASS; // Allow damage normally
         });
     }
 }
 ```
+
+#### InteractionResult Values:
+- **`PASS`** - Allow the action to proceed normally (default behavior)
+- **`SUCCESS`** - Cancel the action but indicate success
+- **`CONSUME`** - Cancel the action with consumption  
+- **`FAIL`** - Cancel the action indicating failure
+
+⚠️ **Important**: Return values work **identically** across Fabric, Forge, and NeoForge - this consistency is critical for cross-platform compatibility.
 
 ## Available Events
 
@@ -93,21 +121,46 @@ Handle player-related actions:
 public class PlayerEventHandlers {
     public static void init() {
         // Entity interactions
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             // Called when player interacts with entities
-            return false;
-        });
-        
-        // Block interactions  
-        PlayerEvents.INTERACT_BLOCK.register((player, level, hand, hit) -> {
-            // Called when player interacts with blocks
             return InteractionResult.PASS;
         });
+    }
+}
+```
+
+### Entity Events
+
+Handle entity lifecycle and behavior:
+
+```java
+public class EntityEventHandlers {
+    public static void init() {
+        // Entity spawning
+        EntityEvent.ENTITY_SPAWN.register((entity, level) -> {
+            // Called when entities spawn in the world
+            System.out.println("Entity spawned: " + entity.getType());
+        });
         
-        // Item usage
-        PlayerEvents.USE_ITEM.register((player, level, hand) -> {
-            // Called when player uses an item
-            return InteractionResultHolder.pass(player.getItemInHand(hand));
+        // Entity death
+        EntityEvent.ENTITY_DEATH.register((entity, source) -> {
+            // Called when living entities die
+            System.out.println("Entity died: " + entity.getType());
+        });
+        
+        // Entity damage (cancellable)
+        EntityEvent.ENTITY_DAMAGE.register((entity, source, amount) -> {
+            // Called before entities take damage
+            if (entity.hasCustomName() && entity.getCustomName().getString().equals("Protected")) {
+                return InteractionResult.FAIL; // Cancel damage
+            }
+            return InteractionResult.PASS; // Allow damage
+        });
+        
+        // Entity damage (after damage is applied)
+        EntityEvent.AFTER_DAMAGE.register((entity, source, baseDamage, actualDamage, blocked) -> {
+            // Called after damage is applied but entity didn't die
+            System.out.println("Entity took " + actualDamage + " damage");
         });
     }
 }
@@ -120,11 +173,11 @@ Register commands across platforms:
 ```java
 public class CommandEventHandlers {
     public static void init() {
-        CommandEvents.REGISTER.register((dispatcher, context, selection) -> {
+        CommandEvents.EVENT.register((dispatcher, context, selection) -> {
             // Register your commands here
             dispatcher.register(Commands.literal("mycommand")
-                .executes(context -> {
-                    context.getSource().sendSuccess(
+                .executes(ctx -> {
+                    ctx.getSource().sendSuccess(
                         () -> Component.literal("Command executed!"), 
                         false
                     );
@@ -143,12 +196,17 @@ Handle client-side events:
 public class ClientEventHandlers {
     public static void init() {
         // Only register on client side
-        if (Platform.getInstance().isClient()) {
+        if (Platform.isClient()) {
             
             // Client tick events
-            ClientEvents.CLIENT_TICK_END.register(client -> {
-                // Called every client tick
-                handleClientTick(client);
+            ClientTickEvents.START_CLIENT_TICK.register(() -> {
+                // Called at the start of each client tick
+                handleTickStart();
+            });
+            
+            ClientTickEvents.END_CLIENT_TICK.register(() -> {
+                // Called at the end of each client tick
+                handleTickEnd();
             });
             
             // HUD rendering
@@ -158,8 +216,13 @@ public class ClientEventHandlers {
         }
     }
     
-    private static void handleClientTick(Minecraft client) {
+    private static void handleTickStart() {
+        // Called at the start of each client tick
+    }
+    
+    private static void handleTickEnd() {
         // Check for key presses, update client state, etc.
+        Minecraft client = Minecraft.getInstance();
         if (MyKeybinds.MAGIC_KEY.isDown()) {
             // Handle key press
         }
@@ -176,38 +239,20 @@ public class ClientEventHandlers {
             );
         }
     }
+    
+    private static boolean shouldShowMagicHUD() {
+        // Example logic - show HUD when player has magic items
+        return true;
+    }
+    
+    private static int getCurrentMana() {
+        // Example mana value
+        return 100;
+    }
 }
 ```
 
 ## Advanced Event Handling
-
-### Event Phases and Ordering
-
-Some events support phases for controlling execution order:
-
-```java
-public class AdvancedEventHandlers {
-    public static void init() {
-        // Early phase - executes before most other handlers
-        PlayerEvents.INTERACT_ENTITY.register(EventPriority.HIGH, (player, entity, hand) -> {
-            // High priority logic
-            return false;
-        });
-        
-        // Normal phase - default priority
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
-            // Normal priority logic
-            return false;
-        });
-        
-        // Late phase - executes after most other handlers  
-        PlayerEvents.INTERACT_ENTITY.register(EventPriority.LOW, (player, entity, hand) -> {
-            // Low priority logic - cleanup, logging, etc.
-            return false;
-        });
-    }
-}
-```
 
 ### Conditional Event Registration
 
@@ -218,17 +263,17 @@ public class ConditionalEventHandlers {
     public static void init() {
         // Only register if feature is enabled
         if (MyModConfig.get().enableMagicSystem) {
-            PlayerEvents.INTERACT_ENTITY.register(MagicHandlers::handleMagicInteraction);
+            PlayerEvents.ENTITY_INTERACT.register(MagicHandlers::handleMagicInteraction);
         }
         
         // Platform-specific events
-        if (Platform.getInstance().isClient()) {
-            ClientEvents.CLIENT_TICK_END.register(ClientHandlers::handleTick);
+        if (Platform.isClient()) {
+            ClientTickEvents.END_CLIENT_TICK.register(ClientHandlers::handleTick);
         }
         
         // Development-only events
-        if (Platform.getInstance().isDevelopmentEnvironment()) {
-            CommandEvents.REGISTER.register(DebugCommands::register);
+        if (Platform.isDevelopmentEnvironment()) {
+            CommandEvents.EVENT.register(DebugCommands::register);
         }
     }
 }
@@ -241,7 +286,7 @@ Access comprehensive event data:
 ```java
 public class DetailedEventHandlers {
     public static void init() {
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             // Access player data
             String playerName = player.getName().getString();
             UUID playerId = player.getUUID();
@@ -255,7 +300,6 @@ public class DetailedEventHandlers {
             Vec3 entityPos = entity.position();
             
             // Access world context
-            Level level = player.level();
             boolean isClientSide = level.isClientSide;
             
             System.out.println(String.format(
@@ -265,7 +309,7 @@ public class DetailedEventHandlers {
                 isMainHand ? "main" : "off"
             ));
             
-            return false;
+            return InteractionResult.PASS;
         });
     }
 }
@@ -327,52 +371,6 @@ public class MagicSystem {
         }
         
         return false; // Spell was cancelled
-    }
-}
-```
-
-## Event-Driven Architecture
-
-Use events to create loosely coupled mod features:
-
-```java
-// Feature modules that communicate via events
-public class MagicModule {
-    public static void init() {
-        // Listen for player interactions
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
-            if (isMagicUser(player)) {
-                return handleMagicInteraction(player, entity, hand);
-            }
-            return false;
-        });
-        
-        // Listen for custom events from other modules
-        QuestEvents.QUEST_COMPLETED.register((player, quest) -> {
-            if (quest.getType() == QuestType.MAGIC) {
-                grantMagicReward(player, quest);
-            }
-        });
-    }
-}
-
-public class QuestModule {
-    public static void init() {
-        // Listen for entity defeats
-        EntityEvents.ENTITY_DEATH.register((entity, damageSource) -> {
-            if (damageSource.getEntity() instanceof Player player) {
-                checkQuestProgress(player, entity);
-            }
-        });
-    }
-    
-    private static void checkQuestProgress(Player player, Entity entity) {
-        // Check if this completes a quest
-        Quest quest = getActiveQuest(player);
-        if (quest != null && quest.checkCompletion(entity)) {
-            // Fire quest completion event
-            QuestEvents.QUEST_COMPLETED.invoker().onQuestCompleted(player, quest);
-        }
     }
 }
 ```
@@ -439,14 +437,14 @@ public class ConditionalRegistration {
         }
         
         // Only register client events on the client
-        if (Platform.getInstance().isClient()) {
+        if (Platform.isClient()) {
             registerClientEvents();
         }
     }
     
     private static void registerAdvancedMagicEvents() {
         // Expensive magic system events
-        PlayerEvents.INTERACT_ENTITY.register(AdvancedMagicHandlers::handleInteraction);
+        PlayerEvents.ENTITY_INTERACT.register(AdvancedMagicHandlers::handleInteraction);
     }
     
     private static void registerClientEvents() {
@@ -510,41 +508,56 @@ public class EventDebugging {
 
 The event system provides a unified interface while handling platform differences transparently.
 
-## Migration from Platform-Specific Events
+## Complete Event Reference
 
-### From Fabric Events
+### Currently Available Events
 
-```java
-// Old Fabric way
-UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-    // Handle interaction
-    return ActionResult.PASS;
-});
+#### Player Events (`PlayerEvents`)
+- **`ENTITY_INTERACT`** - When players interact with entities
+  - Parameters: `Player player, Level level, InteractionHand hand, Entity entity`
+  - Returns: `InteractionResult` (cancellable)
 
-// New Amber way
-PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
-    // Handle interaction  
-    return false; // false = PASS, true = cancel
-});
-```
+#### Entity Events (`EntityEvent`)
+- **`ENTITY_SPAWN`** - When entities spawn in the world
+  - Parameters: `Entity entity, Level level`
+  - Returns: `void` (non-cancellable)
+  
+- **`ENTITY_DEATH`** - When living entities die
+  - Parameters: `LivingEntity entity, DamageSource source`
+  - Returns: `void` (non-cancellable)
+  
+- **`ENTITY_DAMAGE`** - When entities take damage (before damage is applied)
+  - Parameters: `LivingEntity entity, DamageSource source, float amount`
+  - Returns: `InteractionResult` (cancellable)
+  
+- **`AFTER_DAMAGE`** - After entities take damage (but don't die)
+  - Parameters: `LivingEntity entity, DamageSource source, float baseDamage, float actualDamage, boolean blocked`
+  - Returns: `void` (non-cancellable)
 
-### From Forge Events
+#### Command Events (`CommandEvents`)
+- **`EVENT`** - Server command registration
+  - Parameters: `CommandDispatcher dispatcher, CommandBuildContext context, CommandSelection selection`
+  - Returns: `void` (non-cancellable)
 
-```java
-// Old Forge way
-@SubscribeEvent
-public static void onPlayerInteract(PlayerInteractEvent.EntityInteract event) {
-    // Handle interaction
-    event.setCanceled(true);
-}
+#### Client Events (`ClientCommandEvents`, `ClientTickEvents`, `HudEvents`)
+- **`ClientCommandEvents.EVENT`** - Client command registration
+- **`ClientTickEvents.START_CLIENT_TICK`** - Start of client tick
+- **`ClientTickEvents.END_CLIENT_TICK`** - End of client tick  
+- **`HudEvents.RENDER_HUD`** - HUD rendering
 
-// New Amber way
-PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
-    // Handle interaction
-    return true; // true cancels the event
-});
-```
+#### Loot Events (`LootEvents`)
+- **`MODIFY`** - Loot table modification
+  - Parameters: `ResourceLocation lootTable, Consumer<LootPool.Builder> poolAdder`
+  - Returns: `void` (non-cancellable)
 
-The Amber event system provides a cleaner, more consistent API while maintaining the functionality you expect from platform-specific event systems.
+### Cross-Platform Implementation Status
+
+| Event | Fabric | Forge | NeoForge | Notes |
+|-------|--------|-------|----------|-------|
+| `ENTITY_INTERACT` | ✅ | ✅ | ✅ | Fully consistent |
+| `ENTITY_SPAWN` | ✅ (Mixin) | ✅ | ✅ | Fabric uses custom Mixin |
+| `ENTITY_DEATH` | ✅ | ✅ | ✅ | Fully consistent |
+| `ENTITY_DAMAGE` | ✅ | ✅ | ✅ | Cancellation works consistently |
+| `AFTER_DAMAGE` | ✅ | ✅ | ✅ | Fully consistent |
 
 For more information about specific event types, see the [API documentation](../common/src/main/java/com/iamkaf/amber/api/event/v1/) in the source code.

@@ -9,39 +9,76 @@ import com.iamkaf.amber.platform.services.IRegistrarManager;
 
 import java.util.ServiceLoader;
 
-// Service loaders are a built-in Java feature that allow us to locate implementations of an interface that vary from one
-// environment to another. In the context of MultiLoader we use this feature to access a mock API in the common code that
-// is swapped out for the platform specific implementation at runtime.
+/**
+ * Internal service loader registry for Amber's platform-specific implementations.
+ * 
+ * <p><strong>⚠️ INTERNAL API - DO NOT USE</strong></p>
+ * 
+ * <p>This class is for <strong>internal Amber usage only</strong> and should not be used by mod developers.
+ * The APIs in this class are implementation details that may change without notice between versions.</p>
+ * 
+ * <p><strong>For mod developers:</strong> Use the public APIs in {@code com.iamkaf.amber.api.*} packages instead.
+ * These provide stable, documented interfaces that abstract away platform differences.</p>
+ * 
+ * <p>Service loaders are a built-in Java feature that allow us to locate implementations of an interface 
+ * that vary from one environment to another. In the context of MultiLoader we use this feature to access 
+ * a mock API in the common code that is swapped out for the platform specific implementation at runtime.</p>
+ * 
+ * @implNote This class uses Java's ServiceLoader mechanism to dynamically load platform-specific 
+ *           implementations at runtime. Each platform (Fabric, Forge, NeoForge) provides its own 
+ *           implementations via META-INF/services files.
+ */
 public class Services {
 
-    // In this example we provide a platform helper which provides information about what platform the mod is running on.
-    // For example this can be used to check if the code is running on Forge vs Fabric, or to ask the modloader if another
-    // mod is loaded.
+    /**
+     * Platform helper service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use {@link com.iamkaf.amber.api.platform.v1.Platform} instead.</p>
+     */
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
 
-    // This is the service that provides the event setup methods for the Amber mod. It allows us to register common,
-    // client, and server event handlers in a platform-agnostic way. The actual implementation will vary depending on the
-    // platform (Forge, Fabric, etc.) but the interface remains the same.
+    /**
+     * Event setup service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use event classes in {@code com.iamkaf.amber.api.event.v1.*} instead.</p>
+     */
     public static final IAmberEventSetup AMBER_EVENT_SETUP = load(IAmberEventSetup.class);
 
-    // Platform specific registrar manager implementation
+    /**
+     * Registrar manager service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use public registration APIs instead.</p>
+     */
     public static final IRegistrarManager REGISTRAR_MANAGER = load(IRegistrarManager.class);
 
-    
-    // Platform specific networking service implementation
+    /**
+     * Networking service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use public networking APIs instead.</p>
+     */
     public static final INetworkingService NETWORKING = load(INetworkingService.class);
 
-    // This code is used to load a service for the current environment. Your implementation of the service must be defined
-    // manually by including a text file in META-INF/services named with the fully qualified class name of the service.
-    // Inside the file you should write the fully qualified class name of the implementation to load for the platform. For
-    // example our file on Forge points to ForgePlatformHelper while Fabric points to FabricPlatformHelper.
+    /**
+     * Loads a platform-specific service implementation using Java's ServiceLoader.
+     * 
+     * <p><strong>⚠️ INTERNAL API:</strong> This method is for internal Amber usage only.</p>
+     * 
+     * <p>Service implementations must be defined in META-INF/services files with the fully qualified 
+     * class name of the service interface. Inside the file, write the fully qualified class name of 
+     * the implementation to load for the platform.</p>
+     * 
+     * @param <T> the service interface type
+     * @param clazz the service interface class
+     * @return the loaded service implementation
+     * @throws NullPointerException if no service implementation is found
+     */
     public static <T> T load(Class<T> clazz) {
-
         final T loadedService = ServiceLoader.load(clazz)
                 .findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
         Constants.LOG.debug("Loaded {} for service {}", loadedService, clazz);
         return loadedService;
     }
-    public static IKeybindRegister KEYBIND_REGISTER = load(IKeybindRegister.class);
+    
+    /**
+     * Keybind registration service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use public keybind APIs instead.</p>
+     */
+    public static final IKeybindRegister KEYBIND_REGISTER = load(IKeybindRegister.class);
 }

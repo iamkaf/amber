@@ -3,6 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
+import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -15,6 +16,9 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.Priority;
@@ -30,6 +34,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         LootTableLoadEvent.BUS.addListener(EventHandlerCommon::onLootTableEvent);
         PlayerInteractEvent.EntityInteract.BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
         RegisterCommandsEvent.BUS.addListener(EventHandlerCommon::onCommandRegistration);
+        EntityJoinLevelEvent.BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
+        LivingDeathEvent.BUS.addListener(EventHandlerCommon::onLivingDeath);
+        LivingAttackEvent.BUS.addListener(EventHandlerCommon::onLivingAttack);
     }
 
     @Override
@@ -84,6 +91,22 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
                     .register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+        }
+
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+            EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(event.getEntity(), event.getLevel());
+        }
+
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static void onLivingDeath(LivingDeathEvent event) {
+            EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(event.getEntity(), event.getSource());
+        }
+
+        @SubscribeEvent(priority = Priority.HIGH)
+        public static boolean onLivingAttack(LivingAttackEvent event) {
+            InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(event.getEntity(), event.getSource(), event.getAmount());
+            return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
     }
 
