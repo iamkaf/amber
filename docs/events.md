@@ -66,7 +66,7 @@ public class MyEventHandlers {
         System.out.println("Casting spell on " + target.getName().getString());
     }
     
-    private static void handleClientTick(Minecraft client) {
+    private static void handleClientTick() {
         // Client tick logic
     }
 }
@@ -391,16 +391,16 @@ public class EfficientEventHandlers {
     );
     
     public static void init() {
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             ItemStack heldItem = player.getItemInHand(hand);
             
             // Fast check using cached set
             if (!MAGIC_ITEMS.contains(heldItem.getItem())) {
-                return false; // Early exit for non-magic items
+                return InteractionResult.PASS; // Early exit for non-magic items
             }
             
             // Only do expensive operations for relevant items
-            return handleMagicInteraction(player, entity, hand, heldItem);
+            return handleMagicInteraction(player, level, hand, entity, heldItem);
         });
     }
     
@@ -411,15 +411,15 @@ public class EfficientEventHandlers {
         EntityType.CHICKEN, MagicEffect.EGG_PRODUCTION
     );
     
-    private static boolean handleMagicInteraction(Player player, Entity entity, 
-                                                 InteractionHand hand, ItemStack item) {
+    private static InteractionResult handleMagicInteraction(Player player, Level level,
+                                                 InteractionHand hand, Entity entity, ItemStack item) {
         // Use cached lookup instead of complex logic
         MagicEffect effect = ENTITY_EFFECTS.get(entity.getType());
         if (effect != null) {
             effect.apply(entity, player);
-            return true;
+            return InteractionResult.SUCCESS;
         }
-        return false;
+        return InteractionResult.PASS;
     }
 }
 ```

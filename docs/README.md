@@ -43,12 +43,12 @@ repositories {
 
 dependencies {
     // Common
-    implementation "com.iamkaf:amber-common:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-common:6.0.10+1.21.7"
     
     // Platform-specific (choose one)
-    implementation "com.iamkaf:amber-fabric:6.0.9+1.21.7"
-    implementation "com.iamkaf:amber-forge:6.0.9+1.21.7"
-    implementation "com.iamkaf:amber-neoforge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
 }
 ```
 
@@ -62,11 +62,7 @@ public class YourMod {
     public static void init() {
         // Initialize with Amber - automatically detects mod name and version
         AmberInitializer.initialize(MOD_ID);
-        // Register initialization callback
-        AmberInitializer.register(MOD_ID, YourMod::onInitialize);
-    }
-    
-    private static void onInitialize() {
+        
         // Your mod initialization code here
         System.out.println("YourMod initialized with Amber!");
     }
@@ -98,7 +94,7 @@ public class YourMod {
 
 ## 🔄 Version Information
 
-- **Current Version**: 6.0.9+1.21.7
+- **Current Version**: 6.0.10+1.21.7
 - **Minecraft Version**: 1.21.7
 - **Supported Platforms**: Fabric, Forge, NeoForge
 - **License**: MIT

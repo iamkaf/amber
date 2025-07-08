@@ -34,22 +34,22 @@ Choose the appropriate dependencies for your target platforms:
 ```gradle
 // In your common module
 dependencies {
-    implementation "com.iamkaf:amber-common:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-common:6.0.10+1.21.7"
 }
 
 // In your fabric module  
 dependencies {
-    implementation "com.iamkaf:amber-fabric:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
 }
 
 // In your forge module
 dependencies {
-    implementation "com.iamkaf:amber-forge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
 }
 
 // In your neoforge module
 dependencies {
-    implementation "com.iamkaf:amber-neoforge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
 }
 ```
 
@@ -58,11 +58,11 @@ dependencies {
 ```gradle
 dependencies {
     // Choose one based on your platform
-    implementation "com.iamkaf:amber-fabric:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
     // OR
-    implementation "com.iamkaf:amber-forge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
     // OR  
-    implementation "com.iamkaf:amber-neoforge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
 }
 ```
 
@@ -252,13 +252,13 @@ import com.iamkaf.amber.api.event.v1.PlayerEvents;
 public class MyEventHandlers {
     public static void init() {
         // Handle player interaction with entities
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             if (player.getItemInHand(hand).is(MyItems.SPECIAL_TOOL.get())) {
                 // Special interaction logic
                 System.out.println("Player used special tool on: " + entity.getName().getString());
-                return true; // Cancel default interaction
+                return InteractionResult.SUCCESS; // Cancel default interaction
             }
-            return false; // Allow default interaction
+            return InteractionResult.PASS; // Allow default interaction
         });
     }
 }
@@ -363,12 +363,12 @@ public class MyItems {
 // MyEventHandlers.java - Event handling
 public class MyEventHandlers {
     public static void init() {
-        PlayerEvents.INTERACT_ENTITY.register((player, entity, hand) -> {
+        PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
             if (player.getItemInHand(hand).is(MyItems.MAGIC_WAND.get())) {
                 // Cast magic spell
-                return true;
+                return InteractionResult.SUCCESS;
             }
-            return false;
+            return InteractionResult.PASS;
         });
     }
 }
