@@ -83,12 +83,12 @@ repositories {
 
 dependencies {
     // Common
-    implementation "com.iamkaf:amber-common:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-common:6.0.10+1.21.7"
     
     // Platform-specific (choose one)
-    implementation "com.iamkaf:amber-fabric:6.0.9+1.21.7"
-    implementation "com.iamkaf:amber-forge:6.0.9+1.21.7"
-    implementation "com.iamkaf:amber-neoforge:6.0.9+1.21.7"
+    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
 }
 ```
 

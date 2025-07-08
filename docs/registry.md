@@ -239,16 +239,16 @@ Create custom armor materials:
 ```java
 public enum MyArmorMaterials implements ArmorMaterial {
     RUBY("ruby", 25, Map.of(
-        ArmorItem.Type.BOOTS, 2,
-        ArmorItem.Type.LEGGINGS, 5,
-        ArmorItem.Type.CHESTPLATE, 7,
-        ArmorItem.Type.HELMET, 2
+        EquipmentSlot.FEET, 2,
+        EquipmentSlot.LEGS, 5,
+        EquipmentSlot.CHEST, 7,
+        EquipmentSlot.HEAD, 2
     ), 16, SoundEvents.ARMOR_EQUIP_DIAMOND, 1.0F, 0.0F, 
     () -> Ingredient.of(MyItems.RUBY.get()));
     
     private final String name;
     private final int durabilityMultiplier;
-    private final Map<ArmorItem.Type, Integer> protectionAmounts;
+    private final Map<EquipmentSlot, Integer> protectionAmounts;
     private final int enchantmentValue;
     private final SoundEvent equipSound;
     private final float toughness;
@@ -256,7 +256,7 @@ public enum MyArmorMaterials implements ArmorMaterial {
     private final Supplier<Ingredient> repairIngredient;
     
     MyArmorMaterials(String name, int durabilityMultiplier, 
-                     Map<ArmorItem.Type, Integer> protectionAmounts,
+                     Map<EquipmentSlot, Integer> protectionAmounts,
                      int enchantmentValue, SoundEvent equipSound,
                      float toughness, float knockbackResistance,
                      Supplier<Ingredient> repairIngredient) {
@@ -270,12 +270,12 @@ public enum MyArmorMaterials implements ArmorMaterial {
         this.repairIngredient = repairIngredient;
     }
     
-    @Override public int getDurabilityForType(ArmorItem.Type type) {
-        return BASE_DURABILITY.get(type) * durabilityMultiplier;
+    @Override public int getDurabilityForSlot(EquipmentSlot slot) {
+        return BASE_DURABILITY.get(slot) * durabilityMultiplier;
     }
     
-    @Override public int getDefenseForType(ArmorItem.Type type) {
-        return protectionAmounts.get(type);
+    @Override public int getDefense(EquipmentSlot slot) {
+        return protectionAmounts.get(slot);
     }
     
     @Override public int getEnchantmentValue() { return enchantmentValue; }
@@ -285,11 +285,11 @@ public enum MyArmorMaterials implements ArmorMaterial {
     @Override public float getToughness() { return toughness; }
     @Override public float getKnockbackResistance() { return knockbackResistance; }
     
-    private static final Map<ArmorItem.Type, Integer> BASE_DURABILITY = Map.of(
-        ArmorItem.Type.BOOTS, 13,
-        ArmorItem.Type.LEGGINGS, 15,
-        ArmorItem.Type.CHESTPLATE, 16,
-        ArmorItem.Type.HELMET, 11
+    private static final Map<EquipmentSlot, Integer> BASE_DURABILITY = Map.of(
+        EquipmentSlot.FEET, 13,
+        EquipmentSlot.LEGS, 15,
+        EquipmentSlot.CHEST, 16,
+        EquipmentSlot.HEAD, 11
     );
 }
 ```
