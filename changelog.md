@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
-## Unreleased
+## 6.0.10
 
 ### Added
 
@@ -21,25 +21,17 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added events to render to the HUD.
 - Added the `/amber doctor` command to diagnose issues with the mod.
 - Added client tick events.
-- Added unified networking API (`com.iamkaf.amber.api.networking.v1`) supporting Fabric, Forge, and NeoForge.
+- Added unified networking API supporting Fabric, Forge, and NeoForge.
 - Added internal networking system for connectivity testing and latency measurement.
 - Added `/amber ping` command for manual network connectivity testing.
 - Added `/amber reset-stats` command to reset networking statistics.
 - Added networking diagnostics to `/amber doctor` command (initialization status, ping count, average latency).
-
-### Changed
-
-- TBD
 
 ### Deprecated
 
 - AmberMod is now deprecated in favor of AmberInitializer.
 - All unversioned API helper classes have been deprecated in preparation for versioned packages.
 - JsonFileReader is now deprecated in favor of a new JSON system.
-
-### Removed
-
-- TBD
 
 ### Fixed
 
