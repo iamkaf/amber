@@ -15,13 +15,17 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 public class FabricAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerCommon() {
-        LootTableEvents.MODIFY.register((resourceKey, builder, lootTableSource, provider) -> {
+        LootTableEvents.MODIFY.register((ResourceKey<LootTable> resourceKey, LootTable.Builder builder, LootTableSource lootTableSource, HolderLookup.Provider provider) -> {
             LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);
         });
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {

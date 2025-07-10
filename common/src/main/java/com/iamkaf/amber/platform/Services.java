@@ -24,7 +24,7 @@ import java.util.ServiceLoader;
  * that vary from one environment to another. In the context of MultiLoader we use this feature to access 
  * a mock API in the common code that is swapped out for the platform specific implementation at runtime.</p>
  * 
- * @implNote This class uses Java's ServiceLoader mechanism to dynamically load platform-specific 
+ * This class uses Java's ServiceLoader mechanism to dynamically load platform-specific
  *           implementations at runtime. Each platform (Fabric, Forge, NeoForge) provides its own 
  *           implementations via META-INF/services files.
  */
