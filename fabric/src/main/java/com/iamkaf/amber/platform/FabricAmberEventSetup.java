@@ -83,19 +83,19 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
         
         // Render events
-        WorldRenderEvents.BLOCK_OUTLINE.register((context, hitResult) -> {
-            if (hitResult != null) {
+        WorldRenderEvents.BLOCK_OUTLINE.register((context, blockOutlineContext) -> {
+            if (blockOutlineContext != null) {
                 InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
                     context.camera(), 
                     context.consumers(), 
                     context.matrixStack(), 
-                    hitResult, 
-                    hitResult.getBlockPos(), 
-                    context.world().getBlockState(hitResult.getBlockPos())
+                    null, // Fabric doesn't provide BlockHitResult here, pass null
+                    blockOutlineContext.blockPos(), 
+                    blockOutlineContext.blockState()
                 );
                 return result == InteractionResult.PASS; // Only render if PASS is returned
             }
-            return true; // Render by default if no hit result
+            return true; // Render by default if no block outline context
         });
     }
 

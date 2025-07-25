@@ -20,7 +20,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
@@ -118,7 +118,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
-                event.getLevel(), event.getPlayer(), event.getPos(), event.getState(), 
+                event.getPlayer().level(), event.getPlayer(), event.getPos(), event.getState(), 
                 event.getLevel().getBlockEntity(event.getPos())
             );
             if (result != InteractionResult.PASS) {
@@ -128,7 +128,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             
             // Fire after event (can't cancel)
             BlockEvents.BLOCK_BREAK_AFTER.invoker().afterBlockBreak(
-                event.getLevel(), event.getPlayer(), event.getPos(), event.getState(),
+                event.getPlayer().level(), event.getPlayer(), event.getPos(), event.getState(),
                 event.getLevel().getBlockEntity(event.getPos())
             );
         }
@@ -140,7 +140,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             }
             
             InteractionResult result = BlockEvents.BLOCK_PLACE_BEFORE.invoker().beforeBlockPlace(
-                event.getLevel(), player, event.getPos(), event.getPlacedBlock(),
+                player.level(), player, event.getPos(), event.getPlacedBlock(),
                 player.getMainHandItem()
             );
             if (result != InteractionResult.PASS) {
@@ -150,7 +150,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             
             // Fire after event (can't cancel)
             BlockEvents.BLOCK_PLACE_AFTER.invoker().afterBlockPlace(
-                event.getLevel(), player, event.getPos(), event.getPlacedBlock(),
+                player.level(), player, event.getPos(), event.getPlacedBlock(),
                 player.getMainHandItem()
             );
         }
@@ -158,9 +158,9 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker().onBlockInteract(
-                event.getEntity(), event.getLevel(), event.getHand(), 
+                event.getEntity(), event.getEntity().level(), event.getHand(), 
                 new net.minecraft.world.phys.BlockHitResult(
-                    event.getHitVec(), event.getFace(), event.getPos(), false
+                    event.getHitVec().getLocation(), event.getFace(), event.getPos(), false
                 )
             );
             if (result != InteractionResult.PASS) {
@@ -171,7 +171,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker().onBlockClick(
-                event.getEntity(), event.getLevel(), event.getHand(), 
+                event.getEntity(), event.getEntity().level(), event.getHand(), 
                 event.getPos(), event.getFace()
             );
             if (result != InteractionResult.PASS) {
@@ -206,7 +206,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
         
         @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+        public static void onMouseScroll(ScreenEvent.MouseScrolled.Pre event) {
             InteractionResult result = InputEvents.MOUSE_SCROLL.invoker().onMouseScroll(
                 event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
             );
