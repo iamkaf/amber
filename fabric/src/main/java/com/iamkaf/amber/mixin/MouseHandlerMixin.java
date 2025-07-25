@@ -12,19 +12,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseHandlerMixin {
     
     @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
-    private void onMouseScroll(long windowPointer, double scrollX, double scrollY, CallbackInfo ci) {
+    private void onMouseScrollPre(long windowPointer, double scrollX, double scrollY, CallbackInfo ci) {
         MouseHandler mouseHandler = (MouseHandler) (Object) this;
         
         // Get the current mouse position
         double mouseX = mouseHandler.xpos();
         double mouseY = mouseHandler.ypos();
         
-        // Fire the Amber mouse scroll event
-        InteractionResult result = InputEvents.MOUSE_SCROLL.invoker().onMouseScroll(mouseX, mouseY, scrollX, scrollY);
+        // Fire the Amber mouse scroll pre event
+        InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(mouseX, mouseY, scrollX, scrollY);
         
         // Cancel the original scroll event if the Amber event was cancelled
         if (result != InteractionResult.PASS) {
             ci.cancel();
         }
+    }
+    
+    @Inject(method = "onScroll", at = @At("TAIL"))
+    private void onMouseScrollPost(long windowPointer, double scrollX, double scrollY, CallbackInfo ci) {
+        MouseHandler mouseHandler = (MouseHandler) (Object) this;
+        
+        // Get the current mouse position
+        double mouseX = mouseHandler.xpos();
+        double mouseY = mouseHandler.ypos();
+        
+        // Fire the Amber mouse scroll post event
+        InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(mouseX, mouseY, scrollX, scrollY);
     }
 }

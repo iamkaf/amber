@@ -17,7 +17,7 @@ These events are already available in Amber:
 - ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - When players place blocks (before/after variants) 
 - ✅ **BlockEvents.BLOCK_INTERACT** - When players right-click blocks
 - ✅ **BlockEvents.BLOCK_CLICK** - When players left-click blocks
-- ✅ **InputEvents.MOUSE_SCROLL** - When mouse wheel is scrolled
+- ✅ **InputEvents.MOUSE_SCROLL_PRE/POST** - When mouse wheel is scrolled (before/after variants)
 - ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - When block selection outlines are rendered
 
 ---
@@ -457,7 +457,7 @@ For developers implementing these events, here are essential documentation links
 - ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - Implemented using `BlockEvent.EntityPlaceEvent` (Forge/NeoForge), Fabric support planned
 - ✅ **BlockEvents.BLOCK_INTERACT** - Implemented using `UseBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.RightClickBlock` (Forge/NeoForge)
 - ✅ **BlockEvents.BLOCK_CLICK** - Implemented using `AttackBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.LeftClickBlock` (Forge/NeoForge)
-- ✅ **InputEvents.MOUSE_SCROLL** - Implemented using `MouseHandlerMixin` (Fabric), `InputEvent.MouseScrollingEvent` (Forge/NeoForge)
+- ✅ **InputEvents.MOUSE_SCROLL_PRE/POST** - Implemented using `MouseHandlerMixin` (Fabric), `ScreenEvent.MouseScrolled.Pre/Post` (Forge/NeoForge)
 - ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - Implemented using `WorldRenderEvents.BLOCK_OUTLINE` (Fabric), `RenderHighlightEvent.Block` (Forge/NeoForge)
 
 **Technical Notes:**

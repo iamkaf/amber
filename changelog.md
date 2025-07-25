@@ -17,7 +17,8 @@ See the full changelog at https://github.com/iamkaf/amber
   - `BlockEvents.BLOCK_INTERACT` - Fires when players right-click blocks (cancellable)
   - `BlockEvents.BLOCK_CLICK` - Fires when players left-click blocks (cancellable)
 - Added client-side input events:
-  - `InputEvents.MOUSE_SCROLL` - Fires on mouse wheel scroll with position and delta data (cancellable)
+  - `InputEvents.MOUSE_SCROLL_PRE` - Fires before mouse wheel scroll with position and delta data (cancellable)
+  - `InputEvents.MOUSE_SCROLL_POST` - Fires after mouse wheel scroll with position and delta data (non-cancellable)
 - Added client-side rendering events:
   - `RenderEvents.BLOCK_OUTLINE_RENDER` - Fires when block selection outlines are rendered (cancellable)
 - Added Fabric Mixin support for mouse scroll events via `MouseHandlerMixin`

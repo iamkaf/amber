@@ -206,13 +206,20 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
         
         @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onMouseScroll(ScreenEvent.MouseScrolled.Pre event) {
-            InteractionResult result = InputEvents.MOUSE_SCROLL.invoker().onMouseScroll(
+        public static void onMouseScrollPre(ScreenEvent.MouseScrolled.Pre event) {
+            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(
                 event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
             );
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true); // Cancel if not PASS
             }
+        }
+        
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onMouseScrollPost(ScreenEvent.MouseScrolled.Post event) {
+            InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
+                event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
+            );
         }
         
         @SubscribeEvent(priority = EventPriority.HIGH)

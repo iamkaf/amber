@@ -60,7 +60,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
         
         // Input and render events
-        ScreenEvent.MouseScrolled.Post.BUS.addListener(EventHandlerClient::onMouseScroll);
+        ScreenEvent.MouseScrolled.Pre.BUS.addListener(EventHandlerClient::onMouseScrollPre);
+        ScreenEvent.MouseScrolled.Post.BUS.addListener(EventHandlerClient::onMouseScrollPost);
         RenderHighlightEvent.Block.BUS.addListener(EventHandlerClient::onBlockHighlight);
     }
 
@@ -193,11 +194,17 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
         
-        public static boolean onMouseScroll(ScreenEvent.MouseScrolled.Post event) {
-            InteractionResult result = InputEvents.MOUSE_SCROLL.invoker().onMouseScroll(
+        public static boolean onMouseScrollPre(ScreenEvent.MouseScrolled.Pre event) {
+            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(
                 event.getMouseX(), event.getMouseY(), event.getDeltaX(), event.getDeltaY()
             );
             return result != InteractionResult.PASS; // Cancel if not PASS
+        }
+        
+        public static void onMouseScrollPost(ScreenEvent.MouseScrolled.Post event) {
+            InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
+                event.getMouseX(), event.getMouseY(), event.getDeltaX(), event.getDeltaY()
+            );
         }
         
         public static boolean onBlockHighlight(RenderHighlightEvent.Block event) {
