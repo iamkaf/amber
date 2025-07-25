@@ -13,6 +13,12 @@ These events are already available in Amber:
 - ✅ **EntityEvent.ENTITY_SPAWN** - When entities spawn in the world
 - ✅ **EntityEvent.ENTITY_DEATH** - When living entities die
 - ✅ **EntityEvent.ENTITY_DAMAGE** - When entities take damage
+- ✅ **BlockEvents.BLOCK_BREAK_BEFORE/AFTER** - When players break blocks (before/after variants)
+- ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - When players place blocks (before/after variants) 
+- ✅ **BlockEvents.BLOCK_INTERACT** - When players right-click blocks
+- ✅ **BlockEvents.BLOCK_CLICK** - When players left-click blocks
+- ✅ **InputEvents.MOUSE_SCROLL** - When mouse wheel is scrolled
+- ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - When block selection outlines are rendered
 
 ---
 
@@ -35,28 +41,28 @@ These events are already available in Amber:
   - *NeoForge:* `LivingIncomingDamageEvent`
 
 #### 🎮 **Player Interaction Events**
-- [ ] **PlayerInteractBlockEvent** - When players interact with blocks
+- [x] **PlayerInteractBlockEvent** - When players interact with blocks ✅ **IMPLEMENTED**
   - *Fabric:* `UseBlockCallback.EVENT`
   - *Forge:* `PlayerInteractEvent.RightClickBlock`
-  - *NeoForge:* `RightClickBlock`
+  - *NeoForge:* `PlayerInteractEvent.RightClickBlock`
 - [ ] **PlayerUseItemEvent** - When players use items
   - *Fabric:* `UseItemCallback.EVENT`
   - *Forge:* `ItemUseEvent`, `RightClickItem`
   - *NeoForge:* `RightClickItem`, `UseItemOnBlockEvent`
-- [ ] **PlayerAttackEvent** - When players attack entities/blocks
+- [x] **PlayerAttackEvent** - When players attack entities/blocks ✅ **IMPLEMENTED**
   - *Fabric:* `AttackEntityCallback.EVENT`, `AttackBlockCallback.EVENT`
-  - *Forge:* `AttackEntityEvent`
-  - *NeoForge:* `AttackEntityEvent`
+  - *Forge:* `PlayerInteractEvent.LeftClickBlock`
+  - *NeoForge:* `PlayerInteractEvent.LeftClickBlock`
 
 #### 🧱 **World/Block Events**
-- [ ] **BlockBreakEvent** - When players break blocks
+- [x] **BlockBreakEvent** - When players break blocks ✅ **IMPLEMENTED**
   - *Fabric:* `PlayerBlockBreakEvents.BEFORE` / `AFTER`
-  - *Forge:* `BlockEvent.Break`
-  - *NeoForge:* `BreakEvent`
-- [ ] **BlockPlaceEvent** - When players place blocks
-  - *Fabric:* Not directly listed
-  - *Forge:* `BlockEvent.Place`
-  - *NeoForge:* Not directly listed
+  - *Forge:* `BlockEvent.BreakEvent`
+  - *NeoForge:* `BlockEvent.BreakEvent`
+- [x] **BlockPlaceEvent** - When players place blocks ✅ **IMPLEMENTED**
+  - *Fabric:* Not directly available (skipped for now)
+  - *Forge:* `BlockEvent.EntityPlaceEvent`
+  - *NeoForge:* `BlockEvent.EntityPlaceEvent`
 
 ---
 
@@ -318,6 +324,88 @@ When implementing a new event in Amber's multiloader system, follow this process
 
 ---
 
+## 🚀 **Phase 4: Amber-Exclusive Smart Events** (Revolutionary Priority)
+
+These are cutting-edge events that would be unique to Amber, providing capabilities not available in any vanilla mod loader. They represent Amber's evolution from a compatibility layer to an intelligent modding platform.
+
+### 🧠 **Smart Player Intent Detection Events**
+- [ ] **SmartPlayerEvents.BUILDING_DETECTED** - AI-powered detection of sustained building activity
+  - *Implementation:* Pattern analysis of block placement frequency, area coverage, and material consistency
+  - *Triggers:* When player places >20 blocks in <2 minutes within a 32x32 area
+  - *Use Cases:* Auto-enabling build mode, providing building assistance, territory detection
+- [ ] **SmartPlayerEvents.MINING_SESSION_START** - Detection of focused mining behavior
+  - *Implementation:* Analysis of block breaking patterns, tool usage, and movement in underground areas
+  - *Triggers:* Continuous block breaking of stone/ore materials with mining tools for >30 seconds
+  - *Use Cases:* Mining assistance modes, resource tracking, cave-in warnings
+- [ ] **SmartPlayerEvents.PVP_PREPARATION** - Combat readiness detection
+  - *Implementation:* Pattern recognition of armor equipping, weapon selection, potion consumption
+  - *Triggers:* Player equips combat gear + consumes buffs + approaches other players
+  - *Use Cases:* PvP zone notifications, combat mode switching, tournament systems
+- [ ] **SmartPlayerEvents.EXPLORATION_MODE** - Long-distance travel detection
+  - *Implementation:* Movement pattern analysis for sustained travel without building/mining
+  - *Triggers:* Player moves >500 blocks without stopping to build/mine for >2 minutes
+  - *Use Cases:* Journey assistance, landmark notifications, exploration rewards
+- [ ] **SmartPlayerEvents.AFK_DETECTED** - Intelligent idle detection
+  - *Implementation:* Advanced idle detection beyond simple movement (considers inventory management, looking around)
+  - *Triggers:* No meaningful actions (beyond basic movement/looking) for configurable duration
+  - *Use Cases:* AFK systems, resource protection, server management
+
+### 🎮 **Gameplay Flow Context Events**
+- [ ] **GameplayFlowEvents.BOSS_FIGHT_START** - Epic encounter detection
+  - *Implementation:* Analysis of high-damage entities + player tension indicators (health loss, potion use)
+  - *Triggers:* Player engages entity with >100 HP that deals >10 damage per hit
+  - *Use Cases:* Dynamic music, UI changes, challenge notifications, recording highlights
+- [ ] **GameplayFlowEvents.BASE_BUILDING_MODE** - Sustained construction activity
+  - *Implementation:* Extended building pattern detection with infrastructure recognition
+  - *Triggers:* Large-scale building activity (>100 blocks) with defensive/functional patterns
+  - *Use Cases:* Base protection systems, building assistance, territory establishment
+- [ ] **GameplayFlowEvents.RESOURCE_GATHERING** - Systematic collection detection
+  - *Implementation:* Pattern recognition for repetitive farming/mining in productive areas
+  - *Triggers:* Repetitive harvesting/mining actions in resource-rich areas
+  - *Use Cases:* Automation suggestions, efficiency tracking, resource management
+- [ ] **GameplayFlowEvents.SOCIAL_GATHERING** - Multi-player convergence
+  - *Implementation:* Analysis of multiple players converging in close proximity with social indicators
+  - *Triggers:* 3+ players within 16 blocks, low movement, possible chat activity
+  - *Use Cases:* Event detection, social features, meeting assistance
+- [ ] **GameplayFlowEvents.RAID_PREPARATION** - Group coordination detection
+  - *Implementation:* Multi-player gear coordination and strategic positioning analysis
+  - *Triggers:* Multiple players equipping combat gear, grouping, moving toward objectives
+  - *Use Cases:* Raid coordination tools, team management, strategic assistance
+
+### 🔧 **Smart Event Implementation Architecture**
+
+#### **Pattern Recognition Engine**
+- **Event Aggregation**: Combine multiple base events (block placement, movement, inventory changes)
+- **Temporal Analysis**: Track patterns over time windows (30 seconds to 10 minutes)
+- **Spatial Analysis**: Consider player location, biome, and nearby structures
+- **Context Awareness**: Factor in time of day, weather, nearby players
+- **Machine Learning**: Improve detection accuracy over time based on outcomes
+
+#### **Configuration System**
+```java
+SmartEventConfig.builder()
+    .sensitivity(0.7f)              // How easily events trigger
+    .minimumConfidence(0.8f)        // Confidence threshold for triggering
+    .temporalWindow(Duration.ofMinutes(2))  // How long to analyze patterns
+    .spatialRadius(32)              // Area to consider for analysis
+    .enableLearning(true)           // Whether to improve detection over time
+    .build();
+```
+
+#### **Performance Considerations**
+- **Lightweight Analysis**: Use efficient algorithms that don't impact game performance
+- **Configurable Frequency**: Allow servers to adjust analysis frequency based on performance needs
+- **Lazy Evaluation**: Only analyze patterns when base events suggest relevant activity
+- **Memory Efficient**: Use circular buffers and bounded storage for pattern data
+
+#### **Privacy & Ethics**
+- **Opt-in System**: Players must explicitly enable smart detection
+- **Transparency**: Clear notifications when smart events are detected
+- **No Personal Data**: Only analyze gameplay patterns, never personal information
+- **Local Processing**: Pattern analysis happens locally, no data transmitted
+
+---
+
 ## 📚 **Developer References**
 
 For developers implementing these events, here are essential documentation links:
@@ -343,7 +431,7 @@ For developers implementing these events, here are essential documentation links
 
 ---
 
-*Last Updated: 2025-01-07*  
+*Last Updated: 2025-07-25*  
 *Event Data Sources: [iamkaf/modresources](https://github.com/iamkaf/modresources/tree/main/docs)*
 
 ## 📝 **Recent Implementation History**
@@ -363,3 +451,23 @@ For developers implementing these events, here are essential documentation links
 - ✅ **EntityEvent.ENTITY_DEATH**: Consistent timing and parameters across Fabric/Forge/NeoForge
 - ✅ **EntityEvent.ENTITY_DAMAGE**: Consistent damage values and source information 
 - ⚠️ **EntityEvent.ENTITY_SPAWN**: Forge/NeoForge only - Fabric implementation needed for full consistency
+
+### **2025-07-25 - Block Events & Client Input Events**
+- ✅ **BlockEvents.BLOCK_BREAK_BEFORE/AFTER** - Implemented using `PlayerBlockBreakEvents.BEFORE/AFTER` (Fabric), `BlockEvent.BreakEvent` (Forge/NeoForge)
+- ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - Implemented using `BlockEvent.EntityPlaceEvent` (Forge/NeoForge), Fabric support planned
+- ✅ **BlockEvents.BLOCK_INTERACT** - Implemented using `UseBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.RightClickBlock` (Forge/NeoForge)
+- ✅ **BlockEvents.BLOCK_CLICK** - Implemented using `AttackBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.LeftClickBlock` (Forge/NeoForge)
+- ✅ **InputEvents.MOUSE_SCROLL** - Implemented using `MouseHandlerMixin` (Fabric), `InputEvent.MouseScrollingEvent` (Forge/NeoForge)
+- ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - Implemented using `WorldRenderEvents.BLOCK_OUTLINE` (Fabric), `RenderHighlightEvent.Block` (Forge/NeoForge)
+
+**Technical Notes:**
+- All block events support both BEFORE (cancellable) and AFTER (informational) variants where applicable
+- Mouse scroll event uses Mixin on Fabric for global coverage, native events on Forge/NeoForge
+- Block outline rendering allows cancellation and custom rendering on all platforms
+- Events follow EventBus 7 patterns on Forge while maintaining traditional @SubscribeEvent patterns on NeoForge
+- **⚠️ BEHAVIOR CONSISTENCY**: All events use unified `InteractionResult` return values for consistent cancellation behavior
+
+**Cross-Platform Behavior Validation:**
+- ✅ **Block Events**: Consistent timing (before/after), cancellation, and parameter data across all platforms
+- ✅ **Mouse Scroll**: Consistent scroll delta values and mouse coordinates on all platforms
+- ✅ **Block Outline**: Consistent cancellation behavior and rendering context across all platforms

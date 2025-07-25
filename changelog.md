@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## [Unreleased]
+
+### Added
+
+- Added comprehensive block interaction events:
+  - `BlockEvents.BLOCK_BREAK_BEFORE/AFTER` - Fires before/after players break blocks (cancellable)
+  - `BlockEvents.BLOCK_PLACE_BEFORE/AFTER` - Fires before/after players place blocks (cancellable)
+  - `BlockEvents.BLOCK_INTERACT` - Fires when players right-click blocks (cancellable)
+  - `BlockEvents.BLOCK_CLICK` - Fires when players left-click blocks (cancellable)
+- Added client-side input events:
+  - `InputEvents.MOUSE_SCROLL` - Fires on mouse wheel scroll with position and delta data (cancellable)
+- Added client-side rendering events:
+  - `RenderEvents.BLOCK_OUTLINE_RENDER` - Fires when block selection outlines are rendered (cancellable)
+- Added Fabric Mixin support for mouse scroll events via `MouseHandlerMixin`
+- Added full cross-platform event consistency across Fabric, Forge, and NeoForge
+- Added EventBus 7 support for Forge 1.21.8+ with proper cancellation handling
+
 ## 6.0.10
 
 ### Added

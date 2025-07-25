@@ -1,18 +1,24 @@
 package com.iamkaf.amber.platform;
 
+import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
@@ -43,6 +49,21 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(entity, source, amount);
             return result == InteractionResult.PASS; // Only allow damage if PASS is returned
         });
+        
+        // Block events
+        PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
+            InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(level, player, pos, state, blockEntity);
+            return result == InteractionResult.PASS; // Only allow break if PASS is returned
+        });
+        PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> {
+            BlockEvents.BLOCK_BREAK_AFTER.invoker().afterBlockBreak(level, player, pos, state, blockEntity);
+        });
+        UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
+            return BlockEvents.BLOCK_INTERACT.invoker().onBlockInteract(player, level, hand, hitResult);
+        });
+        AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+            return BlockEvents.BLOCK_CLICK.invoker().onBlockClick(player, level, hand, pos, direction);
+        });
     }
 
     @Override
@@ -59,6 +80,22 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
+        });
+        
+        // Render events
+        WorldRenderEvents.BLOCK_OUTLINE.register((context, hitResult) -> {
+            if (hitResult != null) {
+                InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+                    context.camera(), 
+                    context.consumers(), 
+                    context.matrixStack(), 
+                    hitResult, 
+                    hitResult.getBlockPos(), 
+                    context.world().getBlockState(hitResult.getBlockPos())
+                );
+                return result == InteractionResult.PASS; // Only render if PASS is returned
+            }
+            return true; // Render by default if no hit result
         });
     }
 
