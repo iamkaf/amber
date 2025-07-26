@@ -517,6 +517,28 @@ The event system provides a unified interface while handling platform difference
   - Parameters: `Player player, Level level, InteractionHand hand, Entity entity`
   - Returns: `InteractionResult` (cancellable)
 
+#### Block Events (`BlockEvents`)
+- **`BLOCK_PLACE`** - When blocks are placed (server-only for cross-platform consistency)
+  - Parameters: `Level level, Player player, BlockPos pos, BlockState state, ItemStack context`
+  - Returns: `InteractionResult` (cancellable)
+  - **Note**: Fires server-only across all platforms (Fabric, Forge, NeoForge) for consistent behavior
+
+- **`BLOCK_BREAK_BEFORE`** - Before blocks are broken
+  - Parameters: `Level level, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity`
+  - Returns: `InteractionResult` (cancellable)
+
+- **`BLOCK_BREAK_AFTER`** - After blocks are broken
+  - Parameters: `Level level, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity`
+  - Returns: `void` (non-cancellable)
+
+- **`BLOCK_INTERACT`** - When players right-click blocks
+  - Parameters: `Player player, Level level, InteractionHand hand, BlockHitResult hitResult`  
+  - Returns: `InteractionResult` (cancellable)
+
+- **`BLOCK_CLICK`** - When players left-click blocks
+  - Parameters: `Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction`
+  - Returns: `InteractionResult` (cancellable)
+
 #### Entity Events (`EntityEvent`)
 - **`ENTITY_SPAWN`** - When entities spawn in the world
   - Parameters: `Entity entity, Level level`
@@ -554,6 +576,11 @@ The event system provides a unified interface while handling platform difference
 
 | Event | Fabric | Forge | NeoForge | Notes |
 |-------|--------|-------|----------|-------|
+| `BLOCK_PLACE` | ✅ (Server-only) | ✅ (Server-only) | ✅ (Server-only) | Unified server-only for consistency |
+| `BLOCK_BREAK_BEFORE` | ✅ | ✅ | ✅ | Fully consistent |
+| `BLOCK_BREAK_AFTER` | ✅ | ✅ | ✅ | Fully consistent |
+| `BLOCK_INTERACT` | ✅ | ✅ | ✅ | Fully consistent |
+| `BLOCK_CLICK` | ✅ | ✅ | ✅ | Fully consistent |
 | `ENTITY_INTERACT` | ✅ | ✅ | ✅ | Fully consistent |
 | `ENTITY_SPAWN` | ✅ (Mixin) | ✅ | ✅ | Fabric uses custom Mixin |
 | `ENTITY_DEATH` | ✅ | ✅ | ✅ | Fully consistent |

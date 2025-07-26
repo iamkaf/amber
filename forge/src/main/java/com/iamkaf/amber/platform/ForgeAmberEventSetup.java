@@ -141,20 +141,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 return false; // Only handle player placements
             }
             
-            InteractionResult result = BlockEvents.BLOCK_PLACE_BEFORE.invoker().beforeBlockPlace(
+            // Fire the unified BLOCK_PLACE event
+            InteractionResult result = BlockEvents.BLOCK_PLACE.invoker().onBlockPlace(
                 player.level(), player, event.getPos(), event.getPlacedBlock(),
                 player.getMainHandItem()
             );
-            if (result != InteractionResult.PASS) {
-                return true; // Cancel placement
-            }
-            
-            // Fire after event (can't cancel)
-            BlockEvents.BLOCK_PLACE_AFTER.invoker().afterBlockPlace(
-                player.level(), player, event.getPos(), event.getPlacedBlock(),
-                player.getMainHandItem()
-            );
-            return false; // Allow placement
+            return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
         
         public static boolean onBlockInteract(PlayerInteractEvent.RightClickBlock event) {

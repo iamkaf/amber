@@ -139,20 +139,14 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
                 return; // Only handle player placements
             }
             
-            InteractionResult result = BlockEvents.BLOCK_PLACE_BEFORE.invoker().beforeBlockPlace(
+            // Fire the unified BLOCK_PLACE event
+            InteractionResult result = BlockEvents.BLOCK_PLACE.invoker().onBlockPlace(
                 player.level(), player, event.getPos(), event.getPlacedBlock(),
                 player.getMainHandItem()
             );
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true); // Cancel placement
-                return;
             }
-            
-            // Fire after event (can't cancel)
-            BlockEvents.BLOCK_PLACE_AFTER.invoker().afterBlockPlace(
-                player.level(), player, event.getPos(), event.getPlacedBlock(),
-                player.getMainHandItem()
-            );
         }
         
         @SubscribeEvent(priority = EventPriority.HIGH)

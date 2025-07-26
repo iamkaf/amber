@@ -13,7 +13,7 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Added comprehensive block interaction events:
   - `BlockEvents.BLOCK_BREAK_BEFORE/AFTER` - Fires before/after players break blocks (cancellable)
-  - `BlockEvents.BLOCK_PLACE_BEFORE/AFTER` - Fires before/after players place blocks (cancellable)
+  - `BlockEvents.BLOCK_PLACE` - Unified block placement event (server-only, cancellable)
   - `BlockEvents.BLOCK_INTERACT` - Fires when players right-click blocks (cancellable)
   - `BlockEvents.BLOCK_CLICK` - Fires when players left-click blocks (cancellable)
 - Added client-side input events:

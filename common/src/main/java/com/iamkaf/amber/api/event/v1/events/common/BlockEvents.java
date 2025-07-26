@@ -40,28 +40,17 @@ public class BlockEvents {
     );
 
     /**
-     * An event that is called before a block is placed by a player. This event can be cancelled to prevent the block from being placed.
+     * An event that is called when a player places a block. This event can be cancelled to prevent the block from being placed.
      */
-    public static final Event<BlockPlaceBefore> BLOCK_PLACE_BEFORE = EventFactory.createArrayBacked(
-            BlockPlaceBefore.class, callbacks -> (level, player, pos, state, context) -> {
-                for (BlockPlaceBefore callback : callbacks) {
-                    InteractionResult result = callback.beforeBlockPlace(level, player, pos, state, context);
+    public static final Event<BlockPlace> BLOCK_PLACE = EventFactory.createArrayBacked(
+            BlockPlace.class, callbacks -> (level, player, pos, state, context) -> {
+                for (BlockPlace callback : callbacks) {
+                    InteractionResult result = callback.onBlockPlace(level, player, pos, state, context);
                     if (result != InteractionResult.PASS) {
                         return result; // Early return for cancellation
                     }
                 }
                 return InteractionResult.PASS; // Allow placement by default
-            }
-    );
-
-    /**
-     * An event that is called after a block has been placed by a player.
-     */
-    public static final Event<BlockPlaceAfter> BLOCK_PLACE_AFTER = EventFactory.createArrayBacked(
-            BlockPlaceAfter.class, callbacks -> (level, player, pos, state, context) -> {
-                for (BlockPlaceAfter callback : callbacks) {
-                    callback.afterBlockPlace(level, player, pos, state, context);
-                }
             }
     );
 
@@ -125,9 +114,9 @@ public class BlockEvents {
     }
 
     @FunctionalInterface
-    public interface BlockPlaceBefore {
+    public interface BlockPlace {
         /**
-         * Called before a block is placed by a player.
+         * Called when a player places a block.
          *
          * @param level   the level/world where the block is being placed
          * @param player  the player placing the block
@@ -136,21 +125,7 @@ public class BlockEvents {
          * @param context additional context about the placement (item stack being used)
          * @return an {@link InteractionResult} indicating whether the placement should be allowed or cancelled
          */
-        InteractionResult beforeBlockPlace(Level level, Player player, BlockPos pos, BlockState state, ItemStack context);
-    }
-
-    @FunctionalInterface
-    public interface BlockPlaceAfter {
-        /**
-         * Called after a block has been placed by a player.
-         *
-         * @param level   the level/world where the block was placed
-         * @param player  the player who placed the block
-         * @param pos     the position where the block was placed
-         * @param state   the state of the block that was placed
-         * @param context additional context about the placement (item stack that was used)
-         */
-        void afterBlockPlace(Level level, Player player, BlockPos pos, BlockState state, ItemStack context);
+        InteractionResult onBlockPlace(Level level, Player player, BlockPos pos, BlockState state, ItemStack context);
     }
 
     @FunctionalInterface
