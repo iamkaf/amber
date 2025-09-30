@@ -1,7 +1,9 @@
 package com.iamkaf.amber.api.item;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +51,7 @@ public class SmartTooltip {
      * @return The current SmartTooltip instance for method chaining.
      */
     public SmartTooltip shift(Component component) {
-        if (Screen.hasShiftDown()) {
+        if (hasShiftDown()) {
             tooltipComponents.add(component);
         }
         return this;
@@ -77,7 +79,7 @@ public class SmartTooltip {
      * @return The current SmartTooltip instance for method chaining.
      */
     public SmartTooltip shiftKeybind(KeyMapping keybind, Component component) {
-        if (Screen.hasShiftDown() && keybind.isDown()) {
+        if (hasShiftDown() && keybind.isDown()) {
             tooltipComponents.add(component);
         }
         return this;
@@ -102,5 +104,15 @@ public class SmartTooltip {
     @Deprecated
     public void into(List<Component> tooltipAdder) {
         tooltipAdder.addAll(tooltipComponents);
+    }
+
+    /**
+     * Helper method to check if Shift key is held down.
+     * In 1.21.9, this method moved from Screen to Minecraft.
+     *
+     * @return true if the Shift key is held down.
+     */
+    private static boolean hasShiftDown() {
+        return Minecraft.getInstance().hasShiftDown();
     }
 }

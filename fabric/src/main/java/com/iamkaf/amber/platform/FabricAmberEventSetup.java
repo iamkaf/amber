@@ -13,7 +13,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
@@ -81,22 +80,10 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         });
-        
-        // Render events
-        WorldRenderEvents.BLOCK_OUTLINE.register((context, blockOutlineContext) -> {
-            if (blockOutlineContext != null) {
-                InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                    context.camera(), 
-                    context.consumers(), 
-                    context.matrixStack(), 
-                    null, // Fabric doesn't provide BlockHitResult here, pass null
-                    blockOutlineContext.blockPos(), 
-                    blockOutlineContext.blockState()
-                );
-                return result == InteractionResult.PASS; // Only render if PASS is returned
-            }
-            return true; // Render by default if no block outline context
-        });
+
+        // TODO: Render events - WorldRenderEvents.BLOCK_OUTLINE was removed in Fabric API for 1.21.9
+        // Need to find the replacement API for BLOCK_OUTLINE_RENDER event
+        // See: https://github.com/FabricMC/fabric/blob/1.21.9/
     }
 
     @Override

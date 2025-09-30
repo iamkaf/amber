@@ -3,6 +3,7 @@ package com.iamkaf.amber.networking.fabric;
 import com.iamkaf.amber.api.networking.v1.PacketContext;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -36,8 +37,8 @@ public class FabricPacketContext implements PacketContext {
             executeOnClient(task);
         } else {
             // Server-side execution
-            if (player != null && player.getServer() != null) {
-                player.getServer().execute(task);
+            if (player instanceof ServerPlayer serverPlayer && serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                serverLevel.getServer().execute(task);
             } else {
                 // Fallback to immediate execution
                 task.run();

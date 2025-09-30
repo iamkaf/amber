@@ -12,7 +12,8 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
+    // Disabled until compatible with 1.21.9
+    // modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
 }
 
 loom {

@@ -14,6 +14,16 @@ public class RenderEvents {
     /**
      * An event that is called when a block outline is about to be rendered. This event can be cancelled to prevent
      * the outline from being rendered, or used to customize the outline rendering.
+     *
+     * <p><b>Note for 1.21.9:</b> Rendering systems changed significantly in 1.21.9:
+     * <ul>
+     *   <li><b>NeoForge:</b> Fully supported. Uses {@code ExtractBlockOutlineRenderStateEvent} with {@code CustomBlockOutlineRenderer} bridge.</li>
+     *   <li><b>Fabric:</b> Fully supported. Mixin injects into {@code LevelRenderer#renderBlockOutline} with full rendering context.</li>
+     *   <li><b>Forge:</b> Not yet available for 1.21.9.</li>
+     * </ul>
+     *
+     * @see <a href="https://fabricmc.net/2025/09/23/1219.html">Fabric 1.21.9 Release Notes</a>
+     * @see <a href="https://neoforged.net/news/21.9release/">NeoForge 1.21.9 Release Notes</a>
      */
     public static final Event<BlockOutlineRender> BLOCK_OUTLINE_RENDER = EventFactory.createArrayBacked(
             BlockOutlineRender.class, callbacks -> (camera, bufferSource, poseStack, hitResult, pos, state) -> {

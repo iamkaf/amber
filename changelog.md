@@ -25,6 +25,10 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added full cross-platform event consistency across Fabric, Forge, and NeoForge
 - Added EventBus 7 support for Forge 1.21.8+ with proper cancellation handling
 
+### Changed
+
+- **Updated to Minecraft 1.21.9** (Fabric and NeoForge)
+
 ## 6.0.10
 
 ### Added

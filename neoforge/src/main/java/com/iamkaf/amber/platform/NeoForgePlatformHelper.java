@@ -29,7 +29,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
 
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public Env getEnvironment() {
-        switch (FMLLoader.getDist()) {
+        switch (FMLLoader.getCurrent().getDist()) {
             case CLIENT -> {
                 return Env.CLIENT;
             }
@@ -47,7 +47,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
                 return Env.SERVER;
             }
             default -> {
-                throw new IllegalStateException("Unknown environment type: " + FMLLoader.getDist());
+                throw new IllegalStateException("Unknown environment type: " + FMLLoader.getCurrent().getDist());
             }
         }
     }

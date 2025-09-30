@@ -154,7 +154,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             new CustomPacketPayload.Type<>(packetId);
         FabricPacketWrapper<T> wrapper = new FabricPacketWrapper<>(packet, payloadType);
         
-        for (ServerPlayer player : PlayerLookup.all(except.getServer())) {
+        for (ServerPlayer player : PlayerLookup.all(((net.minecraft.server.level.ServerLevel)except.level()).getServer())) {
             if (!player.equals(except)) {
                 ServerPlayNetworking.send(player, wrapper);
             }

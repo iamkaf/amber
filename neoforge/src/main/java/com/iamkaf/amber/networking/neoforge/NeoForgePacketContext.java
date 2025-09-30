@@ -1,6 +1,7 @@
 package com.iamkaf.amber.networking.neoforge;
 
 import com.iamkaf.amber.api.networking.v1.PacketContext;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -31,7 +32,7 @@ public class NeoForgePacketContext implements PacketContext {
         // In NeoForge, we need to ensure execution on the correct thread
         if (isClientSide) {
             // Client-side execution
-            if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+            if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
                 net.minecraft.client.Minecraft.getInstance().execute(task);
             } else {
                 // Fallback
@@ -39,8 +40,8 @@ public class NeoForgePacketContext implements PacketContext {
             }
         } else {
             // Server-side execution
-            if (player != null && player.getServer() != null) {
-                player.getServer().execute(task);
+            if (player instanceof ServerPlayer serverPlayer && serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                serverLevel.getServer().execute(task);
             } else {
                 // Fallback to immediate execution
                 task.run();
