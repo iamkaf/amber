@@ -11,13 +11,9 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
-import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
-import net.minecraft.client.Camera;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -28,7 +24,6 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -218,35 +213,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
                 event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
             );
-        }
-        
-        @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onExtractBlockOutline(ExtractBlockOutlineRenderStateEvent event) {
-            // The new rendering system separates extraction (this event) from actual rendering
-            // We need to bridge the old API that expects immediate rendering with direct buffer access
-            // to the new system that uses CustomBlockOutlineRenderer
-
-            // Store event data that will be needed during rendering
-            final Camera camera = event.getCamera();
-            final BlockPos pos = event.getBlockPos();
-            final BlockState state = event.getBlockState();
-            final BlockHitResult hitResult = event.getHitResult();
-
-            // Add a custom renderer that will invoke our event during the actual render phase
-            event.addCustomRenderer((renderState, bufferSource, poseStack, translucentPass, levelRenderState) -> {
-                // Invoke the Amber BLOCK_OUTLINE_RENDER event
-                InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                    camera,
-                    bufferSource,
-                    poseStack,
-                    hitResult,
-                    pos,
-                    state
-                );
-
-                // Return true to suppress vanilla rendering if event was not PASS
-                return result != InteractionResult.PASS;
-            });
         }
     }
 
