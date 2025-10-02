@@ -17,131 +17,17 @@
 
 ## 🎯 What is Amber?
 
-Amber is a powerful foundation library that provides **unified APIs** for common modding tasks across **Fabric**, **Forge**, and **NeoForge** platforms. Built with cross-platform compatibility in mind, Amber eliminates the complexity of managing platform-specific code while offering modern, easy-to-use APIs for Minecraft mod development.
-
-### ✨ Key Features
-
-<table>
-<tr>
-<td width="50%">
-
-**🌐 Cross-Platform Compatibility**
-- Write once, run everywhere
-- Unified APIs across all major mod loaders
-- Automatic platform abstraction
-- Modern Minecraft 1.21.7 support
-
-</td>
-<td width="50%">
-
-**🔧 Comprehensive Toolkit**
-- Registry system for items, blocks, entities
-- Event handling with Fabric-inspired API
-- JSON configuration management
-- Type-safe networking system
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-**🎮 Game Integration**
-- Command registration and handling
-- Client-side HUD rendering utilities
-- Cross-platform keybind system
-- Sound system with custom parameters
-
-</td>
-<td width="50%">
-
-**🛠️ Developer Utilities**
-- Item helpers and tooltips
-- World interaction utilities
-- Player feedback systems
-- Math and probability utilities
-
-</td>
-</tr>
-</table>
+Amber is a powerful foundation library that provides **unified APIs** for common modding tasks across **Fabric**, **Forge**, and **NeoForge** platforms. If a mod you've downloaded requires Amber, you're in the right place! Just install it in your `mods` folder, and you're good to go.
 
 ---
 
-## 🚀 Quick Start
+## 📖 Documentation
 
-### For End Users
+We have documentation for everyone, whether you're a player, a developer, or a contributor.
 
-Just install Amber and any mods that require it will work automatically! No additional configuration needed.
-
-### For Developers
-
-**Add to your project:**
-
-```gradle
-repositories {
-    maven { url = 'https://raw.githubusercontent.com/iamkaf/modresources/main/maven/' }
-}
-
-dependencies {
-    // Common
-    implementation "com.iamkaf:amber-common:6.0.10+1.21.7"
-    
-    // Platform-specific (choose one)
-    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
-    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
-    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
-}
-```
-
-**Initialize in your mod:**
-
-```java
-public class YourMod {
-    public static final String MOD_ID = "yourmod";
-    
-    public static void init() {
-        // Initialize with Amber - automatically detects mod name and version
-        AmberInitializer.initialize(MOD_ID);
-        
-        // Your mod initialization code here
-        System.out.println("YourMod initialized with Amber!");
-    }
-}
-```
-
-📖 **[Full Documentation](docs/README.md)** | 🏁 **[Getting Started Guide](docs/getting-started.md)**
-
----
-
-## 🏗️ Architecture
-
-Amber follows a service-based architecture that abstracts platform differences:
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Your Mod      │    │   Your Mod      │    │   Your Mod      │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│  Amber Common   │    │  Amber Common   │    │  Amber Common   │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│ Amber Fabric    │    │  Amber Forge    │    │ Amber NeoForge  │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│     Fabric      │    │     Forge       │    │    NeoForge     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
----
-
-## 📋 Maintained Versions
-
-<div align="center">
-
-| Status | Minecraft Version | Support Level |
-|--------|------------------|---------------|
-| 🟢 **Active** | 1.21.7 (Latest) | Full support + new features |
-| 🟡 **Maintained** | 1.21.1 | Bug fixes only |
-| 🟡 **Maintained** | 1.20.1 | Bug fixes only |
-| 🔴 **Legacy** | Older versions | No support |
-
-</div>
+- **[➡️ User Guide](./docs/user/README.md)**: For players and modpack creators.
+- **[➡️ Developer Docs](./docs/dev/README.md)**: For developers using Amber in their mods.
+- **[➡️ Maintainer Docs](./docs/maintainer/CODE_REVIEW.md)**: For contributors to the Amber project.
 
 ---
 
