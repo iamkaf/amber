@@ -6,7 +6,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
+import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +22,7 @@ public class GuiMixin {
 
     /**
      * This method is called after the HUD is rendered, allowing us to inject custom rendering logic.
-     * We check if the current screen is not a ReceivingLevelScreen to avoid conflicts with loading screens.
+     * We check if the current screen is not a LevelLoadingScreen to avoid conflicts with loading screens.
      * This matches the Fabric code for HudRenderCallback, which is deprecated. I'll change to a more robust
      * solution if Forge ever provides a better way to handle HUD rendering events, or I roll my own.
      *
@@ -33,7 +33,7 @@ public class GuiMixin {
     @Inject(method = "render", at = @org.spongepowered.asm.mixin.injection.At("TAIL"), remap = false)
     public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         // this check mirrors the vanilla check
-        if (this.minecraft.screen == null || !(this.minecraft.screen instanceof ReceivingLevelScreen)) {
+        if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, deltaTracker);
         }
     }

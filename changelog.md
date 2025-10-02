@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## [Unreleased]
+
+### Added
+
+- Added Forge 1.21.9 support
+
 ## 7.0.2
 
 ### Added

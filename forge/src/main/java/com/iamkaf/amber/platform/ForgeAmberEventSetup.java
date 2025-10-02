@@ -17,7 +17,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -58,11 +57,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 .addListener(EventHandlerClient::onKeybindRegistration);
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
-        
-        // Input and render events
+
         ScreenEvent.MouseScrolled.Pre.BUS.addListener(EventHandlerClient::onMouseScrollPre);
         ScreenEvent.MouseScrolled.Post.BUS.addListener(EventHandlerClient::onMouseScrollPost);
-        RenderHighlightEvent.Block.BUS.addListener(EventHandlerClient::onBlockHighlight);
     }
 
     @Override
@@ -197,15 +194,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
                 event.getMouseX(), event.getMouseY(), event.getDeltaX(), event.getDeltaY()
             );
-        }
-        
-        public static boolean onBlockHighlight(RenderHighlightEvent.Block event) {
-            InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                event.getCamera(), event.getMultiBufferSource(), event.getPoseStack(),
-                event.getTarget(), event.getTarget().getBlockPos(),
-                event.getCamera().getEntity().level().getBlockState(event.getTarget().getBlockPos())
-            );
-            return result == InteractionResult.PASS; // Only render if PASS (opposite of cancel)
         }
     }
 
