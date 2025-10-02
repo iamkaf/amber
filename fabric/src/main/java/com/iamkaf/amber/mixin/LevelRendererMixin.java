@@ -1,5 +1,6 @@
 package com.iamkaf.amber.mixin;
 
+import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -84,5 +85,9 @@ public class LevelRendererMixin {
         if (result != InteractionResult.PASS) {
             ci.cancel();
         }
+    }
+
+    static {
+        AmberMod.AMBER_MIXINS.add("LevelRendererMixin");
     }
 }
