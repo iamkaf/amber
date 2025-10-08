@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
-## [Unreleased]
+## 8.0.0
 
 ### Added
 
-- Added Forge 1.21.9 support
+- Added Forge 1.21.10 support
 - Added debug tracking to all mixins for `/amber debug` command visibility
 - Added player lifecycle events:
   - `PlayerEvents.PLAYER_JOIN` - Fires when a player joins the server

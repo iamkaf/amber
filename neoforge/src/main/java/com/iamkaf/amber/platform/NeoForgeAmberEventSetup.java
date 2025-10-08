@@ -46,8 +46,8 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerCommon() {
         NeoForge.EVENT_BUS.register(EventHandlerCommonNeoForge.class);
-//        IEventBus bus = (IEventBus) AmberMod.getEventBus(Constants.MOD_ID);
-//        assert bus != null;
+        IEventBus bus = (IEventBus) AmberMod.getEventBus(Constants.MOD_ID);
+        assert bus != null;
 //        bus.register(EventHandlerCommonNeoForge.EventHandlerCommonMod.class);
     }
 
@@ -209,7 +209,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(
                 event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
             );
-            if (result != InteractionResult.PASS) {
+            if (!result.equals(InteractionResult.PASS)) {
                 event.setCanceled(true); // Cancel if not PASS
             }
         }
@@ -222,6 +222,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
     }
 
+    // This is for the mod event bus
     static public class EventHandlerClientMod {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onKeyMappingRegistration(RegisterKeyMappingsEvent event) {

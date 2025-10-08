@@ -76,10 +76,6 @@ public class PlayerEvents {
      * This event is fired on the logical server side after the player has been respawned,
      * either from death or from exiting the End dimension.
      * </p>
-     *
-     * @param oldPlayer the player before respawning (may be the same instance or different)
-     * @param newPlayer the player after respawning
-     * @param alive whether the player was alive before respawning (false if respawning from death)
      */
     public static final Event<PlayerRespawn> PLAYER_RESPAWN = EventFactory.createArrayBacked(
             PlayerRespawn.class, callbacks -> (oldPlayer, newPlayer, alive) -> {
