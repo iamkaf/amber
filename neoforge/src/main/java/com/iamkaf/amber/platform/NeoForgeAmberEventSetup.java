@@ -203,23 +203,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void onClientTickEventPost(ClientTickEvent.Post event) {
             ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
-        
-        @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onMouseScrollPre(ScreenEvent.MouseScrolled.Pre event) {
-            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(
-                event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
-            );
-            if (!result.equals(InteractionResult.PASS)) {
-                event.setCanceled(true); // Cancel if not PASS
-            }
-        }
-        
-        @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onMouseScrollPost(ScreenEvent.MouseScrolled.Post event) {
-            InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
-                event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY()
-            );
-        }
     }
 
     // This is for the mod event bus

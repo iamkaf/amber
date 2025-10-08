@@ -59,13 +59,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     public void registerClient() {
         RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
         // mod bus events
-        RegisterKeyMappingsEvent.getBus((BusGroup) AmberMod.getEventBus(Constants.MOD_ID))
-                .addListener(EventHandlerClient::onKeybindRegistration);
+        RegisterKeyMappingsEvent.BUS.addListener(EventHandlerClient::onKeybindRegistration);
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
-
-        ScreenEvent.MouseScrolled.Pre.BUS.addListener(EventHandlerClient::onMouseScrollPre);
-        ScreenEvent.MouseScrolled.Post.BUS.addListener(EventHandlerClient::onMouseScrollPost);
     }
 
     @Override
@@ -231,19 +227,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static void onClientTickEventPost(TickEvent.ClientTickEvent.Post post) {
             ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
-        }
-        
-        public static boolean onMouseScrollPre(ScreenEvent.MouseScrolled.Pre event) {
-            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker().onMouseScrollPre(
-                event.getMouseX(), event.getMouseY(), event.getDeltaX(), event.getDeltaY()
-            );
-            return result != InteractionResult.PASS; // Cancel if not PASS
-        }
-        
-        public static void onMouseScrollPost(ScreenEvent.MouseScrolled.Post event) {
-            InputEvents.MOUSE_SCROLL_POST.invoker().onMouseScrollPost(
-                event.getMouseX(), event.getMouseY(), event.getDeltaX(), event.getDeltaY()
-            );
         }
     }
 
