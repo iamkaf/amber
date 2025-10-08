@@ -69,18 +69,18 @@ These events are already available in Amber:
 ### ⚡ **Phase 2: Gameplay Mechanics** (Medium Priority)
 
 #### 👥 **Player Lifecycle Events**
-- [ ] **PlayerJoinEvent** - When players join the server
-  - *Fabric:* `ServerPlayerEvents.JOIN`
-  - *Forge:* `PlayerJoinEvent`
-  - *NeoForge:* Not directly listed
-- [ ] **PlayerLeaveEvent** - When players leave the server
-  - *Fabric:* `ServerPlayerEvents.LEAVE`
-  - *Forge:* `PlayerLeaveEvent` (implied)
-  - *NeoForge:* Not directly listed
-- [ ] **PlayerRespawnEvent** - When players respawn
+- [x] **PlayerJoinEvent** - When players join the server ✅ **IMPLEMENTED**
+  - *Fabric:* `ServerPlayConnectionEvents.JOIN`
+  - *Forge:* `PlayerEvent.PlayerLoggedInEvent`
+  - *NeoForge:* `PlayerEvent.PlayerLoggedInEvent`
+- [x] **PlayerLeaveEvent** - When players leave the server ✅ **IMPLEMENTED**
+  - *Fabric:* `ServerPlayConnectionEvents.DISCONNECT`
+  - *Forge:* `PlayerEvent.PlayerLoggedOutEvent`
+  - *NeoForge:* `PlayerEvent.PlayerLoggedOutEvent`
+- [x] **PlayerRespawnEvent** - When players respawn ✅ **IMPLEMENTED**
   - *Fabric:* `ServerPlayerEvents.AFTER_RESPAWN`
   - *Forge:* `PlayerEvent.PlayerRespawnEvent`
-  - *NeoForge:* Not directly listed
+  - *NeoForge:* `PlayerEvent.PlayerRespawnEvent`
 
 #### ⚔️ **Combat & PvP Events**
 - [ ] **LivingKillEvent** - When one entity kills another
@@ -97,10 +97,14 @@ These events are already available in Amber:
   - *NeoForge:* `SweepAttackEvent`
 
 #### 📦 **Inventory & Item Events**
-- [ ] **ItemDropEvent** - When items are dropped/tossed
-  - *Fabric:* Not directly listed
+- [x] **ItemDropEvent** - When items are dropped/tossed ✅ **IMPLEMENTED**
+  - *Fabric:* Mixin on `Player.drop()` (no native event)
   - *Forge:* `ItemTossEvent`
   - *NeoForge:* `ItemTossEvent`
+- [x] **ItemPickupEvent** - When items are picked up ✅ **IMPLEMENTED**
+  - *Fabric:* Mixin on `ItemEntity.playerTouch()` (no native event)
+  - *Forge:* `EntityItemPickupEvent`
+  - *NeoForge:* `ItemEntityPickupEvent.Pre`
 - [ ] **ItemConsumeEvent** - When items are consumed
   - *Fabric:* Not directly listed
   - *Forge:* Not directly listed
@@ -471,3 +475,21 @@ For developers implementing these events, here are essential documentation links
 - ✅ **Block Events**: Consistent timing (before/after), cancellation, and parameter data across all platforms
 - ✅ **Mouse Scroll**: Consistent scroll delta values and mouse coordinates on all platforms
 - ✅ **Block Outline**: Consistent cancellation behavior and rendering context across all platforms
+
+### **2025-01-XX - Item Events**
+- ✅ **ItemEvents.ITEM_DROP** - Implemented using `ItemTossEvent` (Forge/NeoForge), `PlayerMixin` on `Player.drop()` (Fabric)
+- ✅ **ItemEvents.ITEM_PICKUP** - Implemented using `EntityItemPickupEvent` (Forge), `ItemEntityPickupEvent.Pre` (NeoForge), `ItemEntityMixin` on `ItemEntity.playerTouch()` (Fabric)
+
+**Technical Notes:**
+- Both Forge and NeoForge have native events for item drop/pickup
+- Fabric lacks native events (see https://github.com/FabricMC/fabric/issues/1130) - implemented via Mixins
+- Fabric Mixins: `PlayerMixin` (drops) and `ItemEntityMixin` (pickup)
+- All events use consistent callback interfaces: `ItemDrop`, `ItemPickup`
+- Events follow Amber's established patterns with platform-specific registration in `*AmberEventSetup` classes
+- **⚠️ BEHAVIOR CONSISTENCY**: NeoForge uses `TriState.FALSE` for cancellation, Forge uses boolean return, Fabric Mixin uses `CallbackInfo.cancel()`
+
+**Cross-Platform Behavior Validation:**
+- ✅ **ItemEvents.ITEM_DROP**: Consistent cancellation behavior across all platforms (Forge/NeoForge/Fabric)
+- ✅ **ItemEvents.ITEM_PICKUP**: Consistent parameters (player, itemEntity, itemStack) across all platforms
+- ✅ **Fabric Implementation**: Fully implemented via Mixins targeting `Player.drop()` and `ItemEntity.playerTouch()`
+- ✅ **Server-Side Only**: All implementations fire only on server side for consistency

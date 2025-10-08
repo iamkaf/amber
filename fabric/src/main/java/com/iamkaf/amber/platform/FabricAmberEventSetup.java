@@ -3,6 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -19,6 +20,8 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,6 +66,9 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
             return BlockEvents.BLOCK_CLICK.invoker().onBlockClick(player, level, hand, pos, direction);
         });
+
+        // Item events - implemented via Mixins (PlayerMixin, ItemEntityMixin)
+        // Fabric doesn't have native item drop/pickup events: https://github.com/FabricMC/fabric/issues/1130
     }
 
     @Override
@@ -80,14 +86,19 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         });
-
-        // TODO: Render events - WorldRenderEvents.BLOCK_OUTLINE was removed in Fabric API for 1.21.9
-        // Need to find the replacement API for BLOCK_OUTLINE_RENDER event
-        // See: https://github.com/FabricMC/fabric/blob/1.21.9/
     }
 
     @Override
     public void registerServer() {
-
+        // Player lifecycle events
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(handler.getPlayer());
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(handler.getPlayer());
+        });
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(oldPlayer, newPlayer, alive);
+        });
     }
 }

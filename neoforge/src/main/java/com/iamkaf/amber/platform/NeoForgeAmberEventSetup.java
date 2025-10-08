@@ -5,6 +5,7 @@ import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -14,6 +15,8 @@ import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -28,8 +31,11 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
@@ -55,7 +61,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
 
     @Override
     public void registerServer() {
-//        NeoForge.EVENT_BUS.register(EventHandlerServer.class);
+        NeoForge.EVENT_BUS.register(EventHandlerServer.class);
     }
 
     static public class EventHandlerCommonNeoForge {
@@ -164,7 +170,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker().onBlockClick(
-                event.getEntity(), event.getEntity().level(), event.getHand(), 
+                event.getEntity(), event.getEntity().level(), event.getHand(),
                 event.getPos(), event.getFace()
             );
             if (result != InteractionResult.PASS) {
@@ -227,6 +233,46 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerServer {
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(serverPlayer);
+            }
+        }
 
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(serverPlayer);
+            }
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer newPlayer) {
+                // In NeoForge, we don't have easy access to the old player, so we pass the same player twice
+                // The 'alive' flag indicates if they respawned from death (false) or from End portal (true)
+                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(newPlayer, newPlayer, !event.isEndConquered());
+            }
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onItemDrop(ItemTossEvent event) {
+            // Fire the informational Amber item drop event (fires on both client and server)
+            ItemEvents.ITEM_DROP.invoker().onItemDrop(event.getPlayer(), event.getEntity());
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onItemPickup(ItemEntityPickupEvent.Pre event) {
+            // Don't fire if the item has pickup delay (e.g., just dropped)
+            if (event.getItemEntity().hasPickUpDelay()) {
+                return;
+            }
+
+            // Fire the informational Amber item pickup event
+            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
+                event.getPlayer(), event.getItemEntity(), event.getItemEntity().getItem()
+            );
+        }
     }
 }

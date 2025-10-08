@@ -5,6 +5,7 @@ import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
@@ -14,6 +15,8 @@ import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -21,8 +24,11 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
@@ -64,7 +70,14 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
     @Override
     public void registerServer() {
+        // Player lifecycle events
+        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(EventHandlerCommon::onPlayerJoin);
+        PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(EventHandlerCommon::onPlayerLeave);
+        PlayerEvent.PlayerRespawnEvent.BUS.addListener(EventHandlerCommon::onPlayerRespawn);
 
+        // Item events
+        ItemTossEvent.BUS.addListener(EventHandlerCommon::onItemDrop);
+        EntityItemPickupEvent.BUS.addListener(EventHandlerCommon::onItemPickup);
     }
 
     static public class EventHandlerCommon {
@@ -156,10 +169,47 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         
         public static boolean onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker().onBlockClick(
-                event.getEntity(), event.getEntity().level(), event.getHand(), 
+                event.getEntity(), event.getEntity().level(), event.getHand(),
                 event.getPos(), event.getFace()
             );
             return result != InteractionResult.PASS; // Cancel if not PASS
+        }
+
+        public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(serverPlayer);
+            }
+        }
+
+        public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(serverPlayer);
+            }
+        }
+
+        public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer newPlayer) {
+                // In Forge, we don't have easy access to the old player, so we pass the same player twice
+                // The 'alive' flag indicates if they respawned from death (false) or from End portal (true)
+                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(newPlayer, newPlayer, !event.isEndConquered());
+            }
+        }
+
+        public static void onItemDrop(ItemTossEvent event) {
+            // Fire the informational Amber item drop event (fires on both client and server)
+            ItemEvents.ITEM_DROP.invoker().onItemDrop(event.getPlayer(), event.getEntity());
+        }
+
+        public static void onItemPickup(EntityItemPickupEvent event) {
+            // Don't fire if the item has pickup delay (e.g., just dropped)
+            if (event.getItem().hasPickUpDelay()) {
+                return;
+            }
+
+            // Fire the informational Amber item pickup event
+            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
+                event.getEntity(), event.getItem(), event.getItem().getItem()
+            );
         }
     }
 

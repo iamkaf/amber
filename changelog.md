@@ -12,6 +12,14 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Added
 
 - Added Forge 1.21.9 support
+- Added debug tracking to all mixins for `/amber debug` command visibility
+- Added player lifecycle events:
+  - `PlayerEvents.PLAYER_JOIN` - Fires when a player joins the server
+  - `PlayerEvents.PLAYER_LEAVE` - Fires when a player leaves the server
+  - `PlayerEvents.PLAYER_RESPAWN` - Fires after a player respawns (from death or End portal)
+- Added item events (informational only, non-cancellable):
+  - `ItemEvents.ITEM_DROP` - Fires when a player drops an item (fires on both client and server)
+  - `ItemEvents.ITEM_PICKUP` - Fires when a player picks up an item (fires on both client and server)
 
 ## 7.0.2
 
