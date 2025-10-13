@@ -2,9 +2,11 @@ package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
+import com.iamkaf.amber.api.event.v1.events.common.AnimalEvents;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.FarmingEvents;
 import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
@@ -35,6 +37,8 @@ import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
+import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -177,6 +181,34 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
                 event.setCanceled(true); // Cancel if not PASS
             }
         }
+
+        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
+        // Note: BonemealEvent, FarmlandTrampleEvent, and BlockGrowFeatureEvent not available in NeoForge 1.21.10
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onAnimalTame(AnimalTameEvent event) {
+            if (event.getTamer() == null) {
+                return; // No tamer, allow vanilla behavior
+            }
+            InteractionResult result = AnimalEvents.ANIMAL_TAME.invoker().onAnimalTame(
+                event.getAnimal(), event.getTamer()
+            );
+            if (result != InteractionResult.PASS) {
+                event.setCanceled(true); // Cancel if not PASS
+            }
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onAnimalBreed(BabyEntitySpawnEvent event) {
+            if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA &&
+                event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
+                AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(
+                    parentA, parentB, event.getChild()
+                );
+            }
+        }
+
+        // Note: VillagerTradesEvent not available in NeoForge 1.21.10 - will need Mixin
 
         static public class EventHandlerCommonMod {
             // TODO: Implement mod-specific event handling if needed

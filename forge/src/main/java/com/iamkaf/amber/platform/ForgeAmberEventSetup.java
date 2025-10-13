@@ -2,9 +2,11 @@ package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
+import com.iamkaf.amber.api.event.v1.events.common.AnimalEvents;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.FarmingEvents;
 import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
@@ -30,6 +32,8 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.Priority;
@@ -53,6 +57,14 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         BlockEvent.EntityPlaceEvent.BUS.addListener(EventHandlerCommon::onBlockPlace);
         PlayerInteractEvent.RightClickBlock.BUS.addListener(EventHandlerCommon::onBlockInteract);
         PlayerInteractEvent.LeftClickBlock.BUS.addListener(EventHandlerCommon::onBlockClick);
+
+        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
+        // Note: BonemealEvent, FarmlandTrampleEvent, and CropGrowEvent not available in Forge 1.21.10
+
+        // Animal events
+        AnimalTameEvent.BUS.addListener(EventHandlerCommon::onAnimalTame);
+        BabyEntitySpawnEvent.BUS.addListener(EventHandlerCommon::onAnimalBreed);
+        // Note: VillagerTradeEvent not available in Forge 1.21.10 - will need Mixin
     }
 
     @Override
@@ -206,6 +218,25 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
                 event.getEntity(), event.getItem(), event.getItem().getItem()
             );
+        }
+
+        public static boolean onAnimalTame(AnimalTameEvent event) {
+            if (event.getTamer() == null) {
+                return false; // No tamer, allow vanilla behavior
+            }
+            InteractionResult result = AnimalEvents.ANIMAL_TAME.invoker().onAnimalTame(
+                event.getAnimal(), event.getTamer()
+            );
+            return result != InteractionResult.PASS; // Return true to cancel if not PASS
+        }
+
+        public static void onAnimalBreed(BabyEntitySpawnEvent event) {
+            if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA &&
+                event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
+                AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(
+                    parentA, parentB, event.getChild()
+                );
+            }
         }
     }
 

@@ -69,6 +69,12 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Item events - implemented via Mixins (PlayerMixin, ItemEntityMixin)
         // Fabric doesn't have native item drop/pickup events: https://github.com/FabricMC/fabric/issues/1130
+
+        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
+        // Fabric doesn't have native farming events for bonemeal, farmland trampling, or crop growth
+
+        // Animal events - implemented via Mixins (TamableAnimalMixin, AnimalMixin, VillagerMixin)
+        // Fabric doesn't have native animal taming, breeding, or villager trade events
     }
 
     @Override

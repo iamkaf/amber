@@ -7,11 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## Unreleased
+
+### Added
+
+- Added farming events:
+  - `FarmingEvents.BONEMEAL_USE` - Fires when bonemeal is applied to blocks (cancellable)
+  - `FarmingEvents.FARMLAND_TRAMPLE` - Fires when farmland is trampled by entities (cancellable)
+  - `FarmingEvents.CROP_GROW` - Fires when crops attempt to grow (cancellable)
+- Added animal events:
+  - `AnimalEvents.ANIMAL_TAME` - Fires when animals are being tamed (cancellable)
+  - `AnimalEvents.ANIMAL_BREED` - Fires when baby animals spawn from breeding (informational)
+
+
 ## 8.0.0
 
 ### Added
 
-- Added Forge 1.21.10 support
 - Added debug tracking to all mixins for `/amber debug` command visibility
 - Added player lifecycle events:
   - `PlayerEvents.PLAYER_JOIN` - Fires when a player joins the server
@@ -20,6 +32,10 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added item events (informational only, non-cancellable):
   - `ItemEvents.ITEM_DROP` - Fires when a player drops an item (fires on both client and server)
   - `ItemEvents.ITEM_PICKUP` - Fires when a player picks up an item (fires on both client and server)
+
+### Changed
+
+- **Updated to Minecraft 1.21.10**
 
 ## 7.0.2
 

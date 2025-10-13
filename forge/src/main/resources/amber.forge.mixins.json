@@ -3,7 +3,11 @@
   "minVersion": "0.8",
   "package": "com.iamkaf.amber.mixin",
   "compatibilityLevel": "JAVA_18",
-  "mixins": [],
+  "mixins": [
+    "BoneMealItemMixin",
+    "CropBlockMixin",
+    "FarmBlockMixin",
+  ],
   "client": [
     "GuiMixin",
     "MouseHandlerMixin"
