@@ -26,3 +26,7 @@ runs
 
 CLAUDE.local.md
 settings.local.json
+
+# Javascript and the Docs
+node_modules
+docs/.vitepress/cache
