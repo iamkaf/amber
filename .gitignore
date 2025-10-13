@@ -30,3 +30,4 @@ settings.local.json
 # Javascript and the Docs
 node_modules
 docs/.vitepress/cache
+docs/.vitepress/dist

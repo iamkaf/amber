@@ -5,6 +5,9 @@ export default defineConfig({
   description: 'A comprehensive multiloader library for Minecraft mod development',
   lang: 'en-US',
   
+  // Set base path for GitHub Pages deployment
+  base: '/amber/',
+  
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
@@ -89,6 +92,9 @@ export default defineConfig({
       dark: 'github-dark'
     }
   },
+
+  // Ignore dead links during build
+  ignoreDeadLinks: true,
 
   vite: {
     define: {
