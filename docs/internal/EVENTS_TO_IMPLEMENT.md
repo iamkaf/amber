@@ -2,85 +2,21 @@
 
 This document outlines events across **Fabric**, **Forge**, and **NeoForge** that should be implemented in Amber's unified event system.
 
-## ✅ **Already Implemented**
-These events are already available in Amber:
-- ✅ **PlayerEvents.ENTITY_INTERACT** - Player right-clicking entities
-- ✅ **CommandEvents.EVENT** - Server command registration
-- ✅ **ClientCommandEvents.EVENT** - Client command registration  
-- ✅ **ClientTickEvents** - Client tick start/end
-- ✅ **HudEvents.RENDER_HUD** - HUD rendering
-- ✅ **LootEvents.MODIFY** - Loot table modification
-- ✅ **EntityEvent.ENTITY_SPAWN** - When entities spawn in the world
-- ✅ **EntityEvent.ENTITY_DEATH** - When living entities die
-- ✅ **EntityEvent.ENTITY_DAMAGE** - When entities take damage
-- ✅ **BlockEvents.BLOCK_BREAK_BEFORE/AFTER** - When players break blocks (before/after variants)
-- ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - When players place blocks (before/after variants) 
-- ✅ **BlockEvents.BLOCK_INTERACT** - When players right-click blocks
-- ✅ **BlockEvents.BLOCK_CLICK** - When players left-click blocks
-- ✅ **InputEvents.MOUSE_SCROLL_PRE/POST** - When mouse wheel is scrolled (before/after variants)
-- ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - When block selection outlines are rendered
-
 ---
 
 ## 📋 Implementation Priority
 
 ### 🔥 **Phase 1: Essential Player & Entity Events** (High Priority)
 
-#### 💀 **Entity Lifecycle Events**
-- [x] **EntitySpawnEvent** - When entities spawn in the world ✅ **IMPLEMENTED**
-  - *Fabric:* Not directly available (skipped for now)
-  - *Forge:* `EntityJoinLevelEvent`
-  - *NeoForge:* `EntityJoinLevelEvent`, `FinalizeSpawnEvent`
-- [x] **EntityDeathEvent** - When living entities die ✅ **IMPLEMENTED**
-  - *Fabric:* `ServerLivingEntityEvents.AFTER_DEATH`
-  - *Forge:* `LivingDeathEvent`
-  - *NeoForge:* `LivingDeathEvent`
-- [x] **EntityDamageEvent** - When entities take damage ✅ **IMPLEMENTED**
-  - *Fabric:* `ServerLivingEntityEvents.ALLOW_DAMAGE`, `AFTER_DAMAGE`
-  - *Forge:* `LivingDamageEvent`, `LivingAttackEvent`
-  - *NeoForge:* `LivingIncomingDamageEvent`
-
 #### 🎮 **Player Interaction Events**
-- [x] **PlayerInteractBlockEvent** - When players interact with blocks ✅ **IMPLEMENTED**
-  - *Fabric:* `UseBlockCallback.EVENT`
-  - *Forge:* `PlayerInteractEvent.RightClickBlock`
-  - *NeoForge:* `PlayerInteractEvent.RightClickBlock`
 - [ ] **PlayerUseItemEvent** - When players use items
   - *Fabric:* `UseItemCallback.EVENT`
   - *Forge:* `ItemUseEvent`, `RightClickItem`
   - *NeoForge:* `RightClickItem`, `UseItemOnBlockEvent`
-- [x] **PlayerAttackEvent** - When players attack entities/blocks ✅ **IMPLEMENTED**
-  - *Fabric:* `AttackEntityCallback.EVENT`, `AttackBlockCallback.EVENT`
-  - *Forge:* `PlayerInteractEvent.LeftClickBlock`
-  - *NeoForge:* `PlayerInteractEvent.LeftClickBlock`
-
-#### 🧱 **World/Block Events**
-- [x] **BlockBreakEvent** - When players break blocks ✅ **IMPLEMENTED**
-  - *Fabric:* `PlayerBlockBreakEvents.BEFORE` / `AFTER`
-  - *Forge:* `BlockEvent.BreakEvent`
-  - *NeoForge:* `BlockEvent.BreakEvent`
-- [x] **BlockPlaceEvent** - When players place blocks ✅ **IMPLEMENTED**
-  - *Fabric:* Not directly available (skipped for now)
-  - *Forge:* `BlockEvent.EntityPlaceEvent`
-  - *NeoForge:* `BlockEvent.EntityPlaceEvent`
 
 ---
 
 ### ⚡ **Phase 2: Gameplay Mechanics** (Medium Priority)
-
-#### 👥 **Player Lifecycle Events**
-- [x] **PlayerJoinEvent** - When players join the server ✅ **IMPLEMENTED**
-  - *Fabric:* `ServerPlayConnectionEvents.JOIN`
-  - *Forge:* `PlayerEvent.PlayerLoggedInEvent`
-  - *NeoForge:* `PlayerEvent.PlayerLoggedInEvent`
-- [x] **PlayerLeaveEvent** - When players leave the server ✅ **IMPLEMENTED**
-  - *Fabric:* `ServerPlayConnectionEvents.DISCONNECT`
-  - *Forge:* `PlayerEvent.PlayerLoggedOutEvent`
-  - *NeoForge:* `PlayerEvent.PlayerLoggedOutEvent`
-- [x] **PlayerRespawnEvent** - When players respawn ✅ **IMPLEMENTED**
-  - *Fabric:* `ServerPlayerEvents.AFTER_RESPAWN`
-  - *Forge:* `PlayerEvent.PlayerRespawnEvent`
-  - *NeoForge:* `PlayerEvent.PlayerRespawnEvent`
 
 #### ⚔️ **Combat & PvP Events**
 - [ ] **LivingKillEvent** - When one entity kills another
@@ -97,14 +33,6 @@ These events are already available in Amber:
   - *NeoForge:* `SweepAttackEvent`
 
 #### 📦 **Inventory & Item Events**
-- [x] **ItemDropEvent** - When items are dropped/tossed ✅ **IMPLEMENTED**
-  - *Fabric:* Mixin on `Player.drop()` (no native event)
-  - *Forge:* `ItemTossEvent`
-  - *NeoForge:* `ItemTossEvent`
-- [x] **ItemPickupEvent** - When items are picked up ✅ **IMPLEMENTED**
-  - *Fabric:* Mixin on `ItemEntity.playerTouch()` (no native event)
-  - *Forge:* `EntityItemPickupEvent`
-  - *NeoForge:* `ItemEntityPickupEvent.Pre`
 - [ ] **ItemConsumeEvent** - When items are consumed
   - *Fabric:* Not directly listed
   - *Forge:* Not directly listed
@@ -123,32 +51,29 @@ These events are already available in Amber:
 ### 🔧 **Phase 3: Advanced Gameplay** (Lower Priority)
 
 #### 🌱 **Farming & Agriculture Events**
-- [ ] **BonemealEvent** - When bonemeal is applied
-  - *Fabric:* Not directly listed
-  - *Forge:* `BonemealEvent`
-  - *NeoForge:* `BonemealEvent`
-- [ ] **FarmlandTrampleEvent** - When farmland is trampled
-  - *Fabric:* Not directly listed
-  - *Forge:* Not directly listed
-  - *NeoForge:* `FarmlandTrampleEvent`
-- [ ] **CropGrowEvent** - When crops grow
-  - *Fabric:* Not directly listed
-  - *Forge:* Not directly listed
-  - *NeoForge:* `BlockGrowFeatureEvent`
+- [x] **FarmingEvents.BONEMEAL_USE** - When bonemeal is applied ✅ **FULLY IMPLEMENTED**
+  - *Fabric:* `BoneMealItemMixin` ✅
+  - *Forge:* `BoneMealItemMixin` ✅
+  - *NeoForge:* `BoneMealItemMixin` ✅
+- [x] **FarmingEvents.FARMLAND_TRAMPLE** - When farmland is trampled ✅ **FULLY IMPLEMENTED**
+  - *Fabric:* `FarmBlockMixin` ✅
+  - *Forge:* `FarmBlockMixin` ✅
+  - *NeoForge:* `FarmBlockMixin` ✅
+- [x] **FarmingEvents.CROP_GROW** - When crops grow ✅ **FULLY IMPLEMENTED**
+  - *Fabric:* `CropBlockMixin` ✅
+  - *Forge:* `CropBlockMixin` ✅
+  - *NeoForge:* `CropBlockMixin` ✅
 
 #### 🐄 **Animal & Mob Events**
-- [ ] **AnimalTameEvent** - When animals are tamed
-  - *Fabric:* Not directly listed
-  - *Forge:* `AnimalTameEvent`
-  - *NeoForge:* Not directly listed
-- [ ] **AnimalBreedEvent** - When animals breed
-  - *Fabric:* Not directly listed
-  - *Forge:* `BabyEntitySpawnEvent`
-  - *NeoForge:* Not directly listed
-- [ ] **VillagerTradeEvent** - Villager trade generation
-  - *Fabric:* Not directly listed
-  - *Forge:* Not directly listed
-  - *NeoForge:* `VillagerTradesEvent`
+- [x] **AnimalEvents.ANIMAL_TAME** - When animals are tamed ✅ **FULLY IMPLEMENTED**
+  - *Fabric:* `TamableAnimalMixin` ✅
+  - *Forge:* `AnimalTameEvent` ✅
+  - *NeoForge:* `AnimalTameEvent` ✅
+- [x] **AnimalEvents.ANIMAL_BREED** - When animals breed ✅ **FULLY IMPLEMENTED**
+  - *Fabric:* `AnimalMixin` ✅
+  - *Forge:* `BabyEntitySpawnEvent` ✅
+  - *NeoForge:* `BabyEntitySpawnEvent` ✅
+- [x] **AnimalEvents.VILLAGER_TRADE_REGISTER** - Villager trade generation ❌ **REMOVED** (non-functional implementation)
 
 #### 🛌 **Sleep & Time Events**
 - [ ] **PlayerSleepEvent** - Sleep mechanics
@@ -435,61 +360,5 @@ For developers implementing these events, here are essential documentation links
 
 ---
 
-*Last Updated: 2025-07-25*  
+*Last Updated: 2025-01-09*
 *Event Data Sources: [iamkaf/modresources](https://github.com/iamkaf/modresources/tree/main/docs)*
-
-## 📝 **Recent Implementation History**
-
-### **2025-01-07 - Entity Lifecycle Events**
-- ✅ **EntityEvent.ENTITY_SPAWN** - Implemented using `EntityJoinLevelEvent` (Forge/NeoForge), skipped Fabric (no direct equivalent)
-- ✅ **EntityEvent.ENTITY_DEATH** - Implemented using `ServerLivingEntityEvents.AFTER_DEATH` (Fabric), `LivingDeathEvent` (Forge/NeoForge)  
-- ✅ **EntityEvent.ENTITY_DAMAGE** - Implemented using `ServerLivingEntityEvents.ALLOW_DAMAGE` (Fabric), `LivingAttackEvent` (Forge), `LivingIncomingDamageEvent` (NeoForge)
-
-**Technical Notes:**
-- Fabric EntitySpawn event was skipped due to lack of direct equivalent - would require Mixin implementation
-- All platforms use consistent callback interfaces: `EntitySpawn`, `EntityDeath`, `EntityDamage`
-- Events follow Amber's established patterns with platform-specific registration in `*AmberEventSetup` classes
-- **⚠️ BEHAVIOR CONSISTENCY**: Entity events have simple void callbacks, making cross-platform consistency easier to maintain
-
-**Cross-Platform Behavior Validation:**
-- ✅ **EntityEvent.ENTITY_DEATH**: Consistent timing and parameters across Fabric/Forge/NeoForge
-- ✅ **EntityEvent.ENTITY_DAMAGE**: Consistent damage values and source information 
-- ⚠️ **EntityEvent.ENTITY_SPAWN**: Forge/NeoForge only - Fabric implementation needed for full consistency
-
-### **2025-07-25 - Block Events & Client Input Events**
-- ✅ **BlockEvents.BLOCK_BREAK_BEFORE/AFTER** - Implemented using `PlayerBlockBreakEvents.BEFORE/AFTER` (Fabric), `BlockEvent.BreakEvent` (Forge/NeoForge)
-- ✅ **BlockEvents.BLOCK_PLACE_BEFORE/AFTER** - Implemented using `BlockEvent.EntityPlaceEvent` (Forge/NeoForge), Fabric support planned
-- ✅ **BlockEvents.BLOCK_INTERACT** - Implemented using `UseBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.RightClickBlock` (Forge/NeoForge)
-- ✅ **BlockEvents.BLOCK_CLICK** - Implemented using `AttackBlockCallback.EVENT` (Fabric), `PlayerInteractEvent.LeftClickBlock` (Forge/NeoForge)
-- ✅ **InputEvents.MOUSE_SCROLL_PRE/POST** - Implemented using `MouseHandlerMixin` (Fabric), `ScreenEvent.MouseScrolled.Pre/Post` (Forge/NeoForge)
-- ✅ **RenderEvents.BLOCK_OUTLINE_RENDER** - Implemented using `WorldRenderEvents.BLOCK_OUTLINE` (Fabric), `RenderHighlightEvent.Block` (Forge/NeoForge)
-
-**Technical Notes:**
-- All block events support both BEFORE (cancellable) and AFTER (informational) variants where applicable
-- Mouse scroll event uses Mixin on Fabric for global coverage, native events on Forge/NeoForge
-- Block outline rendering allows cancellation and custom rendering on all platforms
-- Events follow EventBus 7 patterns on Forge while maintaining traditional @SubscribeEvent patterns on NeoForge
-- **⚠️ BEHAVIOR CONSISTENCY**: All events use unified `InteractionResult` return values for consistent cancellation behavior
-
-**Cross-Platform Behavior Validation:**
-- ✅ **Block Events**: Consistent timing (before/after), cancellation, and parameter data across all platforms
-- ✅ **Mouse Scroll**: Consistent scroll delta values and mouse coordinates on all platforms
-- ✅ **Block Outline**: Consistent cancellation behavior and rendering context across all platforms
-
-### **2025-01-XX - Item Events**
-- ✅ **ItemEvents.ITEM_DROP** - Implemented using `ItemTossEvent` (Forge/NeoForge), `PlayerMixin` on `Player.drop()` (Fabric)
-- ✅ **ItemEvents.ITEM_PICKUP** - Implemented using `EntityItemPickupEvent` (Forge), `ItemEntityPickupEvent.Pre` (NeoForge), `ItemEntityMixin` on `ItemEntity.playerTouch()` (Fabric)
-
-**Technical Notes:**
-- Both Forge and NeoForge have native events for item drop/pickup
-- Fabric lacks native events (see https://github.com/FabricMC/fabric/issues/1130) - implemented via Mixins
-- Fabric Mixins: `PlayerMixin` (drops) and `ItemEntityMixin` (pickup)
-- All events use consistent callback interfaces: `ItemDrop`, `ItemPickup`
-- Events follow Amber's established patterns with platform-specific registration in `*AmberEventSetup` classes
-- **⚠️ BEHAVIOR CONSISTENCY**: NeoForge uses `TriState.FALSE` for cancellation, Forge uses boolean return, Fabric Mixin uses `CallbackInfo.cancel()`
-
-**Cross-Platform Behavior Validation:**
-- ✅ **ItemEvents.ITEM_DROP**: Consistent cancellation behavior across all platforms (Forge/NeoForge/Fabric)
-- ✅ **ItemEvents.ITEM_PICKUP**: Consistent parameters (player, itemEntity, itemStack) across all platforms
-- ✅ **Fabric Implementation**: Fully implemented via Mixins targeting `Player.drop()` and `ItemEntity.playerTouch()`
-- ✅ **Server-Side Only**: All implementations fire only on server side for consistency
