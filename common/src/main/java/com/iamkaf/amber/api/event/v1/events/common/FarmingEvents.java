@@ -70,9 +70,9 @@ public class FarmingEvents {
      * An event that is fired when a crop attempts to grow.
      * <p>
      * This event is fired before the crop grows and can be used to modify or cancel growth.
+     * </p>
      * <p>
      * This event fires on the server side only.
-     * </p>
      * </p>
      *
      * <p>Return values:</p>

@@ -17,11 +17,11 @@ public class AnimalEvents {
      * An event that is fired when an animal is being tamed.
      * <p>
      * This event is fired before the animal is tamed and can be used to modify or cancel the taming.
+     * </p>
      * <p>
      * <b>Fabric Note:</b> On Fabric, rapid clicking may allow tamable animals (e.g., wolves) to enter
      * sitting pose before taming completes. This is due to timing of vanilla interaction handlers.
      * Forge and NeoForge handle this correctly via native events.
-     * </p>
      * </p>
      *
      * <p>Return values:</p>
