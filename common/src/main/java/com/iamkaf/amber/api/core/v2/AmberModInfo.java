@@ -1,7 +1,5 @@
 package com.iamkaf.amber.api.core.v2;
 
-import org.jetbrains.annotations.Nullable;
-
 /**
  * Represents information about an Amber mod.
  *
