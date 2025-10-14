@@ -8,6 +8,11 @@ export default defineConfig({
   // Set base path for GitHub Pages deployment
   base: '/amber/',
   
+  // Set favicon
+  head: [
+    ['link', { rel: 'icon', href: '/icon.png' }]
+  ],
+  
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },

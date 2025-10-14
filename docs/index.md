@@ -6,7 +6,7 @@ hero:
   text: A comprehensive multiloader library for Minecraft mod development
   tagline: Write once, run everywhere - Unified APIs for Fabric, Forge, and NeoForge
   image:
-    src: /amber-logo.png
+    src: /icon.png
     alt: Amber
   actions:
     - theme: brand
