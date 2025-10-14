@@ -54,7 +54,9 @@ export default defineConfig({
           { text: 'Player Helpers', link: '/utilities/player' },
           { text: 'Level Helpers', link: '/utilities/level' },
           { text: 'Sound Helpers', link: '/utilities/sound' },
-          { text: 'Math Utilities', link: '/utilities/math' }
+          { text: 'Math Utilities', link: '/utilities/math' },
+          { text: 'Keybind Helpers', link: '/utilities/keybinds' },
+          { text: 'Enchantment Helpers', link: '/utilities/enchantments' }
         ]
       },
       {
