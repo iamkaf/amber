@@ -41,6 +41,7 @@ export default defineConfig({
         items: [
           { text: 'Registry System', link: '/systems/registry' },
           { text: 'Event System', link: '/systems/events' },
+          { text: 'Creative Tabs', link: '/systems/creative-tabs' },
           { text: 'Networking', link: '/systems/networking' },
           { text: 'Configuration', link: '/systems/configuration' },
           { text: 'Commands', link: '/systems/commands' }
