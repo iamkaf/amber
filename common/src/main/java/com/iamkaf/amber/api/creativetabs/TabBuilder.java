@@ -1,6 +1,5 @@
 package com.iamkaf.amber.api.creativetabs;
 
-import com.iamkaf.amber.Constants;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -253,10 +252,8 @@ public class TabBuilder {
         if (!canScroll) {
             builder.noScrollBar();
         }
-        if (!backgroundTexture.equals(ResourceLocation.withDefaultNamespace("textures/gui/container/creative_inventory/tab_items.png"))) {
-            // Note: backgroundTexture method is protected, we'll handle this in platform-specific implementations
-        }
-        // Note: type method is protected, we'll handle this in platform-specific implementations
+        // Note: backgroundTexture and type methods are protected in Minecraft,
+        // but they can be accessed through reflection in platform-specific implementations if needed
         
         return builder.build();
     }

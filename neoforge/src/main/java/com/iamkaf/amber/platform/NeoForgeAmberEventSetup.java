@@ -232,12 +232,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
                 AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
             }
         }
-
-        // Note: VillagerTradesEvent not available in NeoForge 1.21.10 - will need Mixin
-
-        static public class EventHandlerCommonMod {
-            // TODO: Implement mod-specific event handling if needed
-        }
     }
     
     /**
