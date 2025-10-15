@@ -507,13 +507,57 @@ public class PositionUpdatePacket implements Packet<PositionUpdatePacket> {
 }
 ```
 
+## Platform-Specific Implementation Details
+
+### Forge Implementation
+
+Amber's Forge implementation uses Forge's ChannelBuilder and SimpleChannel for networking. The implementation handles the complexities of Forge 60.0.0's networking API:
+
+```java
+// Forge-specific implementation (handled automatically by Amber)
+public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
+    private final SimpleChannel channel;
+    
+    public ForgeNetworkChannelImpl(ResourceLocation channelId) {
+        this.channel = ChannelBuilder.named(channelId)
+            .networkProtocolVersion(PROTOCOL_VERSION)
+            .clientAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
+            .serverAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
+            .simpleChannel();
+    }
+    
+    @Override
+    public <T extends Packet<T>> void register(Class<T> packetClass,
+                                            PacketEncoder<T> encoder,
+                                            PacketDecoder<T> decoder,
+                                            PacketHandler<T> handler) {
+        // Uses MessageBuilder API for packet registration
+        channel.messageBuilder(packetClass)
+            .decoder(buffer -> decoder.decode(buffer))
+            .encoder((packet, buffer) -> encoder.encode(packet, buffer))
+            .consumerMainThread((packet, context) -> {
+                // Handles thread-safe packet execution
+            })
+            .add();
+    }
+}
+```
+
+### Thread Safety
+
+All implementations ensure thread-safe packet handling:
+
+- **Forge**: Uses `consumerMainThread()` to ensure packet handling runs on the main thread
+- **Fabric**: Uses built-in thread-safe execution
+- **NeoForge**: Uses proper context handling
+
 ## Migration from Platform-Specific Networking
 
 ### From Fabric
 
 ```java
 // Old Fabric way
-public static final PacketIdentifier SYNC_ENERGY = 
+public static final PacketIdentifier SYNC_ENERGY =
     new PacketIdentifier("mymod", "sync_energy");
 
 PacketByteBuf buf = PacketByteBufs.create();
@@ -537,8 +581,17 @@ public void onRegisterPackets(RegisterPacketHandlerEvent event) {
 }
 
 // New Amber way
-CHANNEL.register(SyncEnergyPacket.class, SyncEnergyPacket::encode, 
+CHANNEL.register(SyncEnergyPacket.class, SyncEnergyPacket::encode,
     SyncEnergyPacket::decode, SyncEnergyPacket::handle);
 ```
+
+### Version Compatibility
+
+Amber's networking system handles version differences automatically:
+
+- **Forge 60.0.0+**: Uses the new ChannelBuilder API
+- **Forge 47.x-59.x**: Uses the traditional SimpleChannel API
+- **Fabric**: Uses Fabric's networking API
+- **NeoForge**: Uses NeoForge's payload system
 
 The Amber networking system provides a cleaner, type-safe API that works across all platforms without the boilerplate of platform-specific code.

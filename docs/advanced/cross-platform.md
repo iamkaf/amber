@@ -363,9 +363,18 @@ public class MyNetworking {
 
 // Without Amber, you'd need different implementations for each platform
 // Fabric: use PacketByteBufs and ServerPlayNetworking
-// Forge: use SimpleChannel and registerMessage
+// Forge: use ChannelBuilder and SimpleChannel (different APIs for different versions)
 // NeoForge: similar to Forge but with NeoForge's networking system
 ```
+
+Amber's networking implementation handles the complexities of different Forge versions:
+
+- **Forge 60.0.0+**: Uses the new ChannelBuilder API with VersionTest
+- **Forge 47.x-59.x**: Uses the traditional SimpleChannel API
+- **Fabric**: Uses Fabric's networking API
+- **NeoForge**: Uses NeoForge's payload system
+
+All implementations ensure thread-safe packet handling and proper network transmission.
 
 ### 2. Configuration
 
@@ -488,6 +497,8 @@ If you're migrating an existing mod to be cross-platform:
 - Forge has a more monolithic architecture
 - Use Forge's capabilities system for custom functionality
 - Be aware of Forge's different event firing order
+- **Networking**: Forge 60.0.0+ uses a new ChannelBuilder API that differs significantly from older versions
+- **Version Compatibility**: Amber handles Forge version differences automatically
 
 ### NeoForge Tips
 
