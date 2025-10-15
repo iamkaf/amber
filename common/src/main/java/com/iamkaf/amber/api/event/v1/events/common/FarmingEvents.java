@@ -11,6 +11,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Events related to farming and agriculture mechanics in Minecraft.
+ * <p>
+ * <b>Note:</b> On Fabric and NeoForge, these events are implemented via Mixins as there are no
+ * native events for bonemeal use, farmland trampling, or crop growth in the current versions.
+ * On Forge, these would use native events if available, but currently also use Mixins.
+ * </p>
  */
 public class FarmingEvents {
 

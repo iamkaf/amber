@@ -11,6 +11,7 @@
     "CropBlockMixin",
     "FarmBlockMixin",
     "ItemEntityMixin",
+    "LightningBoltMixin",
     "PlayerMixin",
     "ServerLevelMixin",
     "TamableAnimalMixin"

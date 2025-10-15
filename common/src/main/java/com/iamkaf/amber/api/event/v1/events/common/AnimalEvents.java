@@ -50,6 +50,10 @@ public class AnimalEvents {
      * This event is informational and fires after the baby animal is created.
      * It cannot be cancelled.
      * </p>
+     * <p>
+     * <b>Note:</b> On Fabric and NeoForge, this event is implemented via Mixins as there are no
+     * native events for animal breeding. On Forge, this uses the native {@code BabyEntitySpawnEvent}.
+     * </p>
      */
     public static final Event<AnimalBreed> ANIMAL_BREED = EventFactory.createArrayBacked(
             AnimalBreed.class, callbacks -> (parentA, parentB, baby) -> {
@@ -84,7 +88,7 @@ public class AnimalEvents {
          *
          * @param parentA the first parent animal
          * @param parentB the second parent animal
-         * @param baby    the baby animal that was spawned (may be null if breeding failed)
+         * @param baby    the baby animal that was spawned
          */
         void onAnimalBreed(Animal parentA, Animal parentB, AgeableMob baby);
     }

@@ -13,6 +13,8 @@ The event system includes:
 - **Farming Events**: Crop growth, bone meal usage
 - **Command Events**: Command execution
 - **Loot Events**: Loot table modification
+- **World Events**: World loading, unloading, saving
+- **Weather Events**: Lightning strikes
 - **Server Tick Events**: Server tick start/end (server-side only)
 - **Client Events**: Rendering, input, HUD (client-side only)
 
@@ -359,6 +361,101 @@ ServerTickEvents.END_SERVER_TICK.register(() -> {
 });
 ```
 
+## World Events
+
+World events provide hooks for world/level lifecycle operations. These events fire on the server side.
+
+### WORLD_LOAD
+
+Fired when a world/level is loaded (works on both client and server).
+
+```java
+WorldEvents.WORLD_LOAD.register((server, level) -> {
+    // Run logic on world load...
+});
+```
+
+### WORLD_UNLOAD
+
+Fired when a world/level is unloaded.
+
+```java
+WorldEvents.WORLD_UNLOAD.register((server, level) -> {
+    // Run logic on world unload...
+});
+```
+
+### WORLD_SAVE
+
+Fired when a world/level is saved to disk, server-side only.
+
+```java
+WorldEvents.WORLD_SAVE.register((server, level) -> {
+    // This event only fires on the server side
+    String dimensionKey = ((ServerLevel)level).dimension().location().toString();
+    
+    // Update world statistics
+    WorldStats.update(dimensionKey);
+    
+    // Save custom data structures
+    CustomDataManager.save(dimensionKey);
+});
+```
+
+## Weather Events
+
+Weather events provide hooks for weather-related phenomena.
+
+### LIGHTNING_STRIKE
+
+Fired when an entity is struck by lightning. Can be cancelled.
+
+```java
+WeatherEvents.LIGHTNING_STRIKE.register((entity, lightning) -> {
+    // This event works consistently across all platforms and can be cancelled on all platforms
+    
+    // Convert items struck by lightning into their smelted variants
+    if (entity instanceof ItemEntity itemEntity) {
+        ItemStack item = itemEntity.getItem();
+        ItemStack result = getSmeltedResult(item);
+        if (!result.isEmpty()) {
+            itemEntity.setItem(result);
+            // Return SUCCESS to prevent default damage but still allow the transformation
+            if (!entity.level().isClientSide()) {
+                entity.level().playSound(null, entity.blockPosition(),
+                    SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F);
+            }
+            return InteractionResult.SUCCESS;
+        }
+    }
+    
+    // Track lightning strikes
+    LightningTracker.recordStrike(entity);
+    
+    // Prevent lightning from striking certain entities
+    if (entity instanceof Player player) {
+        ItemStack mainHandItem = player.getMainHandItem();
+        if (mainHandItem.is(Items.TRIDENT)) {
+            player.sendSystemMessage(Component.literal("Your trident glows as it absorbs the lightning!"));
+            return InteractionResult.FAIL; // Cancel the lightning strike completely
+        }
+    }
+    
+    return InteractionResult.PASS; // Allow the lightning strike to proceed
+});
+
+private static ItemStack getSmeltedResult(ItemStack item) {
+    if (item.is(Items.RAW_IRON)) {
+        return new ItemStack(Items.IRON_INGOT, item.getCount());
+    } else if (item.is(Items.RAW_GOLD)) {
+        return new ItemStack(Items.GOLD_INGOT, item.getCount());
+    } else if (item.is(Items.PORKCHOP)) {
+        return new ItemStack(Items.COOKED_PORKCHOP, item.getCount());
+    }
+    return ItemStack.EMPTY;
+}
+```
+
 ## Client Events
 
 Client events only fire on the client side and are useful for rendering and input handling.
@@ -487,6 +584,20 @@ public class MyMod {
 |-------|------------|--------------|------------|
 | `ITEM_DROP` | Item dropped | No | `(Player, ItemEntity)` |
 | `ITEM_PICKUP` | Item picked up | No | `(Player, ItemEntity, ItemStack)` |
+
+### World Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `WORLD_LOAD` | World is loaded | No | `(MinecraftServer, LevelAccessor)` |
+| `WORLD_UNLOAD` | World is unloaded | No | `(MinecraftServer, LevelAccessor)` |
+| `WORLD_SAVE` | World is saved | No | `(MinecraftServer, LevelAccessor)` |
+
+### Weather Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `LIGHTNING_STRIKE` | Entity struck by lightning | Yes | `(Entity, LightningBolt)` |
 
 ### Server Tick Events
 

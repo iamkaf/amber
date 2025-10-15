@@ -1,43 +1,28 @@
 package com.iamkaf.amber.platform;
 
-import com.iamkaf.amber.AmberMod;
-import com.iamkaf.amber.Constants;
-import com.iamkaf.amber.api.event.v1.events.common.AnimalEvents;
-import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
-import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
-import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
-import com.iamkaf.amber.api.event.v1.events.common.FarmingEvents;
-import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
-import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
-import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
+import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
-import com.iamkaf.amber.api.event.v1.events.common.ServerTickEvents;
-import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
-import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
-import net.minecraftforge.eventbus.api.listener.Priority;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 import static net.minecraft.world.InteractionResult.CONSUME;
@@ -52,7 +37,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         EntityJoinLevelEvent.BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
         LivingDeathEvent.BUS.addListener(EventHandlerCommon::onLivingDeath);
         LivingAttackEvent.BUS.addListener(EventHandlerCommon::onLivingAttack);
-        
+
+        // World events
+        LevelEvent.Load.BUS.addListener(EventHandlerCommon::onWorldLoad);
+        LevelEvent.Unload.BUS.addListener(EventHandlerCommon::onWorldUnload);
+        LevelEvent.Save.BUS.addListener(EventHandlerCommon::onWorldSave);
+
+        // Weather events
+        EntityStruckByLightningEvent.BUS.addListener(EventHandlerCommon::onLightningStrike);
+
         // Block events
         BlockEvent.BreakEvent.BUS.addListener(EventHandlerCommon::onBlockBreak);
         BlockEvent.EntityPlaceEvent.BUS.addListener(EventHandlerCommon::onBlockPlace);
@@ -82,7 +75,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         // Server tick events
         TickEvent.ServerTickEvent.Pre.BUS.addListener(EventHandlerServer::onServerTickEventPre);
         TickEvent.ServerTickEvent.Post.BUS.addListener(EventHandlerServer::onServerTickEventPost);
-        
+
         // Player lifecycle events
         PlayerEvent.PlayerLoggedInEvent.BUS.addListener(EventHandlerCommon::onPlayerJoin);
         PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(EventHandlerCommon::onPlayerLeave);
@@ -138,53 +131,60 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         public static boolean onLivingAttack(LivingAttackEvent event) {
-            InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(event.getEntity(), event.getSource(), event.getAmount());
+            InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker()
+                    .onEntityDamage(event.getEntity(), event.getSource(), event.getAmount());
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
-        
+
         public static boolean onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
-                event.getPlayer().level(), event.getPlayer(), event.getPos(), event.getState(), 
-                event.getLevel().getBlockEntity(event.getPos())
+                    event.getPlayer().level(),
+                    event.getPlayer(),
+                    event.getPos(),
+                    event.getState(),
+                    event.getLevel().getBlockEntity(event.getPos())
             );
             if (result != InteractionResult.PASS) {
                 return true; // Cancel break
             }
-            
+
             // Fire after event (can't cancel)
             BlockEvents.BLOCK_BREAK_AFTER.invoker().afterBlockBreak(
-                event.getPlayer().level(), event.getPlayer(), event.getPos(), event.getState(),
-                event.getLevel().getBlockEntity(event.getPos())
+                    event.getPlayer().level(),
+                    event.getPlayer(),
+                    event.getPos(),
+                    event.getState(),
+                    event.getLevel().getBlockEntity(event.getPos())
             );
             return false; // Allow break
         }
-        
+
         public static boolean onBlockPlace(BlockEvent.EntityPlaceEvent event) {
             if (!(event.getEntity() instanceof net.minecraft.world.entity.player.Player player)) {
                 return false; // Only handle player placements
             }
-            
+
             // Fire the unified BLOCK_PLACE event
-            InteractionResult result = BlockEvents.BLOCK_PLACE.invoker().onBlockPlace(
-                player.level(), player, event.getPos(), event.getPlacedBlock(),
-                player.getMainHandItem()
-            );
+            InteractionResult result = BlockEvents.BLOCK_PLACE.invoker()
+                    .onBlockPlace(player.level(), player, event.getPos(), event.getPlacedBlock(), player.getMainHandItem());
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
-        
+
         public static boolean onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
-            InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker().onBlockInteract(
-                event.getEntity(), event.getEntity().level(), event.getHand(), 
-                event.getHitVec()
-            );
+            InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker()
+                    .onBlockInteract(event.getEntity(), event.getEntity().level(), event.getHand(), event.getHitVec());
             return result != InteractionResult.PASS; // Cancel if not PASS
         }
-        
+
         public static boolean onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
-            InteractionResult result = BlockEvents.BLOCK_CLICK.invoker().onBlockClick(
-                event.getEntity(), event.getEntity().level(), event.getHand(),
-                event.getPos(), event.getFace()
-            );
+            InteractionResult result = BlockEvents.BLOCK_CLICK.invoker()
+                    .onBlockClick(
+                            event.getEntity(),
+                            event.getEntity().level(),
+                            event.getHand(),
+                            event.getPos(),
+                            event.getFace()
+                    );
             return result != InteractionResult.PASS; // Cancel if not PASS
         }
 
@@ -220,28 +220,39 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
 
             // Fire the informational Amber item pickup event
-            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
-                event.getEntity(), event.getItem(), event.getItem().getItem()
-            );
+            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(event.getEntity(), event.getItem(), event.getItem().getItem());
         }
 
         public static boolean onAnimalTame(AnimalTameEvent event) {
             if (event.getTamer() == null) {
                 return false; // No tamer, allow vanilla behavior
             }
-            InteractionResult result = AnimalEvents.ANIMAL_TAME.invoker().onAnimalTame(
-                event.getAnimal(), event.getTamer()
-            );
+            InteractionResult result = AnimalEvents.ANIMAL_TAME.invoker().onAnimalTame(event.getAnimal(), event.getTamer());
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
 
         public static void onAnimalBreed(BabyEntitySpawnEvent event) {
-            if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA &&
-                event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
-                AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(
-                    parentA, parentB, event.getChild()
-                );
+            if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA && event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
+                AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
             }
+        }
+
+        public static void onWorldLoad(LevelEvent.Load event) {
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(event.getLevel().getServer(), event.getLevel());
+        }
+
+        public static void onWorldUnload(LevelEvent.Unload event) {
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(event.getLevel().getServer(), event.getLevel());
+        }
+
+        public static void onWorldSave(LevelEvent.Save event) {
+            WorldEvents.WORLD_SAVE.invoker().onWorldSave(event.getLevel().getServer(), event.getLevel());
+        }
+
+        public static boolean onLightningStrike(EntityStruckByLightningEvent event) {
+            InteractionResult result =
+                    WeatherEvents.LIGHTNING_STRIKE.invoker().onLightningStrike(event.getEntity(), event.getLightning());
+            return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
     }
 
