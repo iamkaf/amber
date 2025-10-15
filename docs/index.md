@@ -139,6 +139,13 @@ PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
 - **[Getting Started](guide/getting-started)** - Set up your first Amber mod
 - **[API Reference](api/core)** - Detailed API documentation
 - **[Examples](systems/events)** - Practical code examples
+- **[Systems](systems/)** - Core system documentation
+  - **[Creative Mode Tabs](systems/creative-tabs)** - Custom creative tabs
+  - **[Events](systems/events)** - Event handling
+  - **[Commands](systems/commands)** - Command registration
+  - **[Configuration](systems/configuration)** - JSON configuration
+  - **[Networking](systems/networking)** - Network communication
+  - **[Registry](systems/registry)** - Object registration
 - **[Best Practices](advanced/best-practices)** - Tips for effective modding
 
 ## Version Information

@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -52,13 +53,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         PlayerInteractEvent.RightClickBlock.BUS.addListener(EventHandlerCommon::onBlockInteract);
         PlayerInteractEvent.LeftClickBlock.BUS.addListener(EventHandlerCommon::onBlockClick);
 
-        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
-        // Note: BonemealEvent, FarmlandTrampleEvent, and CropGrowEvent not available in Forge 1.21.10
-
         // Animal events
         AnimalTameEvent.BUS.addListener(EventHandlerCommon::onAnimalTame);
         BabyEntitySpawnEvent.BUS.addListener(EventHandlerCommon::onAnimalBreed);
-        // Note: VillagerTradeEvent not available in Forge 1.21.10 - will need Mixin
+        
+        // Creative mode tab events (register with high priority)
+        BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
     }
 
     @Override
@@ -253,6 +253,19 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             InteractionResult result =
                     WeatherEvents.LIGHTNING_STRIKE.invoker().onLightningStrike(event.getEntity(), event.getLightning());
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
+        }
+        
+        /**
+         * Handles the BuildCreativeModeTabContentsEvent from Forge.
+         * <p>
+         * This event is fired when items are being added to a creative mode tab,
+         * which allows us to fire our unified MODIFY_ENTRIES event.
+         *
+         * @param event The Forge event
+         */
+        public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
+                .modifyEntries(event.getTabKey(), event::accept);
         }
     }
 

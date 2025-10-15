@@ -8,6 +8,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -43,7 +44,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         NeoForge.EVENT_BUS.register(EventHandlerCommonNeoForge.class);
         IEventBus bus = (IEventBus) AmberMod.getEventBus(Constants.MOD_ID);
         assert bus != null;
-//        bus.register(EventHandlerCommonNeoForge.EventHandlerCommonMod.class);
+        bus.register(ModBusEventHandler.class);
     }
 
     @Override
@@ -236,6 +237,28 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
 
         static public class EventHandlerCommonMod {
             // TODO: Implement mod-specific event handling if needed
+        }
+    }
+    
+    /**
+     * Event handler for mod bus events in NeoForge.
+     * <p>
+     * This class handles events that need to be registered on the mod bus,
+     * such as BuildCreativeModeTabContentsEvent.
+     */
+    static public class ModBusEventHandler {
+        /**
+         * Handles the BuildCreativeModeTabContentsEvent from NeoForge.
+         * <p>
+         * This event is fired when items are being added to a creative mode tab,
+         * which allows us to fire our unified MODIFY_ENTRIES event.
+         *
+         * @param event The NeoForge event
+         */
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
+                .modifyEntries(event.getTabKey(), event::accept);
         }
     }
 

@@ -3,6 +3,8 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+import com.iamkaf.amber.api.creativetabs.CreativeModeTabRegistry;
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -73,6 +75,25 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Animal events - implemented via Mixins (TamableAnimalMixin, AnimalMixin, VillagerMixin)
         // Fabric doesn't have native animal taming, breeding, or villager trade events
+        
+        // Creative mode tab events
+        // Register for all existing vanilla tabs
+        for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
+            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, tab);
+            });
+        }
+        
+        // Register for our custom tabs
+        for (var builder : CreativeModeTabRegistry.getTabBuilders().values()) {
+            var tabKey = net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
+                builder.getId()
+            );
+            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, tab);
+            });
+        }
     }
 
     @Override
