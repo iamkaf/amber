@@ -12,6 +12,7 @@ import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
+import com.iamkaf.amber.api.event.v1.events.common.ServerTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
@@ -25,6 +26,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -249,6 +251,16 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerServer {
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onServerTickEventPre(ServerTickEvent.Pre event) {
+            ServerTickEvents.START_SERVER_TICK.invoker().onStartTick();
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onServerTickEventPost(ServerTickEvent.Post event) {
+            ServerTickEvents.END_SERVER_TICK.invoker().onEndTick();
+        }
+        
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {

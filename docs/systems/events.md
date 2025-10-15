@@ -13,6 +13,7 @@ The event system includes:
 - **Farming Events**: Crop growth, bone meal usage
 - **Command Events**: Command execution
 - **Loot Events**: Loot table modification
+- **Server Tick Events**: Server tick start/end (server-side only)
 - **Client Events**: Rendering, input, HUD (client-side only)
 
 ## Player Events
@@ -314,6 +315,50 @@ FarmingEvents.BONE_MEAL_USE.register((level, pos, state, player, stack) -> {
 });
 ```
 
+## Server Tick Events
+
+Server tick events only fire on the server side and are useful for game logic that needs to run consistently on each server tick.
+
+### START_SERVER_TICK
+
+Fired at the start of each server tick.
+
+```java
+ServerTickEvents.START_SERVER_TICK.register(() -> {
+    // Logic that runs at the start of each server tick
+    tickCounter++;
+    
+    // Process queued actions
+    processQueuedActions();
+    
+    // Update world data
+    updateWorldData();
+});
+```
+
+### END_SERVER_TICK
+
+Fired at the end of each server tick.
+
+```java
+ServerTickEvents.END_SERVER_TICK.register(() -> {
+    // Logic that runs at the end of each server tick
+    
+    // Clean up temporary data
+    cleanupTempData();
+    
+    // Send updates to clients if needed
+    if (shouldSendUpdate()) {
+        sendClientUpdates();
+    }
+    
+    // Log every 1000 ticks to avoid spam
+    if (tickCounter % 1000 == 0) {
+        Constants.LOG.info("Server has been running for {} ticks", tickCounter);
+    }
+});
+```
+
 ## Client Events
 
 Client events only fire on the client side and are useful for rendering and input handling.
@@ -442,5 +487,12 @@ public class MyMod {
 |-------|------------|--------------|------------|
 | `ITEM_DROP` | Item dropped | No | `(Player, ItemEntity)` |
 | `ITEM_PICKUP` | Item picked up | No | `(Player, ItemEntity, ItemStack)` |
+
+### Server Tick Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `START_SERVER_TICK` | Start of server tick | No | `()` |
+| `END_SERVER_TICK` | End of server tick | No | `()` |
 
 The event system provides a clean, consistent API across all platforms, making it easy to handle game events without worrying about platform-specific differences.

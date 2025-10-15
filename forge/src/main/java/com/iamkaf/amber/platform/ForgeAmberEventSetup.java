@@ -12,6 +12,7 @@ import com.iamkaf.amber.api.event.v1.events.common.LootEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
+import com.iamkaf.amber.api.event.v1.events.common.ServerTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
@@ -78,6 +79,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
     @Override
     public void registerServer() {
+        // Server tick events
+        TickEvent.ServerTickEvent.Pre.BUS.addListener(EventHandlerServer::onServerTickEventPre);
+        TickEvent.ServerTickEvent.Post.BUS.addListener(EventHandlerServer::onServerTickEventPost);
+        
         // Player lifecycle events
         PlayerEvent.PlayerLoggedInEvent.BUS.addListener(EventHandlerCommon::onPlayerJoin);
         PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(EventHandlerCommon::onPlayerLeave);
@@ -262,6 +267,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerServer {
+        public static void onServerTickEventPre(TickEvent.ServerTickEvent.Pre pre) {
+            ServerTickEvents.START_SERVER_TICK.invoker().onStartTick();
+        }
 
+        public static void onServerTickEventPost(TickEvent.ServerTickEvent.Post post) {
+            ServerTickEvents.END_SERVER_TICK.invoker().onEndTick();
+        }
     }
 }

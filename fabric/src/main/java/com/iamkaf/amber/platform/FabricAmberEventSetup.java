@@ -13,6 +13,7 @@ import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -96,6 +97,14 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
     @Override
     public void registerServer() {
+        // Server tick events
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            com.iamkaf.amber.api.event.v1.events.common.ServerTickEvents.START_SERVER_TICK.invoker().onStartTick();
+        });
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            com.iamkaf.amber.api.event.v1.events.common.ServerTickEvents.END_SERVER_TICK.invoker().onEndTick();
+        });
+        
         // Player lifecycle events
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(handler.getPlayer());

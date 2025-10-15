@@ -6,6 +6,7 @@ import com.iamkaf.amber.api.event.v1.events.common.AnimalEvents;
 import com.iamkaf.amber.api.event.v1.events.common.FarmingEvents;
 import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
+import com.iamkaf.amber.api.event.v1.events.common.examples.ServerTickExample;
 import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.command.AmberCommands;
 import com.iamkaf.amber.networking.v1.AmberNetworking;
@@ -119,6 +120,8 @@ public class AmberMod {
                     parentB.getDisplayName().getString(),
                     baby.getDisplayName().getString());
         });
+
+        ServerTickExample.register();
 
     }
 
