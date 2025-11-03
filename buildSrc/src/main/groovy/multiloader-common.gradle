@@ -132,9 +132,11 @@ publishing {
         }
     }
     repositories {
-        maven {
-            name = "ModResources"
-            url = file(System.getenv("MOD_RESOURCES").concat(File.separator).concat("maven"))
+        if (System.getenv("MOD_RESOURCES")) {
+            maven {
+                name = "ModResources"
+                url = file(System.getenv("MOD_RESOURCES").concat(File.separator).concat("maven"))
+            }
         }
     }
 }
