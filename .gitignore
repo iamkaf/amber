@@ -26,6 +26,7 @@ runs
 
 CLAUDE.local.md
 settings.local.json
+.kilocode
 
 # Javascript and the Docs
 node_modules

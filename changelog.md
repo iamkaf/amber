@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
-## Unreleased
+## 8.1.0
 
 ### Added
 
