@@ -96,6 +96,27 @@ PlayerEvents.PLAYER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
 });
 ```
 
+### CRAFT_ITEM
+
+Fired when a player crafts an item using a crafting table or other crafting mechanism.
+
+```java
+PlayerEvents.CRAFT_ITEM.register((player, craftedItems) -> {
+    // Calculate total items crafted
+    int totalItems = craftedItems.stream().mapToInt(ItemStack::getCount).sum();
+
+    // Award experience for crafting (example use case)
+    if (totalItems > 0) {
+        player.giveExperienceLevels(totalItems);
+        player.sendSystemMessage(Component.literal("Gained " + totalItems + " levels from crafting!"));
+    }
+
+    // Log crafting for analytics
+    Constants.LOG.info("{} crafted {} items",
+        player.getName().getString(), totalItems);
+});
+```
+
 ## Block Events
 
 Block events provide hooks for block-related interactions and changes.
@@ -568,6 +589,7 @@ public class MyMod {
 | `PLAYER_JOIN` | Player joins server | No | `(ServerPlayer)` |
 | `PLAYER_LEAVE` | Player leaves server | No | `(ServerPlayer)` |
 | `PLAYER_RESPAWN` | Player respawns | No | `(ServerPlayer, ServerPlayer, boolean)` |
+| `CRAFT_ITEM` | Player crafts item | No | `(ServerPlayer, List<ItemStack>)` |
 
 ### Block Events
 

@@ -45,7 +45,8 @@ public class AmberCommands {
                             MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
                                     .append(" - Version: " + modInfo.version() + "\n")
                                     .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                                    .append(" - Minecraft: 1.21.7" + "\n")
+                                    // FIXME: Kaf PLEASE find a way to get this number automatically omg PLEASE
+                                    .append(" - Minecraft: 1.21.10" + "\n")
                                     .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
                                             "Not " + "Initialized") + "\n")
                                     .append(" - Total Pings: " + AmberNetworking.getTotalPings() + "\n")

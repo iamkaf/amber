@@ -5,8 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BoneMealItemMixin",
+    "CraftingPlayerMixin",
     "CropBlockMixin",
-    "FarmBlockMixin",
+    "FarmBlockMixin"
   ],
   "client": [
     "LevelRendererMixin",

@@ -2,11 +2,13 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class PlayerEvents {
@@ -86,6 +88,25 @@ public class PlayerEvents {
     );
 
     /**
+     * An event that is fired when a player crafts an item.
+     * <p>
+     * This event is fired on the logical server side after a player successfully crafts an item
+     * using a crafting table or other crafting mechanism.
+     * </p>
+     * <p>
+     * <b>This event is informational only and cannot be cancelled.</b>
+     * The crafting has already completed when this event is fired.
+     * </p>
+     */
+    public static final Event<CraftItem> CRAFT_ITEM = EventFactory.createArrayBacked(
+            CraftItem.class, callbacks -> (player, craftedItems) -> {
+                for (CraftItem callback : callbacks) {
+                    callback.onCraftItem(player, craftedItems);
+                }
+            }
+    );
+
+    /**
      * Functional interface for handling {@link #ENTITY_INTERACT} callbacks.
      */
     @FunctionalInterface
@@ -129,6 +150,24 @@ public class PlayerEvents {
          * @param player the player who left
          */
         void onPlayerLeave(ServerPlayer player);
+    }
+
+    /**
+     * Functional interface for handling {@link #CRAFT_ITEM} callbacks.
+     */
+    @FunctionalInterface
+    public interface CraftItem {
+
+        /**
+         * Called when a player crafts an item.
+         * <p>
+         * This is an informational event only - you cannot cancel the crafting.
+         * </p>
+         *
+         * @param player the player who crafted the item
+         * @param craftedItems the list of item stacks that were crafted (including byproducts)
+         */
+        void onCraftItem(ServerPlayer player, List<ItemStack> craftedItems);
     }
 
     /**

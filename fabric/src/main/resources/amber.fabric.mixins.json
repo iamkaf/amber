@@ -8,6 +8,7 @@
     "AnimalMixin",
     "BlockItemMixin",
     "BoneMealItemMixin",
+    "CraftingPlayerMixin",
     "CropBlockMixin",
     "FarmBlockMixin",
     "ItemEntityMixin",

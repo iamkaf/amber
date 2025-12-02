@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 8.2.0
+
+### Added
+
+- Added player crafting event:
+  - `PlayerEvents.CRAFT_ITEM` - Fires when a player crafts an item using any crafting mechanism (informational)
+
 ## 8.1.0
 
 ### Added
