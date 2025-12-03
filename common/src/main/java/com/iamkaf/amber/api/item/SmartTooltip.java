@@ -97,15 +97,7 @@ public class SmartTooltip {
         }
     }
 
-    /**
-     * @deprecated Use {@link #into(Consumer)} instead. This is only here so mods that use
-     * SmartTooltip can still compile.
-     */
-    @Deprecated
-    public void into(List<Component> tooltipAdder) {
-        tooltipAdder.addAll(tooltipComponents);
-    }
-
+    
     /**
      * Helper method to check if Shift key is held down.
      * In 1.21.9, this method moved from Screen to Minecraft.

@@ -22,6 +22,14 @@ See the full changelog at https://github.com/iamkaf/amber
   - Cross-platform support for Fabric, NeoForge, and Forge
   - Useful for shield leveling systems, shield durability management, and combat mechanics
 
+### Removed
+
+- Removed deprecated and unused classes:
+  - `JsonFileReader` - Unused configuration class that was deprecated in favor of `JsonConfigManager`
+  - `LiteralSetHolder` - Unused utility class that had no references in the codebase
+  - `AmberMod` (deprecated v1 version) - Unused legacy initialization class, replaced by `AmberInitializer`
+- Removed deprecated `SmartTooltip.into()` method in favor of the Consumer-based implementation
+
 ## 8.2.0
 
 ### Added
