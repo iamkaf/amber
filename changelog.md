@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 8.3.0
+
+### Added
+
+- Added item component modification system:
+  - `ItemEvents.MODIFY_DEFAULT_COMPONENTS` - Allows mods to modify the default properties and behaviors of items when they are created
+  - Enables adding custom data components to existing items (e.g., making normally non-repairable items repairable with specific materials)
+  - Cross-platform support for Fabric, NeoForge, and Forge
+  - Useful for mods that need to modify vanilla item behaviors without replacing the items
+
 ## 8.2.0
 
 ### Added

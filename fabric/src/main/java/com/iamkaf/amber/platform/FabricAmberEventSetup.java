@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.creativetabs.CreativeModeTabRegistry;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -24,11 +25,37 @@ import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.LootTable;
 
+import java.util.function.Consumer;
+
 public class FabricAmberEventSetup implements IAmberEventSetup {
+
+    /**
+     * Fabric-specific wrapper for DefaultItemComponentEvents.ModifyContext.
+     */
+    private static class FabricComponentModificationContext implements ItemEvents.ComponentModificationContext {
+        private final DefaultItemComponentEvents.ModifyContext modifyContext;
+
+        FabricComponentModificationContext(DefaultItemComponentEvents.ModifyContext modifyContext) {
+            this.modifyContext = modifyContext;
+        }
+
+        @Override
+        public void modify(Item item, Consumer<DataComponentMap.Builder> builderConsumer) {
+            java.util.function.Predicate<Item> itemPredicate = testItem -> testItem == item;
+            modifyContext.modify(itemPredicate, (builder, actualItem) -> {
+                if (actualItem == item) {
+                    builderConsumer.accept(builder);
+                }
+            });
+        }
+    }
+
     @Override
     public void registerCommon() {
         LootTableEvents.MODIFY.register((ResourceKey<LootTable> resourceKey, LootTable.Builder builder,
@@ -76,6 +103,13 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         // Animal events - implemented via Mixins (TamableAnimalMixin, AnimalMixin, VillagerMixin)
         // Fabric doesn't have native animal taming, breeding, or villager trade events
         
+        // Default item components event
+        DefaultItemComponentEvents.MODIFY.register(modifyContext -> {
+            ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
+                new FabricComponentModificationContext(modifyContext)
+            );
+        });
+
         // Creative mode tab events
         // Register for all existing vanilla tabs
         for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
@@ -83,7 +117,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, tab);
             });
         }
-        
+
         // Register for our custom tabs
         for (var builder : CreativeModeTabRegistry.getTabBuilders().values()) {
             var tabKey = net.minecraft.resources.ResourceKey.create(

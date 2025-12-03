@@ -20,6 +20,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
@@ -34,11 +35,41 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 
 import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
 
 public class NeoForgeAmberEventSetup implements IAmberEventSetup {
+
+    /**
+     * NeoForge-specific wrapper for ModifyDefaultComponentsEvent.
+     */
+    private static class NeoForgeComponentModificationContext implements ItemEvents.ComponentModificationContext {
+        private final ModifyDefaultComponentsEvent event;
+
+        NeoForgeComponentModificationContext(ModifyDefaultComponentsEvent event) {
+            this.event = event;
+        }
+
+        @Override
+        public void modify(Item item, java.util.function.Consumer<DataComponentMap.Builder> builderConsumer) {
+            event.modify(item, patchBuilder -> {
+                DataComponentMap.Builder tempBuilder = DataComponentMap.builder();
+                builderConsumer.accept(tempBuilder);
+
+                DataComponentMap modifiedComponents = tempBuilder.build();
+                for (TypedDataComponent<?> component : modifiedComponents) {
+                    patchBuilder.set(component);
+                }
+            });
+        }
+    }
+
     @Override
     public void registerCommon() {
         NeoForge.EVENT_BUS.register(EventHandlerCommonNeoForge.class);
@@ -212,6 +243,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             }
         }
 
+  
         // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
         // Note: BonemealEvent, FarmlandTrampleEvent, and BlockGrowFeatureEvent not available in NeoForge 1.21.10
 
@@ -253,6 +285,16 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
             CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
                 .modifyEntries(event.getTabKey(), event::accept);
+        }
+
+        /**
+         * Handles ModifyDefaultComponentsEvent from NeoForge.
+         */
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onModifyDefaultComponents(ModifyDefaultComponentsEvent event) {
+            ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
+                new NeoForgeComponentModificationContext(event)
+            );
         }
     }
 

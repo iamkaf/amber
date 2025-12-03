@@ -5,31 +5,64 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.keymapping.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraft.world.InteractionResult;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraft.world.InteractionResult;
+import net.minecraftforge.event.GatherComponentsEvent;
 
 import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
 
 public class ForgeAmberEventSetup implements IAmberEventSetup {
+
+    /**
+     * Forge-specific wrapper for GatherComponentsEvent.Item.
+     */
+    private static class ForgeComponentModificationContext implements ItemEvents.ComponentModificationContext {
+        private final GatherComponentsEvent.Item event;
+
+        ForgeComponentModificationContext(GatherComponentsEvent.Item event) {
+            this.event = event;
+        }
+
+        @Override
+        public void modify(Item item, java.util.function.Consumer<DataComponentMap.Builder> builderConsumer) {
+            if (event.getOwner() == item) {
+                DataComponentMap.Builder tempBuilder = DataComponentMap.builder();
+                builderConsumer.accept(tempBuilder);
+
+                DataComponentMap modifiedComponents = tempBuilder.build();
+                for (TypedDataComponent<?> component : modifiedComponents) {
+                    @SuppressWarnings("unchecked")
+                    var compType = (DataComponentType<Object>) component.type();
+                    event.register(compType, component.value());
+                }
+            }
+        }
+    }
     @Override
     public void registerCommon() {
         LootTableLoadEvent.BUS.addListener(EventHandlerCommon::onLootTableEvent);
@@ -59,6 +92,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         
         // Creative mode tab events (register with high priority)
         BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
+
+        // Default item components event
+        GatherComponentsEvent.Item.BUS.addListener(EventHandlerCommon::onGatherComponents);
     }
 
     @Override
@@ -266,6 +302,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
             CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
                 .modifyEntries(event.getTabKey(), event::accept);
+        }
+
+        /**
+         * Handles GatherComponentsEvent.Item from Forge.
+         */
+        public static void onGatherComponents(GatherComponentsEvent.Item event) {
+            ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
+                new ForgeComponentModificationContext(event)
+            );
         }
     }
 
