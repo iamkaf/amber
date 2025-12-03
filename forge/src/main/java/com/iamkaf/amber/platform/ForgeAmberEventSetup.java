@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -89,7 +90,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         // Animal events
         AnimalTameEvent.BUS.addListener(EventHandlerCommon::onAnimalTame);
         BabyEntitySpawnEvent.BUS.addListener(EventHandlerCommon::onAnimalBreed);
-        
+
+        // Shield block events
+        ShieldBlockEvent.BUS.addListener(EventHandlerCommon::onShieldBlock);
+
         // Creative mode tab events (register with high priority)
         BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
 
@@ -270,6 +274,17 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static void onAnimalBreed(BabyEntitySpawnEvent event) {
             if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA && event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
                 AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
+            }
+        }
+
+        public static void onShieldBlock(ShieldBlockEvent event) {
+            if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player) {
+                net.minecraft.world.item.ItemStack shield = event.getBlockedWith();
+                if (!shield.isEmpty()) {
+                    PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(
+                        player, shield, event.getOriginalBlockedDamage(), event.getDamageSource()
+                    );
+                }
             }
         }
 

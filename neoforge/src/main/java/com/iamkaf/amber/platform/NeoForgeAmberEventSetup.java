@@ -29,6 +29,7 @@ import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -262,6 +263,18 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void onAnimalBreed(BabyEntitySpawnEvent event) {
             if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA && event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
                 AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
+            }
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onShieldBlock(LivingShieldBlockEvent event) {
+            if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player && event.getBlocked()) {
+                net.minecraft.world.item.ItemStack shield = player.getUseItem();
+                if (!shield.isEmpty()) {
+                    PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(
+                        player, shield, event.getOriginalBlockedDamage(), event.getDamageSource()
+                    );
+                }
             }
         }
     }

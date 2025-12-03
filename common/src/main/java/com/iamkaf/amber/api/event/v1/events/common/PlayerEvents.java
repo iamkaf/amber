@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -107,6 +108,25 @@ public class PlayerEvents {
     );
 
     /**
+     * An event that is fired when a player successfully blocks damage with a shield.
+     * <p>
+     * This event is fired on both the client and server side when a player blocks
+     * damage using a shield. The shield ItemStack and blocked damage are provided.
+     * </p>
+     * <p>
+     * <b>This event is informational only and cannot be cancelled.</b>
+     * The blocking has already completed when this event is fired.
+     * </p>
+     */
+    public static final Event<ShieldBlock> SHIELD_BLOCK = EventFactory.createArrayBacked(
+        ShieldBlock.class, callbacks -> (player, shield, blockedDamage, source) -> {
+            for (ShieldBlock callback : callbacks) {
+                callback.onShieldBlock(player, shield, blockedDamage, source);
+            }
+        }
+    );
+
+    /**
      * Functional interface for handling {@link #ENTITY_INTERACT} callbacks.
      */
     @FunctionalInterface
@@ -184,5 +204,25 @@ public class PlayerEvents {
          * @param alive whether the player was alive before respawning (false if respawning from death)
          */
         void onPlayerRespawn(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive);
+    }
+
+    /**
+     * Functional interface for handling {@link #SHIELD_BLOCK} callbacks.
+     */
+    @FunctionalInterface
+    public interface ShieldBlock {
+
+        /**
+         * Called when a player blocks damage with a shield.
+         * <p>
+         * This is an informational event only - you cannot cancel the block.
+         * </p>
+         *
+         * @param player the player who blocked with the shield
+         * @param shield the shield ItemStack that blocked the damage
+         * @param blockedDamage the amount of damage that was blocked
+         * @param source the damage source that was blocked
+         */
+        void onShieldBlock(Player player, ItemStack shield, float blockedDamage, DamageSource source);
     }
 }

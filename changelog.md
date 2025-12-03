@@ -16,6 +16,11 @@ See the full changelog at https://github.com/iamkaf/amber
   - Enables adding custom data components to existing items (e.g., making normally non-repairable items repairable with specific materials)
   - Cross-platform support for Fabric, NeoForge, and Forge
   - Useful for mods that need to modify vanilla item behaviors without replacing the items
+- Added player shield block event:
+  - `PlayerEvents.SHIELD_BLOCK` - Fires when a player successfully blocks damage with a shield
+  - Provides access to the player, shield ItemStack, blocked damage amount, and damage source
+  - Cross-platform support for Fabric, NeoForge, and Forge
+  - Useful for shield leveling systems, shield durability management, and combat mechanics
 
 ## 8.2.0
 

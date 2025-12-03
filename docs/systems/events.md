@@ -6,7 +6,7 @@ Amber provides a comprehensive event system that works consistently across Fabri
 
 The event system includes:
 
-- **Player Events**: Player interactions, joining/leaving, respawning
+- **Player Events**: Player interactions, joining/leaving, respawning, shield blocking
 - **Block Events**: Block breaking, placing, interaction
 - **Item Events**: Item dropping, picking up
 - **Entity Events**: Entity spawning, interaction
@@ -114,6 +114,39 @@ PlayerEvents.CRAFT_ITEM.register((player, craftedItems) -> {
     // Log crafting for analytics
     Constants.LOG.info("{} crafted {} items",
         player.getName().getString(), totalItems);
+});
+```
+
+### SHIELD_BLOCK
+
+Fired when a player successfully blocks damage with a shield. This event fires on both client and server.
+
+```java
+PlayerEvents.SHIELD_BLOCK.register((player, shield, blockedDamage, source) -> {
+    // Track shield blocking for leveling systems
+    ShieldLeveling.addExperience(player, (int)blockedDamage);
+
+    // Custom shield effects
+    if (shield.getItem() == MyItems.MAGIC_SHIELD.get()) {
+        // Reflect damage back to attacker
+        if (source.getEntity() instanceof LivingEntity attacker) {
+            attacker.hurt(player.damageSources().magic(), blockedDamage * 0.5F);
+        }
+    }
+
+    // Shield durability management
+    if (shouldReduceDurability(shield, source)) {
+        shield.hurtAndBreak(1, player, (p) -> {
+            p.broadcastBreakEvent(net.minecraft.world.InteractionHand.MAIN_HAND);
+        });
+    }
+
+    // Log shield blocks for analytics
+    Constants.LOG.info("{} blocked {} damage from {} using {}",
+        player.getName().getString(),
+        blockedDamage,
+        source.getMsgId(),
+        shield.getItem().getDescriptionId());
 });
 ```
 
@@ -590,6 +623,7 @@ public class MyMod {
 | `PLAYER_LEAVE` | Player leaves server | No | `(ServerPlayer)` |
 | `PLAYER_RESPAWN` | Player respawns | No | `(ServerPlayer, ServerPlayer, boolean)` |
 | `CRAFT_ITEM` | Player crafts item | No | `(ServerPlayer, List<ItemStack>)` |
+| `SHIELD_BLOCK` | Player blocks with shield | No | `(Player, ItemStack, float, DamageSource)` |
 
 ### Block Events
 
