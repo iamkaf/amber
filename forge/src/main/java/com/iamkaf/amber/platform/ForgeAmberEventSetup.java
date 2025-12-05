@@ -3,7 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
-import com.iamkaf.amber.api.keymapping.KeybindHelper;
+import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;

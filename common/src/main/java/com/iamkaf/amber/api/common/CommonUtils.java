@@ -8,11 +8,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-/** Amber API - Common Utilities
- * This class provides utility methods for common operations in the Amber API.
- *
- * @since 6.0.6
+/**
+ * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.WorldFunctions} for world utilities or other appropriate functions class.
+ * This class will be removed in Amber 10.0
  */
+@Deprecated
 public class CommonUtils {
     /**
      * Performs a raytrace to determine the block the player is looking at.

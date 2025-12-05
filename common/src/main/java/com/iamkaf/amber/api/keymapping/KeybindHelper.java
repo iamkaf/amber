@@ -1,55 +1,38 @@
 package com.iamkaf.amber.api.keymapping;
 
-import com.iamkaf.amber.Constants;
-import com.iamkaf.amber.api.platform.v1.Platform;
-import com.iamkaf.amber.platform.Services;
-import com.iamkaf.amber.util.Env;
 import net.minecraft.client.KeyMapping;
 
 import java.util.ArrayList;
 
 /**
- * A utility class for managing keybinds in the Amber API.
- * This class allows for the registration of keybinds.
- * It is designed to be used in a client environment only.
- *
- * @since 6.0.5
+ * @deprecated Use {@link com.iamkaf.amber.api.registry.v1.KeybindHelper} instead.
+ * This class will be removed in Amber 10.0
  */
+@Deprecated
 public class KeybindHelper {
-    private static final ArrayList<KeyMapping> KEYBINDINGS = new ArrayList<>();
-    public static boolean forgeEventAlreadyFired = false;
 
     /**
-     * Registers a keybind.
-     *
-     * @param keybind the keybind to register
+     * @deprecated Use {@link com.iamkaf.amber.api.registry.v1.KeybindHelper#register(KeyMapping)} instead.
+     * Will be removed in Amber 10.0
      */
+    @Deprecated
     public static KeyMapping register(KeyMapping keybind) {
-        if (!Platform.getEnvironment().equals(Env.CLIENT)) {
-            return null;
-        }
-        if (forgeEventAlreadyFired) {
-            Constants.LOG.error(
-                    "Attempted to register a keybind after the Forge event has already fired. This is not allowed.");
-            Constants.LOG.error("Please ensure that all keybinds are registered before the Forge event is fired.");
-            Constants.LOG.error("{}", keybind.getName());
-        }
-
-        KEYBINDINGS.add(keybind);
-
-        if (Platform.getPlatformName().equals("Fabric")) {
-            Services.KEYBIND_REGISTER.register(keybind);
-        }
-
-        return keybind;
+        return com.iamkaf.amber.api.registry.v1.KeybindHelper.register(keybind);
     }
 
     /**
-     * Gets the list of registered keybinds.
-     *
-     * @return the list of keybinds
+     * @deprecated Use {@link com.iamkaf.amber.api.registry.v1.KeybindHelper#getKeybindings()} instead.
+     * Will be removed in Amber 10.0
      */
+    @Deprecated
     public static ArrayList<KeyMapping> getKeybindings() {
-        return KEYBINDINGS;
+        return com.iamkaf.amber.api.registry.v1.KeybindHelper.getKeybindings();
     }
+
+    /**
+     * @deprecated This field is moved to {@link com.iamkaf.amber.api.registry.v1.KeybindHelper#forgeEventAlreadyFired}.
+     * Will be removed in Amber 10.0
+     */
+    @Deprecated
+    public static boolean forgeEventAlreadyFired = com.iamkaf.amber.api.registry.v1.KeybindHelper.forgeEventAlreadyFired;
 }

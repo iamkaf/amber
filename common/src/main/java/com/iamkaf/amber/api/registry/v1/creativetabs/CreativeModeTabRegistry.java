@@ -1,4 +1,4 @@
-package com.iamkaf.amber.api.creativetabs;
+package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;

@@ -1,6 +1,7 @@
-package com.iamkaf.amber.api.common.client;
+package com.iamkaf.amber.api.functions.v1;
 
 import com.iamkaf.amber.Constants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -11,29 +12,42 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
- * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.ClientFunctions} instead.
- * This class will be removed in Amber 10.0
+ * Consolidated utility class for client-side operations, including player feedback,
+ * HUD rendering, tooltips, and text writing.
+ * This class combines functionality from FeedbackHelper, CommonClientUtils, and SmartTooltip
+ * that will be removed on Amber 10.
+ *
+ * @since 8.3.0
  */
-@Deprecated
-public class CommonClientUtils {
+public final class ClientFunctions {
+
     public static final int WHITE = 0xFFFFFFFF; // Default white color for text rendering
     public static final int BLACK = 0x000000FF; // Default black color for text rendering
     public static final int TRANSPARENT = 0x00000000; // Transparent color for text rendering
     public static final int PACKED_LIGHT = 15728880;
 
-    // --------------------- HUD ---------------------
+    private ClientFunctions() {
+        // Utility class - prevent instantiation
+    }
+
+    // ==================== HUD RENDERING OPERATIONS ====================
 
     /**
-     * Checks HUDs should be rendered based on the current game state.
+     * Checks if HUDs should be rendered based on the current game state.
      * Takes into account whether the debug screen is shown, GUI is hidden, and the player is null.
      *
      * @return true if the HUD should be rendered, false otherwise.
      */
-    public static boolean shouldRender() {
+    public static boolean shouldRenderHud() {
         Minecraft mc = Minecraft.getInstance();
+        if (mc == null) {
+            return false;
+        }
         try {
             return !(mc.getDebugOverlay().showDebugScreen() || mc.options.hideGui || mc.level == null || mc.player == null);
         } catch (Exception e) {
@@ -53,7 +67,7 @@ public class CommonClientUtils {
      * @param y       the y-coordinate where to start writing.
      * @param color   the color to use for rendering the text (specify an alpha value, or it will be invisible).
      */
-    public static void text(GuiGraphics context, Font font, Component message, int x, int y, int color) {
+    public static void renderText(GuiGraphics context, Font font, Component message, int x, int y, int color) {
         context.drawString(font, message, x, y, color);
     }
 
@@ -67,6 +81,15 @@ public class CommonClientUtils {
      */
     public static void renderTooltip(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
+
+        if (mc == null) {
+            return;
+        }
+
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
         // converts a list of components to a list of ClientTooltipComponents
         List<ClientTooltipComponent> tooltipComponents = Screen.getTooltipFromItem(mc, stack)
                 .stream()
@@ -84,6 +107,98 @@ public class CommonClientUtils {
         );
     }
 
+    // ==================== SMART TOOLTIP OPERATIONS ====================
+
+    /**
+     * A utility class for building smart tooltips that respond to player input.
+     * This class allows adding tooltip components conditionally based on player
+     * key presses or modifier keys.
+     */
+    public static final class SmartTooltip {
+        // List of tooltip components to display.
+        private final List<Component> tooltipComponents = new ArrayList<>();
+
+        /**
+         * Constructs a SmartTooltip.
+         */
+        public SmartTooltip() {
+        }
+
+        /**
+         * Adds a component to the tooltip unconditionally.
+         *
+         * @param component The component to add.
+         * @return The current SmartTooltip instance for method chaining.
+         */
+        public SmartTooltip add(Component component) {
+            tooltipComponents.add(component);
+            return this;
+        }
+
+        /**
+         * Adds a component to the tooltip if the player is holding the Shift key.
+         *
+         * @param component The component to add if Shift is held down.
+         * @return The current SmartTooltip instance for method chaining.
+         */
+        public SmartTooltip shift(Component component) {
+            if (hasShiftDown()) {
+                tooltipComponents.add(component);
+            }
+            return this;
+        }
+
+        /**
+         * Adds a component to the tooltip if a specific keybind is pressed.
+         *
+         * @param keybind   The key mapping to check.
+         * @param component The component to add if the keybind is pressed.
+         * @return The current SmartTooltip instance for method chaining.
+         */
+        public SmartTooltip keybind(KeyMapping keybind, Component component) {
+            if (keybind.isDown()) {
+                tooltipComponents.add(component);
+            }
+            return this;
+        }
+
+        /**
+         * Adds a component to the tooltip if both the Shift key and a specific keybind are pressed.
+         *
+         * @param keybind   The key mapping to check.
+         * @param component The component to add if both the Shift key and the keybind are pressed.
+         * @return The current SmartTooltip instance for method chaining.
+         */
+        public SmartTooltip shiftKeybind(KeyMapping keybind, Component component) {
+            if (hasShiftDown() && keybind.isDown()) {
+                tooltipComponents.add(component);
+            }
+            return this;
+        }
+
+        /**
+         * Appends all accumulated components in this SmartTooltip to an external tooltip list.
+         *
+         * @param tooltipAdder A consumer that accepts a Component and adds it to the tooltip list.
+         */
+        public void into(Consumer<Component> tooltipAdder) {
+            for (Component component : tooltipComponents) {
+                tooltipAdder.accept(component);
+            }
+        }
+
+        /**
+         * Helper method to check if Shift key is held down.
+         *
+         * @return true if the Shift key is held down.
+         */
+        private static boolean hasShiftDown() {
+            return Minecraft.getInstance().hasShiftDown();
+        }
+    }
+
+    // ==================== TEXT WRITER ====================
+
     /**
      * Helper class for writing text to the screen with a cursor position.
      * Maintains an internal cursor and supports writing at specific positions or sequential lines.
@@ -91,8 +206,8 @@ public class CommonClientUtils {
      * <h2>Usage Examples</h2>
      * <pre><code>
      * // Example 1: Start at (20, 40) and write two lines
-     * CommonClientUtils.TextWriter writer = new CommonClientUtils.TextWriter(graphics, font, 20, 40);
-     * writer.writeLine(Component.literal("First line"), CommonClientUtils.WHITE);
+     * TextWriter writer = new TextWriter(graphics, font, 20, 40);
+     * writer.writeLine(Component.literal("First line"), WHITE);
      * writer.writeLine(Component.literal("Second line"));
      *
      * // Example 2: Inline writing and repositioning
@@ -102,8 +217,6 @@ public class CommonClientUtils {
      * // Example 3: Using default color for lines
      * writer.writeLine(Component.literal("Default color line"));
      * </code></pre>
-     *
-     * @since 6.0.6
      */
     public static final class TextWriter {
         private final GuiGraphics context;
@@ -152,7 +265,7 @@ public class CommonClientUtils {
         public void write(Component message, int x, int y, int color) {
             cursorX = x;
             cursorY = y;
-            text(context, font, message, cursorX, cursorY, color);
+            renderText(context, font, message, cursorX, cursorY, color);
         }
 
         /**
@@ -186,7 +299,7 @@ public class CommonClientUtils {
          * @param color   the color to use for rendering the text
          */
         public void writeLine(Component message, int color) {
-            text(context, font, message, cursorX, cursorY, color);
+            renderText(context, font, message, cursorX, cursorY, color);
             cursorY += font.lineHeight; // Move cursor down by one line height
         }
 

@@ -7,15 +7,21 @@ import java.util.stream.Stream;
 
 /**
  * Lightweight optional supplier used for deferred registry objects.
+ *
+ * @param <T> the type of value supplied
  */
 public interface OptionalSupplier<T> extends Supplier<T> {
     /**
+     * Checks if the value is present.
+     *
      * @return whether the value is present.
      */
     boolean isPresent();
 
     /**
      * Returns the value if present or {@code null} otherwise.
+     *
+     * @return the value if present, or {@code null} if absent
      */
     default T getOrNull() {
         return isPresent() ? get() : null;
@@ -23,6 +29,8 @@ public interface OptionalSupplier<T> extends Supplier<T> {
 
     /**
      * Wraps the value in an {@link Optional}.
+     *
+     * @return an {@link Optional} containing the value if present
      */
     default Optional<T> toOptional() {
         return Optional.ofNullable(getOrNull());
@@ -30,6 +38,8 @@ public interface OptionalSupplier<T> extends Supplier<T> {
 
     /**
      * Runs the given consumer if a value is present.
+     *
+     * @param action the consumer to run if a value is present
      */
     default void ifPresent(Consumer<? super T> action) {
         if (isPresent()) {
@@ -39,6 +49,9 @@ public interface OptionalSupplier<T> extends Supplier<T> {
 
     /**
      * Runs one of the given runnables depending on presence of a value.
+     *
+     * @param action      the consumer to run if a value is present
+     * @param emptyAction the runnable to run if no value is present
      */
     default void ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) {
         if (isPresent()) {

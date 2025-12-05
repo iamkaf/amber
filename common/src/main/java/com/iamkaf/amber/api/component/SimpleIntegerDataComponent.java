@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 /**
  * A simple record class that represents an integer-based data component.
  *
+ * @param value the integer value stored in this component
  * @deprecated This helper will be replaced by a versioned alternative in a future release.
  */
 @Deprecated

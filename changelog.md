@@ -11,16 +11,25 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
-- Added item component modification system:
-  - `ItemEvents.MODIFY_DEFAULT_COMPONENTS` - Allows mods to modify the default properties and behaviors of items when they are created
-  - Enables adding custom data components to existing items (e.g., making normally non-repairable items repairable with specific materials)
-  - Cross-platform support for Fabric, NeoForge, and Forge
-  - Useful for mods that need to modify vanilla item behaviors without replacing the items
-- Added player shield block event:
-  - `PlayerEvents.SHIELD_BLOCK` - Fires when a player successfully blocks damage with a shield
-  - Provides access to the player, shield ItemStack, blocked damage amount, and damage source
-  - Cross-platform support for Fabric, NeoForge, and Forge
-  - Useful for shield leveling systems, shield durability management, and combat mechanics
+- Added consolidated API utility classes in `api.functions.v1` package:
+  - **PlayerFunctions** - Player operations, experience, abilities, inventory, messaging
+  - **ItemFunctions** - Item/inventory operations, armor management, crafting utilities
+  - **WorldFunctions** - World utilities, sounds, dimension checks, distance calculations
+  - **ClientFunctions** - Client-side utilities, HUD rendering, tooltips
+  - **MathFunctions** - Mathematical operations, probability, random generation
+- Added `ItemEvents.MODIFY_DEFAULT_COMPONENTS` - Allows mods to modify default item properties and add custom data components with cross-platform support
+- Added `PlayerEvents.SHIELD_BLOCK` - Fires when players block damage with shields, providing access to shield data for combat mechanics and shield systems
+
+### Deprecated
+
+- Deprecated legacy utility classes in favor of consolidated `api.functions.v1` package:
+  - `InventoryHelper`, `ItemHelper`, `ArmorTierHelper` → Use `ItemFunctions`
+  - `LevelHelper`, `SoundHelper`, `CommonUtils`, `BoundingBoxMerger` → Use `WorldFunctions`
+  - `FeedbackHelper` → Use `PlayerFunctions`
+  - `CommonClientUtils`, `SmartTooltip` → Use `ClientFunctions`
+  - `Chance` → Use `MathFunctions`
+- Legacy utility classes will be removed in Amber 10.0
+- Creative tabs moved to `registry.v1` package
 
 ### Removed
 
@@ -28,6 +37,7 @@ See the full changelog at https://github.com/iamkaf/amber
   - `JsonFileReader` - Unused configuration class that was deprecated in favor of `JsonConfigManager`
   - `LiteralSetHolder` - Unused utility class that had no references in the codebase
   - `AmberMod` (deprecated v1 version) - Unused legacy initialization class, replaced by `AmberInitializer`
+  - `BrewingHelper` - Never implemented brewing functionality that was planned but never developed
 - Removed deprecated `SmartTooltip.into()` method in favor of the Consumer-based implementation
 
 ## 8.2.0

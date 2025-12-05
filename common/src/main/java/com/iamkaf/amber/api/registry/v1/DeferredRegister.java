@@ -28,6 +28,8 @@ import java.util.function.Supplier;
  *
  * <p>The {@code ResourceKey} parameter can be used to set the id on any
  * {@code Properties} instance that requires it.</p>
+ *
+ * @param <T> the type of objects being registered
  */
 public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     private final Supplier<RegistrarManager> managerSupplier;
@@ -45,6 +47,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
 
     /**
      * Creates a deferred register bound to the given mod id and registry.
+     *
+     * @param <T>   the type of objects being registered
+     * @param modId the mod id for namespace
+     * @param key   the registry key
+     * @return a new {@link DeferredRegister} instance
      */
     public static <T> DeferredRegister<T> create(String modId, ResourceKey<Registry<T>> key) {
         Supplier<RegistrarManager> value = Suppliers.memoize(() -> RegistrarManager.get(modId));
@@ -54,6 +61,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     /**
      * Registers a supplier with an id under the mod namespace.
      * Use this when the entry's {@code Properties} already have the id set.
+     *
+     * @param <R>      the type of the registered object
+     * @param id       the identifier for the registry entry
+     * @param supplier a supplier that provides the object to register
+     * @return a {@link RegistrySupplier} for the registered entry
      */
     public <R extends T> RegistrySupplier<R> register(String id, Supplier<? extends R> supplier) {
         if (modId == null) {
@@ -65,6 +77,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     /**
      * Registers a supplier that receives the entry {@link ResourceKey}. This is useful for
      * automatically setting the id on {@code Properties} objects.
+     *
+     * @param <R>      the type of the registered object
+     * @param id       the identifier for the registry entry
+     * @param supplier a function that receives the entry {@link ResourceKey} and returns the object to register
+     * @return a {@link RegistrySupplier} for the registered entry
      */
     public <R extends T> RegistrySupplier<R> register(String id, Function<ResourceKey<T>, ? extends R> supplier) {
         if (modId == null) {

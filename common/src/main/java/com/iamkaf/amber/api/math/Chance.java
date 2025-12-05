@@ -3,7 +3,8 @@ package com.iamkaf.amber.api.math;
 import java.util.Random;
 
 /**
- * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.MathFunctions} instead.
+ * This class will be removed in Amber 10.0
  */
 @Deprecated
 public class Chance {

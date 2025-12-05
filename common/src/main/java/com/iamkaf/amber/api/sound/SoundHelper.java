@@ -8,7 +8,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.WorldFunctions#playSoundAt} for position-based sounds or {@link com.iamkaf.amber.api.functions.v1.PlayerFunctions#playSound} for player-directed sounds.
+ * This class will be removed in Amber 10.0
  */
 @Deprecated
 public class SoundHelper {

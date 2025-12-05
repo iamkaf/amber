@@ -1,4 +1,4 @@
-package com.iamkaf.amber.api.creativetabs;
+package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;

@@ -6,7 +6,7 @@ import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
-import com.iamkaf.amber.api.keymapping.KeybindHelper;
+import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraft.world.InteractionResult;

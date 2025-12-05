@@ -20,7 +20,8 @@ import java.util.function.Consumer;
  * key presses or modifier keys.
  */
 /**
- * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.ClientFunctions.SmartTooltip} instead.
+ * This class will be removed in Amber 10.0
  */
 @Deprecated
 public class SmartTooltip {

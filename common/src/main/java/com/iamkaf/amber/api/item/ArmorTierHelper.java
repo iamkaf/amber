@@ -6,7 +6,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import java.util.function.Supplier;
 
 /**
- * @deprecated This helper will be replaced by a versioned alternative in a future release.
+ * @deprecated Use {@link com.iamkaf.amber.api.functions.v1.ItemFunctions} instead.
+ * This class will be removed in Amber 10.0
  */
 @Deprecated
 public class ArmorTierHelper {

@@ -32,4 +32,5 @@ settings.local.json
 node_modules
 docs/.vitepress/cache
 docs/.vitepress/dist
-BEAM_TOOLS_GUIDE.md
+docs/_internal
+

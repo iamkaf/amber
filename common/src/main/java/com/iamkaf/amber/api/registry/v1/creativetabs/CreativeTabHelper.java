@@ -1,4 +1,4 @@
-package com.iamkaf.amber.api.creativetabs;
+package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
