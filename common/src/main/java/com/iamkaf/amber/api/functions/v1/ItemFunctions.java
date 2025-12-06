@@ -1,21 +1,27 @@
 package com.iamkaf.amber.api.functions.v1;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -197,6 +203,39 @@ public final class ItemFunctions {
         }
     }
 
+    /**
+     * Gets all items from the inventory as a NonNullList.
+     * This is useful for inventory operations that need a mutable list copy.
+     *
+     * @param inventory The inventory to get items from.
+     * @return A NonNullList containing all ItemStacks from the inventory.
+     * @since 8.3.0
+     */
+    public static NonNullList<ItemStack> getInventoryItems(Inventory inventory) {
+        NonNullList<ItemStack> items = NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            items.set(i, inventory.getItem(i));
+        }
+        return items;
+    }
+
+    /**
+     * Gets all armor items from a player's equipment slots.
+     * Returns a list in the order: head, chest, legs, feet.
+     *
+     * @param player The player to get armor from.
+     * @return A List containing the four armor slot ItemStacks.
+     * @since 8.3.0
+     */
+    public static List<ItemStack> getArmorSlots(Player player) {
+        return List.of(
+                player.getItemBySlot(EquipmentSlot.HEAD),
+                player.getItemBySlot(EquipmentSlot.CHEST),
+                player.getItemBySlot(EquipmentSlot.LEGS),
+                player.getItemBySlot(EquipmentSlot.FEET)
+        );
+    }
+
     // ==================== ITEM OPERATIONS ====================
 
     /**
@@ -304,6 +343,202 @@ public final class ItemFunctions {
         ItemStack defaultInstance = item.getDefaultInstance();
 
         return defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+    }
+
+    // ==================== ENCHANTMENT OPERATIONS ====================
+
+    /**
+     * Checks if the ItemStack contains the specified enchantment by ResourceLocation.
+     * Uses the modern enchantment API for Minecraft 1.21.10+.
+     *
+     * @param stack        The ItemStack to check.
+     * @param enchantment The ResourceLocation of the enchantment to check for.
+     * @return true if the item has the specified enchantment, false otherwise.
+     */
+    public static boolean containsEnchantment(ItemStack stack, ResourceLocation enchantment) {
+        ItemEnchantments enchantments = stack.getEnchantments();
+        if (enchantments.isEmpty()) {
+            return false;
+        }
+
+        // Check each enchantment in the item to see if it matches the specified ResourceLocation
+        for (var enchantmentEntry : enchantments.entrySet()) {
+            Holder<Enchantment> enchantmentHolder = enchantmentEntry.getKey();
+            if (enchantmentHolder.is(enchantment)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the ItemStack contains the specified enchantment by Enchantment object.
+     * Uses the modern enchantment API for Minecraft 1.21.10+.
+     *
+     * @param stack        The ItemStack to check.
+     * @param enchantment The Enchantment to check for.
+     * @return true if the item has the specified enchantment, false otherwise.
+     */
+    public static boolean containsEnchantment(ItemStack stack, Enchantment enchantment) {
+        if (enchantment == null) {
+            return false;
+        }
+
+        ItemEnchantments enchantments = stack.getEnchantments();
+
+        // Iterate through enchantment entries to find matching enchantment
+        for (var entry : enchantments.entrySet()) {
+            Holder<Enchantment> enchantmentHolder = entry.getKey();
+            if (enchantmentHolder.value().equals(enchantment)) {
+                return entry.getIntValue() > 0;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the level of a specific enchantment on the ItemStack.
+     * Returns 0 if the enchantment is not present.
+     *
+     * @param stack        The ItemStack to check.
+     * @param enchantment The Enchantment to get the level for.
+     * @return The level of the enchantment, or 0 if not present.
+     */
+    public static int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+        if (enchantment == null) {
+            return 0;
+        }
+
+        ItemEnchantments enchantments = stack.getEnchantments();
+
+        // Iterate through enchantment entries to find matching enchantment
+        for (var entry : enchantments.entrySet()) {
+            Holder<Enchantment> enchantmentHolder = entry.getKey();
+            if (enchantmentHolder.value().equals(enchantment)) {
+                return entry.getIntValue();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the level of a specific enchantment on the ItemStack by ResourceLocation.
+     * Returns 0 if the enchantment is not present.
+     *
+     * @param stack        The ItemStack to check.
+     * @param enchantment The ResourceLocation of the enchantment to get the level for.
+     * @return The level of the enchantment, or 0 if not present.
+     */
+    public static int getEnchantmentLevel(ItemStack stack, ResourceLocation enchantment) {
+        ItemEnchantments enchantments = stack.getEnchantments();
+        if (enchantments.isEmpty()) {
+            return 0;
+        }
+
+        // Check each enchantment in the item to see if it matches the specified ResourceLocation
+        for (var entry : enchantments.entrySet()) {
+            Holder<Enchantment> enchantmentHolder = entry.getKey();
+            if (enchantmentHolder.is(enchantment)) {
+                return entry.getIntValue();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Checks if the ItemStack is enchanted with any enchantments.
+     *
+     * @param stack The ItemStack to check.
+     * @return true if the item has any enchantments, false otherwise.
+     */
+    public static boolean isEnchanted(ItemStack stack) {
+        return stack.isEnchanted();
+    }
+
+    /**
+     * Gets all enchantments on the ItemStack as an ItemEnchantments object.
+     *
+     * @param stack The ItemStack to get enchantments from.
+     * @return The ItemEnchantments component.
+     */
+    public static ItemEnchantments getEnchantments(ItemStack stack) {
+        return stack.getEnchantments();
+    }
+
+    // ==================== ITEM CLASSIFICATION OPERATIONS ====================
+
+    /**
+     * Checks if the ItemStack is a tool using the modern Minecraft 1.21.7+ DataComponents system.
+     * Uses DataComponents.TOOL to identify tools like pickaxes, axes, shovels, etc.
+     *
+     * @param stack The ItemStack to check.
+     * @return true if the item has tool properties, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isTool(ItemStack stack) {
+        return stack.has(DataComponents.TOOL);
+    }
+
+    /**
+     * Checks if the Item is a tool using the modern Minecraft 1.21.7+ DataComponents system.
+     * Creates a default instance to check for tool properties.
+     *
+     * @param item The Item to check.
+     * @return true if the item has tool properties, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isTool(Item item) {
+        return item.getDefaultInstance().has(DataComponents.TOOL);
+    }
+
+    /**
+     * Checks if the ItemStack is a weapon using the modern Minecraft 1.21.7+ DataComponents system.
+     * Uses DataComponents.WEAPON to identify weapons like swords, tridents, etc.
+     *
+     * @param stack The ItemStack to check.
+     * @return true if the item has weapon properties, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isWeapon(ItemStack stack) {
+        return stack.has(DataComponents.WEAPON);
+    }
+
+    /**
+     * Checks if the Item is a weapon using the modern Minecraft 1.21.7+ DataComponents system.
+     * Creates a default instance to check for weapon properties.
+     *
+     * @param item The Item to check.
+     * @return true if the item has weapon properties, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isWeapon(Item item) {
+        return item.getDefaultInstance().has(DataComponents.WEAPON);
+    }
+
+    /**
+     * Checks if the ItemStack is armor using the modern Minecraft 1.21.7+ DataComponents system.
+     * Uses DataComponents.EQUIPPABLE to identify armor and other equippable items.
+     * Note: This assumes all EQUIPPABLE items are armor for practical purposes.
+     *
+     * @param stack The ItemStack to check.
+     * @return true if the item can be equipped, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isArmor(ItemStack stack) {
+        return stack.has(DataComponents.EQUIPPABLE);
+    }
+
+    /**
+     * Checks if the Item is armor using the modern Minecraft 1.21.7+ DataComponents system.
+     * Creates a default instance to check for equippable properties.
+     * Note: This assumes all EQUIPPABLE items are armor for practical purposes.
+     *
+     * @param item The Item to check.
+     * @return true if the item can be equipped, false otherwise.
+     * @since 8.3.0
+     */
+    public static boolean isArmor(Item item) {
+        return item.getDefaultInstance().has(DataComponents.EQUIPPABLE);
     }
 
     // ==================== ARMOR TIER OPERATIONS ====================
