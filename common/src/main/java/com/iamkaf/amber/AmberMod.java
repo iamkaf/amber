@@ -27,8 +27,8 @@ public class AmberMod {
 
         // Hook events
         Services.AMBER_EVENT_SETUP.registerCommon();
+        Services.AMBER_EVENT_SETUP.registerServer(); // TODO: move these to common
         EnvExecutor.runInEnv(Env.CLIENT, () -> Services.AMBER_EVENT_SETUP::registerClient);
-        EnvExecutor.runInEnv(Env.SERVER, () -> Services.AMBER_EVENT_SETUP::registerServer);
 
         // Init Amber's own features
         AmberNetworking.initialize();
