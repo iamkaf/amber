@@ -110,6 +110,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
     }
 
+    // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
+    // TODO: Move all server events to registerCommon() and sunset registerServer() methods
     @Override
     public void registerServer() {
         // Server tick events

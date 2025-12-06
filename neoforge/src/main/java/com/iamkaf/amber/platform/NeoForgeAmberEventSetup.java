@@ -87,6 +87,8 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         bus.register(EventHandlerClientMod.class);
     }
 
+    // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
+    // TODO: Move all server events to registerCommon() and sunset registerServer() methods
     @Override
     public void registerServer() {
         NeoForge.EVENT_BUS.register(EventHandlerServer.class);
