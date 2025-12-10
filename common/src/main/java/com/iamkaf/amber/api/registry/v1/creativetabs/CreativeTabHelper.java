@@ -4,7 +4,7 @@ import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.ItemLike;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * // Add to another mod's tab
  * ResourceKey<CreativeModeTab> otherModTab = 
  *     ResourceKey.create(Registries.CREATIVE_MODE_TAB, 
- *         ResourceLocation.fromNamespaceAndPath("othermod", "tab"));
+ *         Identifier.fromNamespaceAndPath("othermod", "tab"));
  * CreativeTabHelper.addItem(otherModTab, MyItems.COMPAT_ITEM);
  * 
  * // Add multiple items
@@ -111,7 +111,7 @@ public final class CreativeTabHelper {
      * @param tabId The tab ID to add items to
      * @param items The items to add
      */
-    public static void addItemsToTab(ResourceLocation tabId, Supplier<ItemLike>... items) {
+    public static void addItemsToTab(Identifier tabId, Supplier<ItemLike>... items) {
         ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
@@ -131,7 +131,7 @@ public final class CreativeTabHelper {
      * @param tabId The tab ID to add items to
      * @param items The items to add
      */
-    public static void addItemsToTab(ResourceLocation tabId, ItemLike... items) {
+    public static void addItemsToTab(Identifier tabId, ItemLike... items) {
         ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {

@@ -4,7 +4,7 @@ package com.iamkaf.amber.event;
 import com.google.common.collect.MapMaker;
 import com.iamkaf.amber.api.event.v1.ArrayBackedEvent;
 import com.iamkaf.amber.api.event.v1.Event;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -34,8 +34,8 @@ public final class EventFactoryImpl {
         return event;
     }
 
-    public static void ensureContainsDefault(ResourceLocation[] defaultPhases) {
-        for (ResourceLocation id : defaultPhases) {
+    public static void ensureContainsDefault(Identifier[] defaultPhases) {
+        for (Identifier id : defaultPhases) {
             if (id.equals(Event.DEFAULT_PHASE)) {
                 return;
             }
@@ -44,7 +44,7 @@ public final class EventFactoryImpl {
         throw new IllegalArgumentException("The event phases must contain Event.DEFAULT_PHASE.");
     }
 
-    public static void ensureNoDuplicates(ResourceLocation[] defaultPhases) {
+    public static void ensureNoDuplicates(Identifier[] defaultPhases) {
         for (int i = 0; i < defaultPhases.length; ++i) {
             for (int j = i + 1; j < defaultPhases.length; ++j) {
                 if (defaultPhases[i].equals(defaultPhases[j])) {

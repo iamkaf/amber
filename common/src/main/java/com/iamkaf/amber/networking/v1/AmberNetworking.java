@@ -2,7 +2,7 @@ package com.iamkaf.amber.networking.v1;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.NetworkChannel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,7 +15,7 @@ public class AmberNetworking {
     
     // Network channel for internal Amber networking
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
-        ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "internal")
+        Identifier.fromNamespaceAndPath(Constants.MOD_ID, "internal")
     );
     
     // Latency tracking

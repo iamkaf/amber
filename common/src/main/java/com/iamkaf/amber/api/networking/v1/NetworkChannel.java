@@ -1,6 +1,6 @@
 package com.iamkaf.amber.api.networking.v1;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
  * Usage:
  * <pre>
  * // Create a channel
- * NetworkChannel CHANNEL = NetworkChannel.create(ResourceLocation.fromNamespaceAndPath("mymod", "main"));
+ * NetworkChannel CHANNEL = NetworkChannel.create(Identifier.fromNamespaceAndPath("mymod", "main"));
  * 
  * // Register a packet type
  * CHANNEL.register(MyPacket.class, MyPacket::encode, MyPacket::decode, MyPacket::handle);
@@ -28,7 +28,7 @@ public interface NetworkChannel {
      * @param channelId unique identifier for this channel
      * @return a new network channel instance
      */
-    static NetworkChannel create(ResourceLocation channelId) {
+    static NetworkChannel create(Identifier channelId) {
         return NetworkChannelImpl.create(channelId);
     }
     
@@ -91,5 +91,5 @@ public interface NetworkChannel {
      * 
      * @return the channel identifier
      */
-    ResourceLocation getChannelId();
+    Identifier getChannelId();
 }

@@ -4,7 +4,7 @@ import com.iamkaf.amber.api.networking.v1.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -19,14 +19,14 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
-    private final ResourceLocation channelId;
+    private final Identifier channelId;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     private final ConcurrentMap<Class<?>, PayloadTypePair<?>> packetToPayloadTypes = new ConcurrentHashMap<>();
     private PayloadRegistrar registrar;
     private boolean initialized = false;
-    private static final ConcurrentMap<ResourceLocation, Boolean> registeredPayloads = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Identifier, Boolean> registeredPayloads = new ConcurrentHashMap<>();
     
-    public NeoForgeNetworkChannelImpl(ResourceLocation channelId) {
+    public NeoForgeNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
         // Note: PayloadRegistrar will be set later during RegisterPayloadHandlersEvent
     }
@@ -66,11 +66,11 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         Class<T> typedPacketClass = (Class<T>) packetClass;
         
         // Create separate packet types for each direction
-        ResourceLocation c2sPacketId = ResourceLocation.fromNamespaceAndPath(
+        Identifier c2sPacketId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_c2s"
         );
-        ResourceLocation s2cPacketId = ResourceLocation.fromNamespaceAndPath(
+        Identifier s2cPacketId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_s2c"
         );

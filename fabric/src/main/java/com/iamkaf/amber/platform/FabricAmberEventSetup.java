@@ -60,7 +60,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
     public void registerCommon() {
         LootTableEvents.MODIFY.register((ResourceKey<LootTable> resourceKey, LootTable.Builder builder,
                 LootTableSource lootTableSource, HolderLookup.Provider provider) -> {
-            LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);
+            LootEvents.MODIFY.invoker().modify(resourceKey.identifier(), builder::withPool);
         });
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
             return PlayerEvents.ENTITY_INTERACT.invoker().interact(player, level, hand, entity);

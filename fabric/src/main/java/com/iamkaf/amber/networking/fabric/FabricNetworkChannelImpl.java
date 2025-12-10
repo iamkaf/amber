@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,10 +20,10 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
     
-    private final ResourceLocation channelId;
+    private final Identifier channelId;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     
-    public FabricNetworkChannelImpl(ResourceLocation channelId) {
+    public FabricNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
     }
     
@@ -38,7 +38,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         registrations.put(packetClass, registration);
         
         // Create packet type for this packet class
-        ResourceLocation packetId = ResourceLocation.fromNamespaceAndPath(
+        Identifier packetId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase()
         );
@@ -83,7 +83,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        ResourceLocation packetId = ResourceLocation.fromNamespaceAndPath(
+        Identifier packetId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -103,7 +103,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        ResourceLocation packetId = ResourceLocation.fromNamespaceAndPath(
+        Identifier packetId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -123,7 +123,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        ResourceLocation packetId = ResourceLocation.fromNamespaceAndPath(
+        Identifier packetId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -145,7 +145,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        ResourceLocation packetId = ResourceLocation.fromNamespaceAndPath(
+        Identifier packetId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );

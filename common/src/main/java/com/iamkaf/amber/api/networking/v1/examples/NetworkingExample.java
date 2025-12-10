@@ -2,7 +2,7 @@ package com.iamkaf.amber.api.networking.v1.examples;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.NetworkChannel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -19,7 +19,7 @@ public class NetworkingExample {
     
     // Create a network channel - this works on all platforms automatically
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
-        ResourceLocation.fromNamespaceAndPath("amber", "example")
+        Identifier.fromNamespaceAndPath("amber", "example")
     );
     
     /**

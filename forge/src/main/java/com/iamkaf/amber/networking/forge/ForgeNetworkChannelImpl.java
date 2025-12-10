@@ -4,7 +4,7 @@ import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
@@ -23,11 +23,11 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     private static final int PROTOCOL_VERSION = 1;
     
-    private final ResourceLocation channelId;
+    private final Identifier channelId;
     private final SimpleChannel channel;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     
-    public ForgeNetworkChannelImpl(ResourceLocation channelId) {
+    public ForgeNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
         this.channel = ChannelBuilder.named(channelId)
             .networkProtocolVersion(PROTOCOL_VERSION)

@@ -3,7 +3,7 @@ package com.iamkaf.amber.api.registry.v1.creativetabs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -30,11 +30,11 @@ import java.util.function.Supplier;
  * }</pre>
  */
 public class TabBuilder {
-    private final ResourceLocation id;
+    private final Identifier id;
     private Component title = Component.empty();
     private Supplier<ItemStack> icon = () -> ItemStack.EMPTY;
     private final List<Supplier<ItemLike>> items = new ArrayList<>();
-    private ResourceLocation backgroundTexture = ResourceLocation.withDefaultNamespace("textures/gui/container/creative_inventory/tab_items.png");
+    private Identifier backgroundTexture = Identifier.withDefaultNamespace("textures/gui/container/creative_inventory/tab_items.png");
     private boolean canScroll = true;
     private boolean showTitle = true;
     private boolean alignedRight = false;
@@ -42,7 +42,7 @@ public class TabBuilder {
     private int column = 0;
     private CreativeModeTab.Type type = CreativeModeTab.Type.CATEGORY;
 
-    TabBuilder(ResourceLocation id) {
+    TabBuilder(Identifier id) {
         this.id = id;
     }
 
@@ -133,7 +133,7 @@ public class TabBuilder {
      * @param backgroundTexture The background texture location
      * @return This builder for chaining
      */
-    public TabBuilder backgroundTexture(ResourceLocation backgroundTexture) {
+    public TabBuilder backgroundTexture(Identifier backgroundTexture) {
         this.backgroundTexture = backgroundTexture;
         return this;
     }
@@ -263,7 +263,7 @@ public class TabBuilder {
      *
      * @return The tab ID
      */
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 }

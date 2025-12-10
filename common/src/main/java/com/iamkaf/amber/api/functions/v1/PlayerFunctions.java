@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -621,11 +622,16 @@ public final class PlayerFunctions {
 
     /**
      * Triggers player respawn logic.
+     * <p>
+     * <strong>CLIENT ONLY:</strong> This function only works on client-side LocalPlayer instances.
+     * </p>
      *
-     * @param player The player to respawn.
+     * @param player The player to respawn. Must be a LocalPlayer instance.
      */
     public static void respawn(Player player) {
-        player.respawn();
+        if (player instanceof LocalPlayer) {
+            ((LocalPlayer) player).respawn();
+        }
     }
 
     /**

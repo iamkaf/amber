@@ -2,7 +2,7 @@ package com.iamkaf.amber.api.registry.v1;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Information about an entry that may not yet be registered.
@@ -11,7 +11,7 @@ public interface DeferredSupplier<T> extends OptionalSupplier<T> {
     /**
      * Returns the identifier of the registry this supplier belongs to.
      */
-    ResourceLocation getRegistryId();
+    Identifier getRegistryId();
 
     /**
      * Returns the registry key for this supplier.
@@ -23,7 +23,7 @@ public interface DeferredSupplier<T> extends OptionalSupplier<T> {
     /**
      * Returns the identifier of the entry.
      */
-    ResourceLocation getId();
+    Identifier getId();
 
     /**
      * Returns the entry key.

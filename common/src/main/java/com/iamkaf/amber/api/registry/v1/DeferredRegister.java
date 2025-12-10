@@ -3,7 +3,7 @@ package com.iamkaf.amber.api.registry.v1;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -71,7 +71,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(ResourceLocation.fromNamespaceAndPath(modId, id), supplier);
+        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
     }
 
     /**
@@ -87,7 +87,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(ResourceLocation.fromNamespaceAndPath(modId, id), supplier);
+        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
     }
 
     /**
@@ -95,7 +95,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * has its {@code Properties} id set.
      */
     @SuppressWarnings("unchecked")
-    public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
+    public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
         Entry<T> entry = new Entry<>(id, (Supplier<T>) supplier);
         entries.add(entry);
         if (registered) {
@@ -111,7 +111,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * @param id       the full identifier of the entry
      * @param supplier a factory taking the entry key
      */
-    public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Function<ResourceKey<T>, ? extends R> supplier) {
+    public <R extends T> RegistrySupplier<R> register(Identifier id, Function<ResourceKey<T>, ? extends R> supplier) {
         return register(id, (Supplier<? extends R>) () -> supplier.apply(ResourceKey.create(this.key, id)));
     }
 
@@ -143,11 +143,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     }
 
     private class Entry<R> implements RegistrySupplier<R> {
-        private final ResourceLocation id;
+        private final Identifier id;
         private final Supplier<R> supplier;
         private RegistrySupplier<R> value;
 
-        Entry(ResourceLocation id, Supplier<R> supplier) {
+        Entry(Identifier id, Supplier<R> supplier) {
             this.id = id;
             this.supplier = supplier;
         }
@@ -166,12 +166,12 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         }
 
         @Override
-        public ResourceLocation getRegistryId() {
-            return getRegistrar().key().location();
+        public Identifier getRegistryId() {
+            return getRegistrar().key().identifier();
         }
 
         @Override
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return id;
         }
 

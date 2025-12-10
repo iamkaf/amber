@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -49,9 +49,9 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
+        public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
             DeferredHolder<T, R> holder = register.register(id.getPath(), supplier);
-            return new NeoForgeRegistrySupplier<>(key.location(), id, holder);
+            return new NeoForgeRegistrySupplier<>(key.identifier(), id, holder);
         }
 
         @Override
@@ -60,22 +60,22 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public Optional<Holder.Reference<T>> get(ResourceLocation id) {
+        public Optional<Holder.Reference<T>> get(Identifier id) {
             return registry().get(id);
         }
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
-            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());
+            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
         }
     }
 
     private static class NeoForgeRegistrySupplier<T, R extends T> implements RegistrySupplier<R> {
-        private final ResourceLocation registryId;
-        private final ResourceLocation id;
+        private final Identifier registryId;
+        private final Identifier id;
         private final DeferredHolder<T, R> holder;
 
-        NeoForgeRegistrySupplier(ResourceLocation registryId, ResourceLocation id, DeferredHolder<T, R> holder) {
+        NeoForgeRegistrySupplier(Identifier registryId, Identifier id, DeferredHolder<T, R> holder) {
             this.registryId = registryId;
             this.id = id;
             this.holder = holder;
@@ -92,12 +92,12 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public ResourceLocation getRegistryId() {
+        public Identifier getRegistryId() {
             return registryId;
         }
 
         @Override
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return id;
         }
     }

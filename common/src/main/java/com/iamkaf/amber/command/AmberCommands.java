@@ -20,7 +20,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class AmberCommands {
 
     private static final LiteralArgumentBuilder<CommandSourceStack> PING_COMMAND =
-            Commands.literal("ping").requires(source -> source.hasPermission(2)).executes(commandContext -> {
+            Commands.literal("ping").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(commandContext -> {
                 if (commandContext.getSource().getPlayer() instanceof ServerPlayer serverPlayer) {
                     AmberNetworking.testConnectivity(serverPlayer);
                     commandContext.getSource().sendSuccess(() -> Component.literal("Sent ping to test connectivity"), false);
@@ -73,7 +73,7 @@ public class AmberCommands {
             });
 
     private static final LiteralArgumentBuilder<CommandSourceStack> RESET_STATS_COMMAND =
-            Commands.literal("reset-stats").requires(source -> source.hasPermission(2)).executes(commandContext -> {
+            Commands.literal("reset-stats").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(commandContext -> {
                 AmberNetworking.resetStats();
                 commandContext.getSource().sendSuccess(() -> Component.literal("Reset networking statistics"), false);
                 return Command.SINGLE_SUCCESS;

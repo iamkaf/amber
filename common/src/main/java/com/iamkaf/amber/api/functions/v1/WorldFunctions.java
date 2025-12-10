@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -402,44 +403,44 @@ public final class WorldFunctions {
     /**
      * Gets the current difficulty at a specific position.
      *
-     * @param level The level to check.
+     * @param level The level to check. Must be a ServerLevelAccessor.
      * @param position The position to check difficulty at.
      * @return The difficulty instance at the position.
      */
-    public static DifficultyInstance getCurrentDifficulty(Level level, BlockPos position) {
+    public static DifficultyInstance getCurrentDifficulty(ServerLevelAccessor level, BlockPos position) {
         return level.getCurrentDifficultyAt(position);
     }
 
     /**
      * Gets the current difficulty at a specific position using Vec3.
      *
-     * @param level The level to check.
+     * @param level The level to check. Must be a ServerLevelAccessor.
      * @param position The position to check difficulty at.
      * @return The difficulty instance at the position.
      */
-    public static DifficultyInstance getCurrentDifficulty(Level level, Vec3 position) {
+    public static DifficultyInstance getCurrentDifficulty(ServerLevelAccessor level, Vec3 position) {
         return level.getCurrentDifficultyAt(BlockPos.containing(position));
     }
 
     /**
      * Checks if the difficulty at a position is at least hard.
      *
-     * @param level The level to check.
+     * @param level The level to check. Must be a ServerLevelAccessor.
      * @param position The position to check difficulty at.
      * @return true if difficulty is hard or harder, false otherwise.
      */
-    public static boolean isHardDifficulty(Level level, BlockPos position) {
+    public static boolean isHardDifficulty(ServerLevelAccessor level, BlockPos position) {
         return getCurrentDifficulty(level, position).isHard();
     }
 
     /**
      * Checks if the difficulty at a position is at least hard using Vec3.
      *
-     * @param level The level to check.
+     * @param level The level to check. Must be a ServerLevelAccessor.
      * @param position The position to check difficulty at.
      * @return true if difficulty is hard or harder, false otherwise.
      */
-    public static boolean isHardDifficulty(Level level, Vec3 position) {
+    public static boolean isHardDifficulty(ServerLevelAccessor level, Vec3 position) {
         return getCurrentDifficulty(level, position).isHard();
     }
 

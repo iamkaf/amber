@@ -1,6 +1,6 @@
 package com.iamkaf.amber.api.enchantment;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
  */
 @Deprecated
 public class EnchantmentUtils {
-    public static boolean containsEnchantment(ItemStack stack, ResourceLocation enchantment) {
+    public static boolean containsEnchantment(ItemStack stack, Identifier enchantment) {
         if (!stack.isEnchanted() || stack.getEnchantments().isEmpty()) {
             return false;
         }

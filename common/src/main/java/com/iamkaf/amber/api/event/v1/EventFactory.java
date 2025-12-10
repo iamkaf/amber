@@ -1,7 +1,7 @@
 package com.iamkaf.amber.api.event.v1;
 
 import com.iamkaf.amber.event.EventFactoryImpl;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
@@ -85,7 +85,7 @@ public final class EventFactory {
      * @return The Event instance.
      */
     public static <T> Event<T> createWithPhases(Class<? super T> type, Function<T[], T> invokerFactory,
-            ResourceLocation... defaultPhases) {
+            Identifier... defaultPhases) {
         EventFactoryImpl.ensureContainsDefault(defaultPhases);
         EventFactoryImpl.ensureNoDuplicates(defaultPhases);
 

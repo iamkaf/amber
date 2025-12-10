@@ -1,7 +1,7 @@
 package com.iamkaf.amber.api.networking.v1;
 
 import com.iamkaf.amber.platform.Services;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,17 +13,17 @@ import java.util.concurrent.ConcurrentMap;
  */
 class NetworkChannelImpl implements NetworkChannel {
     
-    private static final ConcurrentMap<ResourceLocation, NetworkChannelImpl> CHANNELS = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Identifier, NetworkChannelImpl> CHANNELS = new ConcurrentHashMap<>();
     
-    private final ResourceLocation channelId;
+    private final Identifier channelId;
     private final PlatformNetworkChannel platformChannel;
     
-    private NetworkChannelImpl(ResourceLocation channelId) {
+    private NetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
         this.platformChannel = Services.NETWORKING.createChannel(channelId);
     }
     
-    static NetworkChannel create(ResourceLocation channelId) {
+    static NetworkChannel create(Identifier channelId) {
         return CHANNELS.computeIfAbsent(channelId, NetworkChannelImpl::new);
     }
     
@@ -58,7 +58,7 @@ class NetworkChannelImpl implements NetworkChannel {
     }
     
     @Override
-    public ResourceLocation getChannelId() {
+    public Identifier getChannelId() {
         return channelId;
     }
 }

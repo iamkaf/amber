@@ -3,7 +3,7 @@ package com.iamkaf.amber.api.inventory;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -78,7 +78,7 @@ public class ItemHelper {
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
         var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<ResourceLocation> added = new HashSet<>();
+        Set<Identifier> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
             if (!added.contains(mod.modifier().id())) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
@@ -104,10 +104,10 @@ public class ItemHelper {
      * Checks if an {@code ItemStack} has an attribute modifier with the specified id.
      *
      * @param stack The {@code ItemStack} to check.
-     * @param id    The {@code ResourceLocation} to check.
+     * @param id    The {@code Identifier} to check.
      * @return {@code} true if the modifier with the id is present.
      */
-    public static boolean hasModifier(ItemStack stack, ResourceLocation id) {
+    public static boolean hasModifier(ItemStack stack, Identifier id) {
         var list = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         assert list != null;
         return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));

@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -26,16 +26,16 @@ public class FabricRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
+        public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
             Registry<T> registry = registry();
             R value = supplier.get();
             Registry.register(registry, id, value);
-            return new FabricRegistrySupplier<>(key.location(), id, value);
+            return new FabricRegistrySupplier<>(key.identifier(), id, value);
         }
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
-            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());
+            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
         }
 
         @Override
@@ -44,17 +44,17 @@ public class FabricRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public Optional<Holder.Reference<T>> get(ResourceLocation id) {
+        public Optional<Holder.Reference<T>> get(Identifier id) {
             return registry().get(id);
         }
     }
 
     private static class FabricRegistrySupplier<R> implements RegistrySupplier<R> {
-        private final ResourceLocation registryId;
-        private final ResourceLocation id;
+        private final Identifier registryId;
+        private final Identifier id;
         private final R value;
 
-        FabricRegistrySupplier(ResourceLocation registryId, ResourceLocation id, R value) {
+        FabricRegistrySupplier(Identifier registryId, Identifier id, R value) {
             this.registryId = registryId;
             this.id = id;
             this.value = value;
@@ -71,12 +71,12 @@ public class FabricRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public ResourceLocation getRegistryId() {
+        public Identifier getRegistryId() {
             return registryId;
         }
 
         @Override
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return id;
         }
     }

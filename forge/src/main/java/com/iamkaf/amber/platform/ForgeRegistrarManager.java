@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -45,9 +45,9 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {
+        public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
             RegistryObject<R> obj = register.register(id.getPath(), supplier);
-            return new ForgeRegistrySupplier<>(key.location(), id, obj);
+            return new ForgeRegistrySupplier<>(key.identifier(), id, obj);
         }
 
         @Override
@@ -56,22 +56,22 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public Optional<Holder.Reference<T>> get(ResourceLocation id) {
+        public Optional<Holder.Reference<T>> get(Identifier id) {
             return registry().get(id);
         }
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
-            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());
+            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
         }
     }
 
     private static class ForgeRegistrySupplier<R> implements RegistrySupplier<R> {
-        private final ResourceLocation registryId;
-        private final ResourceLocation id;
+        private final Identifier registryId;
+        private final Identifier id;
         private final RegistryObject<R> obj;
 
-        ForgeRegistrySupplier(ResourceLocation registryId, ResourceLocation id, RegistryObject<R> obj) {
+        ForgeRegistrySupplier(Identifier registryId, Identifier id, RegistryObject<R> obj) {
             this.registryId = registryId;
             this.id = id;
             this.obj = obj;
@@ -88,12 +88,12 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
-        public ResourceLocation getRegistryId() {
+        public Identifier getRegistryId() {
             return registryId;
         }
 
         @Override
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return id;
         }
     }

@@ -1,7 +1,7 @@
 package com.iamkaf.amber.platform.services;
 
 import com.iamkaf.amber.api.networking.v1.PlatformNetworkChannel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Platform service for creating networking channels.
@@ -15,5 +15,5 @@ public interface INetworkingService {
      * @param channelId the unique identifier for the channel
      * @return a platform-specific network channel implementation
      */
-    PlatformNetworkChannel createChannel(ResourceLocation channelId);
+    PlatformNetworkChannel createChannel(Identifier channelId);
 }

@@ -3,7 +3,7 @@ package com.iamkaf.amber.api.registry.v1.creativetabs;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.Collections;
@@ -28,7 +28,7 @@ import java.util.Map;
  * }</pre>
  */
 public final class CreativeModeTabRegistry {
-    private static final Map<ResourceLocation, TabBuilder> TAB_BUILDERS = new HashMap<>();
+    private static final Map<Identifier, TabBuilder> TAB_BUILDERS = new HashMap<>();
     
     private CreativeModeTabRegistry() {}
     
@@ -41,7 +41,7 @@ public final class CreativeModeTabRegistry {
      * @return A tab builder
      */
     public static TabBuilder builder(String id) {
-        return builder(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, id));
+        return builder(Identifier.fromNamespaceAndPath(Constants.MOD_ID, id));
     }
     
     /**
@@ -52,7 +52,7 @@ public final class CreativeModeTabRegistry {
      * @param id The tab ID (with namespace)
      * @return A tab builder
      */
-    public static TabBuilder builder(ResourceLocation id) {
+    public static TabBuilder builder(Identifier id) {
         return new TabBuilder(id);
     }
     
@@ -92,7 +92,7 @@ public final class CreativeModeTabRegistry {
      * @param id The tab ID (with namespace)
      * @return A RegistrySupplier for the tab
      */
-    public static RegistrySupplier<CreativeModeTab> register(ResourceLocation id) {
+    public static RegistrySupplier<CreativeModeTab> register(Identifier id) {
         return register(builder(id));
     }
     
@@ -104,7 +104,7 @@ public final class CreativeModeTabRegistry {
      * 
      * @return An unmodifiable map of all registered tab builders
      */
-    public static Map<ResourceLocation, TabBuilder> getTabBuilders() {
+    public static Map<Identifier, TabBuilder> getTabBuilders() {
         return Collections.unmodifiableMap(TAB_BUILDERS);
     }
     
@@ -114,7 +114,7 @@ public final class CreativeModeTabRegistry {
      * @param id The tab ID
      * @return The tab builder, or null if not found
      */
-    public static TabBuilder getTabBuilder(ResourceLocation id) {
+    public static TabBuilder getTabBuilder(Identifier id) {
         return TAB_BUILDERS.get(id);
     }
     
@@ -124,7 +124,7 @@ public final class CreativeModeTabRegistry {
      * @param id The tab ID
      * @return True if the tab is registered, false otherwise
      */
-    public static boolean isTabRegistered(ResourceLocation id) {
+    public static boolean isTabRegistered(Identifier id) {
         return TAB_BUILDERS.containsKey(id);
     }
 }

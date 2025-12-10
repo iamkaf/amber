@@ -3,7 +3,7 @@ package com.iamkaf.amber.api.functions.v1;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -293,7 +293,7 @@ public final class ItemFunctions {
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
         var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<ResourceLocation> added = new HashSet<>();
+        Set<Identifier> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
             if (!added.contains(mod.modifier().id())) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
@@ -319,10 +319,10 @@ public final class ItemFunctions {
      * Checks if an {@code ItemStack} has an attribute modifier with the specified id.
      *
      * @param stack The {@code ItemStack} to check.
-     * @param id    The {@code ResourceLocation} to check.
+     * @param id    The {@code Identifier} to check.
      * @return {@code} true if the modifier with the id is present.
      */
-    public static boolean hasModifier(ItemStack stack, ResourceLocation id) {
+    public static boolean hasModifier(ItemStack stack, Identifier id) {
         if (!stack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
             return false;
         }
@@ -348,20 +348,20 @@ public final class ItemFunctions {
     // ==================== ENCHANTMENT OPERATIONS ====================
 
     /**
-     * Checks if the ItemStack contains the specified enchantment by ResourceLocation.
+     * Checks if the ItemStack contains the specified enchantment by Identifier.
      * Uses the modern enchantment API for Minecraft 1.21.10+.
      *
      * @param stack        The ItemStack to check.
-     * @param enchantment The ResourceLocation of the enchantment to check for.
+     * @param enchantment The Identifier of the enchantment to check for.
      * @return true if the item has the specified enchantment, false otherwise.
      */
-    public static boolean containsEnchantment(ItemStack stack, ResourceLocation enchantment) {
+    public static boolean containsEnchantment(ItemStack stack, Identifier enchantment) {
         ItemEnchantments enchantments = stack.getEnchantments();
         if (enchantments.isEmpty()) {
             return false;
         }
 
-        // Check each enchantment in the item to see if it matches the specified ResourceLocation
+        // Check each enchantment in the item to see if it matches the specified Identifier
         for (var enchantmentEntry : enchantments.entrySet()) {
             Holder<Enchantment> enchantmentHolder = enchantmentEntry.getKey();
             if (enchantmentHolder.is(enchantment)) {
@@ -422,20 +422,20 @@ public final class ItemFunctions {
     }
 
     /**
-     * Gets the level of a specific enchantment on the ItemStack by ResourceLocation.
+     * Gets the level of a specific enchantment on the ItemStack by Identifier.
      * Returns 0 if the enchantment is not present.
      *
      * @param stack        The ItemStack to check.
-     * @param enchantment The ResourceLocation of the enchantment to get the level for.
+     * @param enchantment The Identifier of the enchantment to get the level for.
      * @return The level of the enchantment, or 0 if not present.
      */
-    public static int getEnchantmentLevel(ItemStack stack, ResourceLocation enchantment) {
+    public static int getEnchantmentLevel(ItemStack stack, Identifier enchantment) {
         ItemEnchantments enchantments = stack.getEnchantments();
         if (enchantments.isEmpty()) {
             return 0;
         }
 
-        // Check each enchantment in the item to see if it matches the specified ResourceLocation
+        // Check each enchantment in the item to see if it matches the specified Identifier
         for (var entry : enchantments.entrySet()) {
             Holder<Enchantment> enchantmentHolder = entry.getKey();
             if (enchantmentHolder.is(enchantment)) {
