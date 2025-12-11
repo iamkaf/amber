@@ -16,11 +16,12 @@ pluginManagement {
         }
         // Mod Publisher
         maven { url "https://maven.firstdark.dev/releases" }
+        mavenLocal()
     }
 }
 
 plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 
 dependencyResolutionManagement {
@@ -36,5 +37,5 @@ dependencyResolutionManagement {
 rootProject.name = mod_name
 include('common')
 include('fabric')
-//include('forge') // Temporarily disabled - Forge doesn't have 1.21.11 support yet
+include('forge')
 include('neoforge')
