@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
-## 8.3.0
+## 9.0.0
+
+### Changed
+
+- **Updated to Minecraft 1.21.11**
 
 ### Added
 
