@@ -11,7 +11,13 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /guide/getting-started
+      link: /v9/guide/getting-started
+    - theme: alt
+      text: View on Modrinth
+      link: https://modrinth.com/mod/amber
+    - theme: alt
+      text: View on CurseForge
+      link: https://www.curseforge.com/minecraft/mc-mods/amber-lib
     - theme: alt
       text: View on GitHub
       link: https://github.com/iamkaf/amber
@@ -38,23 +44,17 @@ features:
 
 ---
 
-## What is Amber?
+## Documentation Versions
 
-Amber is a powerful foundation library that provides unified APIs for common modding tasks across **Fabric**, **Forge**, and **NeoForge** platforms. Built with cross-platform compatibility in mind, Amber eliminates the complexity of managing platform-specific code while offering modern, easy-to-use APIs for Minecraft mod development.
+::: tip Choose Your Amber Version
+Select the Amber version that matches your Minecraft version:
 
-## Why Amber?
-
-### 🎯 Write Once, Run Everywhere
-With Amber's unified APIs, you can write your mod once and it will work on all major mod loaders without platform-specific code.
-
-### 🚀 Modern Design
-Built for Minecraft 1.21.10 with modern Java practices, Amber provides clean, intuitive APIs that reduce boilerplate and speed up development.
-
-### 🔧 Comprehensive Toolkit
-From registry management to networking, events to configuration, Amber provides all the tools you need for modern mod development.
-
-### 🌟 Community Driven
-Open source and community-focused, Amber is designed to evolve with the needs of mod developers.
+- **Amber 10.x** → Minecraft 26.1
+- **Amber 9.x** → Minecraft 1.21.11
+- **Amber 8.x** → Minecraft 1.21.10
+- **Amber 3.x** → Minecraft 1.21.1
+- **Amber 1.x** → Minecraft 1.20.1
+:::
 
 ## Quick Start
 
@@ -66,11 +66,11 @@ repositories {
 }
 
 dependencies {
-    implementation "com.iamkaf:amber-common:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-common:9.0.2+1.21.11"
     // Platform-specific dependencies
-    implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
-    // OR implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
-    // OR implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
+    // OR implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
+    // OR implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
 }
 ```
 
@@ -79,82 +79,21 @@ dependencies {
 ```java
 public class YourMod {
     public static final String MOD_ID = "yourmod";
-    
+
     public static void init() {
-        // Initialize with Amber - automatically detects mod name and version
         AmberInitializer.initialize(MOD_ID);
-        
         // Your mod initialization code here
-        System.out.println("YourMod initialized with Amber!");
     }
 }
 ```
 
-### 3. Start Building
-
-```java
-// Register items
-public static final DeferredRegister<Item> ITEMS = 
-    DeferredRegister.create(MOD_ID, Registries.ITEM);
-
-public static final RegistrySupplier<Item> MY_ITEM = ITEMS.register("my_item", 
-    () -> new Item(new Item.Properties()));
-
-// Handle events
-PlayerEvents.ENTITY_INTERACT.register((player, level, hand, entity) -> {
-    // Your interaction logic here
-    return InteractionResult.PASS;
-});
-```
-
-## Core Features
-
-### 🌐 Platform Abstraction
-- **Environment Detection**: Automatically detect client/server environments
-- **Platform Information**: Get details about the current mod loader
-- **Path Management**: Cross-platform access to game directories
-
-### 📋 Registry System
-- **Deferred Registration**: Queue objects for registration at the right time
-- **Cross-Platform**: Works identically on all mod loaders
-- **Type Safety**: Full type safety for registered objects
-
-### 🎪 Event System
-- **Fabric-Inspired**: Clean, familiar event API
-- **Cross-Platform Events**: Events work consistently across platforms
-- **Performance Optimized**: Efficient event dispatching
-
-### 🌐 Networking
-- **Type-Safe Packets**: Compile-time safety for network messages
-- **Simple API**: Easy to send and receive packets
-- **Platform Abstracted**: Same API works on all platforms
-
-### ⚙️ Configuration
-- **JSON-Based**: Simple JSON configuration files
-- **Automatic Serialization**: No manual serialization needed
-- **Hot Reloading**: Runtime configuration updates
-
 ## Documentation
 
-- **[Getting Started](guide/getting-started)** - Set up your first Amber mod
-- **[API Reference](api/core)** - Detailed API documentation
-- **[Examples](systems/events)** - Practical code examples
-- **[Systems](systems/)** - Core system documentation
-  - **[Creative Mode Tabs](systems/creative-tabs)** - Custom creative tabs
-  - **[Events](systems/events)** - Event handling
-  - **[Commands](systems/commands)** - Command registration
-  - **[Configuration](systems/configuration)** - JSON configuration
-  - **[Networking](systems/networking)** - Network communication
-  - **[Registry](systems/registry)** - Object registration
-- **[Best Practices](advanced/best-practices)** - Tips for effective modding
-
-## Version Information
-
-- **Current Version**: 8.0.0+1.21.10
-- **Minecraft Version**: 1.21.10
-- **Supported Platforms**: Fabric, Forge, NeoForge
-- **License**: MIT
-
----
-
-Ready to get started? Check out the **[Getting Started Guide](guide/getting-started)** to begin using Amber in your mod development projects.
+- **[Getting Started Guide](/v9/guide/getting-started)** - Set up your first Amber mod
+- **[API Reference](/v9/api/core)** - Detailed API documentation
+- **[Systems](/v9/systems/)** - Core system documentation
+  - **[Registry](/v9/systems/registry)** - Object registration
+  - **[Events](/v9/systems/events)** - Event handling
+  - **[Commands](/v9/systems/commands)** - Command registration
+  - **[Networking](/v9/systems/networking)** - Network communication
+- **[Best Practices](/v9/advanced/best-practices)** - Tips for effective modding

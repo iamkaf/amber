@@ -1,74 +1,42 @@
 import { defineConfig } from 'vitepress'
+import { v8Sidebar } from './sidebars/v8'
+import { v9Sidebar } from './sidebars/v9'
 
 export default defineConfig({
   title: 'Amber',
   description: 'A comprehensive multiloader library for Minecraft mod development',
   lang: 'en-US',
-  
+
   // Set base path for GitHub Pages deployment
   base: '/amber/',
-  
+
   // Set favicon
   head: [
-    ['link', { rel: 'icon', href: '/icon.png' }]
+    ['link', { rel: 'icon', href: '/amber/favicon.ico' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/amber/favicon-16x16.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/amber/favicon-32x32.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/amber/apple-touch-icon.png' }]
   ],
-  
+
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'API', link: '/api/core' }
-    ],
-
-    sidebar: [
+      { text: 'Guide', link: '/v9/guide/getting-started' },
+      { text: 'API', link: '/v9/api/core' },
       {
-        text: 'Introduction',
+        text: 'Versions',
         items: [
-          { text: 'What is Amber?', link: '/' },
-          { text: 'Getting Started', link: '/guide/getting-started' },
-          { text: 'Installation', link: '/guide/installation' }
-        ]
-      },
-      {
-        text: 'Core API',
-        items: [
-          { text: 'Core Module', link: '/api/core' },
-          { text: 'Platform Abstraction', link: '/api/platform' }
-        ]
-      },
-      {
-        text: 'Systems',
-        items: [
-          { text: 'Registry System', link: '/systems/registry' },
-          { text: 'Event System', link: '/systems/events' },
-          { text: 'Creative Tabs', link: '/systems/creative-tabs' },
-          { text: 'Networking', link: '/systems/networking' },
-          { text: 'Configuration', link: '/systems/configuration' },
-          { text: 'Commands', link: '/systems/commands' }
-        ]
-      },
-      {
-        text: 'Utilities',
-        items: [
-          { text: 'Item Helpers', link: '/utilities/items' },
-          { text: 'Inventory Helpers', link: '/utilities/inventory' },
-          { text: 'Player Helpers', link: '/utilities/player' },
-          { text: 'Level Helpers', link: '/utilities/level' },
-          { text: 'Sound Helpers', link: '/utilities/sound' },
-          { text: 'Math Utilities', link: '/utilities/math' },
-          { text: 'Keybind Helpers', link: '/utilities/keybinds' },
-          { text: 'Enchantment Helpers', link: '/utilities/enchantments' }
-        ]
-      },
-      {
-        text: 'Advanced',
-        items: [
-          { text: 'Cross-Platform Development', link: '/advanced/cross-platform' },
-          { text: 'Best Practices', link: '/advanced/best-practices' },
-          { text: 'Migration Guide', link: '/advanced/migration' }
+          { text: 'v9 (Minecraft 1.21.11)', link: '/v9/' },
+          { text: 'v8 (Minecraft 1.21.10)', link: '/v8/' }
         ]
       }
     ],
+
+    // Merge all versioned sidebars - VitePress picks the correct one based on route
+    sidebar: {
+      ...v9Sidebar,
+      ...v8Sidebar
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/iamkaf/amber' }
@@ -104,6 +72,7 @@ export default defineConfig({
   // Ignore dead links during build
   ignoreDeadLinks: true,
 
+  srcExclude: ['_internal/**/*.md'],
   vite: {
     define: {
       __VUE_OPTIONS_API__: false

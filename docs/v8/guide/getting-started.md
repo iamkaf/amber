@@ -34,22 +34,22 @@ Choose the appropriate dependencies for your target platforms:
 ```gradle
 // In your common module
 dependencies {
-    implementation "com.iamkaf:amber-common:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-common:8.3.2+1.21.10"
 }
 
 // In your fabric module  
 dependencies {
-    implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-fabric:8.3.2+1.21.10"
 }
 
 // In your forge module
 dependencies {
-    implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-forge:8.3.2+1.21.10"
 }
 
 // In your neoforge module
 dependencies {
-    implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-neoforge:8.3.2+1.21.10"
 }
 ```
 
@@ -58,11 +58,11 @@ dependencies {
 ```gradle
 dependencies {
     // Choose one based on your platform
-    implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-fabric:8.3.2+1.21.10"
     // OR
-    implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-forge:8.3.2+1.21.10"
     // OR  
-    implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-neoforge:8.3.2+1.21.10"
 }
 ```
 

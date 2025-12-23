@@ -13,7 +13,7 @@ Update your build.gradle to include Amber:
 // implementation "net.fabricmc.fabric-api:fabric-api:0.89.0+1.20.1"
 
 // Add Amber dependencies
-implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-fabric:8.3.2+1.21.10"
 ```
 
 ### 2. Mod Entry Point
@@ -148,7 +148,7 @@ Update your build.gradle to include Amber:
 
 ```gradle
 // Add Amber dependencies
-implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-forge:8.3.2+1.21.10"
 ```
 
 ### 2. Mod Entry Point
@@ -271,7 +271,7 @@ Update your build.gradle to include Amber:
 
 ```gradle
 // Add Amber dependencies
-implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-neoforge:8.3.2+1.21.10"
 ```
 
 ### 2. Mod Entry Point
@@ -460,13 +460,13 @@ public static void init() {
 
 ```gradle
 // Fabric
-implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-fabric:8.3.2+1.21.10"
 
 // Forge
-implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-forge:8.3.2+1.21.10"
 
 // NeoForge
-implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+implementation "com.iamkaf:amber-neoforge:8.3.2+1.21.10"
 ```
 
 ## Getting Help

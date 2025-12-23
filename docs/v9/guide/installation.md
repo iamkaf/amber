@@ -4,7 +4,7 @@ This guide covers how to add Amber to your Minecraft mod project, whether you're
 
 ## Supported Versions
 
-- **Minecraft**: 1.21.10
+- **Minecraft**: 1.21.11
 - **Java**: 21 or higher
 - **Platforms**: Fabric, Forge, NeoForge
 
@@ -37,7 +37,7 @@ If you're using a multiloader setup with separate modules for each platform:
 ```gradle
 dependencies {
     // Amber Common - contains all shared APIs
-    implementation "com.iamkaf:amber-common:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-common:9.0.2+1.21.11"
 }
 ```
 
@@ -48,7 +48,7 @@ dependencies {
     implementation project(':common')
     
     // Amber Fabric implementation
-    implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
 }
 ```
 
@@ -59,7 +59,7 @@ dependencies {
     implementation project(':common')
     
     // Amber Forge implementation
-    implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
 }
 ```
 
@@ -70,7 +70,7 @@ dependencies {
     implementation project(':common')
     
     // Amber NeoForge implementation
-    implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
 }
 ```
 
@@ -81,21 +81,21 @@ If you're targeting only one platform:
 **Fabric Only**:
 ```gradle
 dependencies {
-    implementation "com.iamkaf:amber-fabric:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
 }
 ```
 
 **Forge Only**:
 ```gradle
 dependencies {
-    implementation "com.iamkaf:amber-forge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
 }
 ```
 
 **NeoForge Only**:
 ```gradle
 dependencies {
-    implementation "com.iamkaf:amber-neoforge:8.0.0+1.21.10"
+    implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
 }
 ```
 
@@ -122,13 +122,13 @@ mod_name=My Mod
 mod_author=YourName
 
 # Minecraft
-minecraft_version=1.21.10
+minecraft_version=1.21.11
 
 # Amber Version
-amber_version=8.0.0+1.21.10
+amber_version=9.0.2+1.21.11
 
 # Platform-specific versions
-fabric_version=0.135.0+1.21.10
+fabric_version=0.135.0+1.21.11
 fabric_loader_version=0.17.2
 forge_version=60.0.0
 neoforge_version=21.10.2-beta
@@ -199,8 +199,8 @@ It's recommended to use variables for version management:
 
 **`gradle.properties`**:
 ```properties
-amber_version=8.0.0+1.21.10
-minecraft_version=1.21.10
+amber_version=9.0.2+1.21.11
+minecraft_version=1.21.11
 ```
 
 **`build.gradle`**:
@@ -240,7 +240,7 @@ Check the [changelog](https://github.com/iamkaf/amber/blob/main/CHANGELOG.md) fo
 
 ### Dependency Resolution Errors
 
-**Problem**: `Could not find com.iamkaf:amber-common:8.0.0+1.21.10`
+**Problem**: `Could not find com.iamkaf:amber-common:9.0.2+1.21.11`
 
 **Solution**:
 1. Verify the repository URL is correct

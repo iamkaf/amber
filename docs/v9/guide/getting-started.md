@@ -5,7 +5,7 @@ This guide will help you set up Amber in your Minecraft mod project and demonstr
 ## Prerequisites
 
 - **Java 21** or higher
-- **Minecraft 1.21.7** (or supported version)
+- **Minecraft 1.21.11** (or supported version)
 - **Gradle** build system
 - Basic knowledge of Minecraft modding
 
@@ -34,22 +34,22 @@ Choose the appropriate dependencies for your target platforms:
 ```gradle
 // In your common module
 dependencies {
-    implementation "com.iamkaf:amber-common:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-common:9.0.2+1.21.11"
 }
 
 // In your fabric module  
 dependencies {
-    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
 }
 
 // In your forge module
 dependencies {
-    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
 }
 
 // In your neoforge module
 dependencies {
-    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
 }
 ```
 
@@ -58,11 +58,11 @@ dependencies {
 ```gradle
 dependencies {
     // Choose one based on your platform
-    implementation "com.iamkaf:amber-fabric:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
     // OR
-    implementation "com.iamkaf:amber-forge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
     // OR  
-    implementation "com.iamkaf:amber-neoforge:6.0.10+1.21.7"
+    implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
 }
 ```
 
@@ -93,11 +93,11 @@ public class MyMod {
     }
     
     private static void setupRegistries() {
-        // Registry setup (covered in registry.md)
+        // Registry setup (covered in registry documentation)
     }
     
     private static void setupEvents() {
-        // Event handling (covered in events.md)
+        // Event handling (covered in events documentation)
     }
 }
 ```
@@ -208,7 +208,7 @@ public class MyModConfig {
     }
     
     public static void save() {
-        configManager.save();
+        configManager.saveConfig();
     }
 }
 ```
@@ -247,7 +247,7 @@ public class MyItems {
 Set up event handlers using Amber's event system:
 
 ```java
-import com.iamkaf.amber.api.event.v1.PlayerEvents;
+import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 
 public class MyEventHandlers {
     public static void init() {
@@ -277,7 +277,7 @@ public class MyClientFeatures {
         // Register HUD renderer
         setupHUD();
         
-        // Register keybinds (covered in keybinds.md)
+        // Register keybinds (covered in keybinds documentation)
         setupKeybinds();
     }
     
@@ -378,10 +378,10 @@ public class MyEventHandlers {
 
 Now that you have a basic Amber mod set up, explore these areas:
 
-1. **[Events](events.md)** - Handle game events effectively  
-2. **[Commands](commands.md)** - Create custom commands
-3. **[HUD System](hud.md)** - Add client-side UI elements
-4. **[Registry System](registry.md)** - Advanced registration patterns
+1. **[Event System](../systems/events)** - Handle game events effectively  
+2. **[Commands](../systems/commands)** - Create custom commands
+3. **[Registry System](../systems/registry)** - Advanced registration patterns
+4. **[Networking](../systems/networking)** - Client-server communication
 
 ## Common Issues
 
@@ -397,12 +397,12 @@ If you encounter build issues:
 
 If your mod doesn't load:
 
-1. **Check mod initialization**: Ensure `AmberInitializer.register()` is called
+1. **Check mod initialization**: Ensure `AmberInitializer.initialize()` is called
 2. **Verify dependencies**: Make sure Amber is properly included
 3. **Check logs**: Look for error messages in the game logs
 
 ### Getting Help
 
-- Check the [troubleshooting section](README.md#troubleshooting) in the main README
-- Look at the [example implementations](../common/src/main/java/com/iamkaf/amber/api/) in the Amber source code
+- Check the [troubleshooting section](../../README.md#troubleshooting) in the main README
+- Look at the [example implementations](../../common/src/main/java/com/iamkaf/amber/api/) in the Amber source code
 - Review the specific feature documentation for detailed usage patterns
