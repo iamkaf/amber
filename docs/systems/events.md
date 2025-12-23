@@ -371,6 +371,69 @@ FarmingEvents.BONE_MEAL_USE.register((level, pos, state, player, stack) -> {
 });
 ```
 
+## Loot Events
+
+Loot events provide hooks for modifying loot tables when they are loaded.
+
+### MODIFY
+
+Fired when a loot table is loaded, allowing you to add additional loot pools to it.
+
+```java
+LootEvents.MODIFY.register((lootTable, addPool) -> {
+    // Add items to vanilla chest loot tables
+    if (lootTable.equals(ResourceLocation.fromNamespaceAndPath("minecraft", "chests/simple_dungeon"))) {
+        addPool.accept(LootPool.lootPool()
+            .setRolls(UniformGenerator.between(1, 3))
+            .add(LootItem.lootTableItem(MyItems.RARE_SWORD.get())
+                .setWeight(1))
+            .add(LootItem.lootTableItem(MyItems.MAGIC_COIN.get())
+                .setWeight(5)
+                .apply(SetItemCountFunction.setCount(UniformGenerator.between(2, 6))))
+        );
+    }
+
+    // Add bonus drops to entity loot
+    if (lootTable.equals(ResourceLocation.fromNamespaceAndPath("minecraft", "entities/zombie"))) {
+        addPool.accept(LootPool.lootPool()
+            .setRolls(UniformGenerator.between(0, 1))
+            .add(LootItem.lootTableItem(MyItems.ZOMBIE_ESSENCE.get())
+                .setWeight(10))
+        );
+    }
+
+    // Add rare loot to fishing
+    if (lootTable.equals(ResourceLocation.fromNamespaceAndPath("minecraft", "gameplay/fishing"))) {
+        addPool.accept(LootPool.lootPool()
+            .setRolls(UniformGenerator.between(0, 1))
+            .add(LootItem.lootTableItem(MyItems.MAGIC_FISHING_ROD.get())
+                .setWeight(1)
+                .apply(EnchantRandomlyFunction.randomEnchantment()))
+        );
+    }
+});
+```
+
+Common loot table identifiers you might want to modify:
+
+```java
+// Chest loot tables
+ResourceLocation.fromNamespaceAndPath("minecraft", "chests/simple_dungeon")
+ResourceLocation.fromNamespaceAndPath("minecraft", "chests/village/village_weaponsmith")
+ResourceLocation.fromNamespaceAndPath("minecraft", "chests/village/village_armorer")
+ResourceLocation.fromNamespaceAndPath("minecraft", "chests/desert_pyramid")
+ResourceLocation.fromNamespaceAndPath("minecraft", "chests/stronghold_corridor")
+
+// Entity loot tables
+ResourceLocation.fromNamespaceAndPath("minecraft", "entities/zombie")
+ResourceLocation.fromNamespaceAndPath("minecraft", "entities/skeleton")
+ResourceLocation.fromNamespaceAndPath("minecraft", "entities/creeper")
+ResourceLocation.fromNamespaceAndPath("minecraft", "entities/ender_dragon")
+
+// Gameplay loot tables
+ResourceLocation.fromNamespaceAndPath("minecraft", "gameplay/fishing")
+```
+
 ## Server Tick Events
 
 Server tick events only fire on the server side and are useful for game logic that needs to run consistently on each server tick.
@@ -640,6 +703,12 @@ public class MyMod {
 |-------|------------|--------------|------------|
 | `ITEM_DROP` | Item dropped | No | `(Player, ItemEntity)` |
 | `ITEM_PICKUP` | Item picked up | No | `(Player, ItemEntity, ItemStack)` |
+
+### Loot Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `MODIFY` | Loot table loaded | No | `(ResourceLocation, Consumer<LootPool.Builder>)` |
 
 ### World Events
 
