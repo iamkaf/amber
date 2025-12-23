@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
@@ -30,7 +31,7 @@ public class GuiMixin {
      * @param deltaTracker  the {@link DeltaTracker} instance used for tracking deltas
      * @param ci            the callback info
      */
-    @Inject(method = "render", at = @org.spongepowered.asm.mixin.injection.At("TAIL"), remap = false)
+    @Inject(method = "render", at = @At("RETURN"), remap = false)
     public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         // this check mirrors the vanilla check
         if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {

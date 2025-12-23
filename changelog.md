@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 9.0.2
+
+### Fixed
+
+- Fixed HUD event on Forge
+
 ## 9.0.0
 
 ### Changed
