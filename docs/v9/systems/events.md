@@ -9,14 +9,16 @@ The event system includes:
 - **Player Events**: Player interactions, joining/leaving, respawning, shield blocking
 - **Block Events**: Block breaking, placing, interaction
 - **Item Events**: Item dropping, picking up
-- **Entity Events**: Entity spawning, interaction
+- **Entity Events**: Entity spawning, death, damage
+- **Animal Events**: Animal taming, breeding
 - **Farming Events**: Crop growth, bone meal usage
-- **Command Events**: Command execution
+- **Command Events**: Server command registration
 - **Loot Events**: Loot table modification
+- **Creative Mode Tab Events**: Adding items to existing creative tabs
 - **World Events**: World loading, unloading, saving
 - **Weather Events**: Lightning strikes
 - **Server Tick Events**: Server tick start/end (server-side only)
-- **Client Events**: Rendering, input, HUD (client-side only)
+- **Client Events**: Rendering, input, HUD, tick events (client-side only)
 
 ## Player Events
 
@@ -317,7 +319,7 @@ Entity events provide hooks for entity-related actions.
 Fired when an entity spawns in the world.
 
 ```java
-EntityEvents.ENTITY_SPAWN.register((entity, level, x, y, z) -> {
+EntityEvents.ENTITY_SPAWN.register((entity, level) -> {
     // Modify spawning conditions
     if (entity instanceof Zombie zombie) {
         // Give zombies random armor in hard mode
@@ -325,10 +327,181 @@ EntityEvents.ENTITY_SPAWN.register((entity, level, x, y, z) -> {
             zombie.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.LEATHER_CHESTPLATE));
         }
     }
-    
+
     // Track entity spawning for analytics
     if (level instanceof ServerLevel serverLevel) {
-        SpawnTracker.recordSpawn(serverLevel, entity.getType(), new Vec3(x, y, z));
+        SpawnTracker.recordSpawn(serverLevel, entity.getType(), entity.blockPosition());
+    }
+});
+```
+
+### ENTITY_DEATH
+
+Fired when a living entity dies.
+
+```java
+EntityEvents.ENTITY_DEATH.register((entity, source) -> {
+    // Log death events
+    Constants.LOG.info("{} died from {}", entity.getName().getString(), source.getMsgId());
+
+    // Handle special death effects
+    if (entity instanceof WitherBoss wither) {
+        // Create explosion when wither dies
+        wither.level().explode(null, wither.getX(), wither.getY(), wither.getZ(),
+            5.0F, Level.ExplosionInteraction.MOB);
+    }
+
+    // Drop custom items on death
+    if (entity instanceof Player player && source.getEntity() instanceof Player killer) {
+        // Drop player head when killed by another player
+        player.spawnAtLocation(new ItemStack(Items.PLAYER_HEAD));
+    }
+
+    // Track kills for advancement systems
+    if (source.getEntity() instanceof ServerPlayer killer) {
+        KillTracker.trackKill(killer, entity.getType());
+    }
+});
+```
+
+### ENTITY_DAMAGE
+
+Fired when an entity takes damage, before damage is applied. Can be cancelled.
+
+```java
+EntityEvents.ENTITY_DAMAGE.register((entity, source, amount) -> {
+    // Reduce damage from specific sources
+    if (source.is(DamageTypes.ON_FIRE) && entity.hasEffect(MobEffects.FIRE_RESISTANCE)) {
+        return InteractionResult.FAIL; // Cancel fire damage completely
+    }
+
+    // Implement custom damage reduction
+    if (entity instanceof Player player) {
+        ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
+        if (helmet.is(MyItems.PROTECTION_HELMET.get())) {
+            // Reduce damage by 50% when wearing protection helmet
+            float newDamage = amount * 0.5F;
+            entity.hurt(source, newDamage);
+            return InteractionResult.FAIL; // Cancel original damage
+        }
+    }
+
+    // Prevent friendly fire
+    if (entity instanceof Player victim && source.getEntity() instanceof Player attacker) {
+        if (areTeammates(victim, attacker)) {
+            attacker.sendSystemMessage(Component.literal("You cannot hurt your teammates!"));
+            return InteractionResult.FAIL; // Cancel damage
+        }
+    }
+
+    return InteractionResult.PASS; // Allow damage to proceed
+});
+```
+
+### AFTER_DAMAGE
+
+Fired after a living entity took damage, unless they were killed. The base damage taken is given as damage taken before armor or enchantments are applied, but after other effects like shields are applied.
+
+```java
+EntityEvents.AFTER_DAMAGE.register((entity, source, baseDamageTaken, damageTaken, blocked) -> {
+    // Track damage for leveling systems
+    if (entity instanceof ServerPlayer player) {
+        CombatLeveling.addExperience(player, (int)damageTaken);
+    }
+
+    // Handle thorns damage reflection
+    if (!blocked && entity instanceof LivingEntity living) {
+        ItemStack chestplate = living.getItemBySlot(EquipmentSlot.CHEST);
+        if (chestplate.is(Items.DIAMOND_CHESTPLATE) && chestplate.hasEnchantments()) {
+            int thornsLevel = EnchantmentHelper.getEnchantmentLevel(
+                Enchantments.THORNS, chestplate);
+            if (thornsLevel > 0 && source.getEntity() instanceof LivingEntity attacker) {
+                // Reflect damage back to attacker
+                attacker.hurt(entity.damageSources().thorns(attacker), thornsLevel * 1.5F);
+            }
+        }
+    }
+
+    // Log damage events
+    if (entity instanceof Player player) {
+        Constants.LOG.info("Player took {} damage (base: {}, blocked: {})",
+            damageTaken, baseDamageTaken, blocked);
+    }
+});
+```
+
+## Animal Events
+
+Animal events provide hooks for animal taming and breeding.
+
+### ANIMAL_TAME
+
+Fired when an animal is being tamed. Can be cancelled or used to implement custom taming logic.
+
+```java
+AnimalEvents.ANIMAL_TAME.register((animal, player) -> {
+    // Require special items for taming
+    ItemStack stack = player.getMainHandItem();
+    if (stack.is(Items.WHEAT)) {
+        player.sendSystemMessage(Component.literal("This animal needs something special!"));
+        return InteractionResult.FAIL; // Cancel taming
+    }
+
+    // Implement custom taming mechanics
+    if (stack.is(MyItems.MAGIC_TREAT.get())) {
+        animal.tame(player);
+        animal.setCustomName(Component.literal("Tamed " + animal.getName().getString()));
+        return InteractionResult.SUCCESS; // Cancel vanilla taming (already handled)
+    }
+
+    // Bonus: auto-sit after taming
+    if (animal instanceof Wolf wolf && !wolf.isTame()) {
+        wolf.tame(player);
+        wolf.setInSittingPose(true);
+        wolf.level().playSound(null, wolf, SoundEvents.WOLF_WHINE,
+            SoundSource.NEUTRAL, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
+    }
+
+    return InteractionResult.PASS; // Allow default taming
+});
+```
+
+### ANIMAL_BREED
+
+Fired when a baby animal is spawned from breeding. This is informational and cannot be cancelled.
+
+```java
+AnimalEvents.ANIMAL_BREED.register((parentA, parentB, baby) -> {
+    // Track breeding for analytics
+    Constants.LOG.info("Baby {} born from {} and {}",
+        baby.getType().getDescriptionId(),
+        parentA.getUUID(),
+        parentB.getUUID());
+
+    // Give baby animals special traits
+    if (parentA instanceof Wolf || parentB instanceof Wolf) {
+        // Baby wolf gets extra speed
+        baby.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(
+            baby.getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue() * 1.2F
+        );
+    }
+
+    // Apply genetic traits from parents
+    if (parentA instanceof Sheep sheepA && parentB instanceof Sheep) {
+        // Baby inherits parent's color or gets a mix
+        DyeColor colorA = sheepA.getColor();
+        DyeColor colorB = ((Sheep) parentB).getColor();
+        DyeColor babyColor = Math.random() < 0.5 ? colorA : colorB;
+        ((Sheep) baby).setColor(babyColor);
+    }
+
+    // Special effects for rare breeding combinations
+    if (parentA.getType() == EntityType.HORSE && parentB.getType() == EntityType.HORSE) {
+        // Check for special breeding combinations
+        if (hasGoldenApple(parentA) && hasGoldenApple(parentB)) {
+            baby.setAttribute(BaseAttributes.GENERIC_FOLLOW_RANGE, 48.0);
+        }
     }
 });
 ```
@@ -433,6 +606,103 @@ ResourceLocation.fromNamespaceAndPath("minecraft", "entities/ender_dragon")
 // Gameplay loot tables
 ResourceLocation.fromNamespaceAndPath("minecraft", "gameplay/fishing")
 ```
+
+## Command Events
+
+Command events allow you to register custom commands during server initialization.
+
+### REGISTER
+
+Fired when the server is registering commands. This is where you should register your mod's custom commands.
+
+```java
+CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
+    // Register a simple command
+    dispatcher.register(Commands.literal("hello")
+        .executes(context -> {
+            context.getSource().sendSuccess(() -> Component.literal("Hello, world!"), true);
+            return 1;
+        })
+    );
+
+    // Register a command with arguments
+    dispatcher.register(Commands.literal("giveitem")
+        .then(Commands.argument("item", ItemArgument.item(context))
+            .executes(context -> {
+                ServerPlayer player = context.getSource().getPlayerOrException();
+                ItemStack stack = ItemArgument.getItem(context, "item").createItemStack(1, false);
+                player.getInventory().add(stack);
+                context.getSource().sendSuccess(() -> Component.literal("Gave " + stack), true);
+                return 1;
+            })
+        )
+    );
+
+    // Register commands only for dedicated server
+    if (environment == Commands.CommandSelection.DEDICATED) {
+        dispatcher.register(Commands.literal("admin-only")
+            .requires(source -> source.hasPermission(2))
+            .executes(context -> {
+                context.getSource().sendSuccess(() -> Component.literal("Admin command!"), true);
+                return 1;
+            })
+        );
+    }
+
+    // Register commands only for integrated server
+    if (environment == Commands.CommandSelection.INTEGRATED) {
+        dispatcher.register(Commands.literal("singleplayer")
+            .executes(context -> {
+                context.getSource().sendSuccess(() -> Component.literal("Singleplayer command!"), true);
+                return 1;
+            })
+        );
+    }
+});
+```
+
+## Creative Mode Tab Events
+
+Creative mode tab events allow mods to add items to existing creative tabs (vanilla or from other mods) in a unified way.
+
+### MODIFY_ENTRIES
+
+Fired when items are being added to a creative mode tab.
+
+```java
+CreativeModeTabEvents.MODIFY_ENTRIES.register((tabKey, output) -> {
+    // Add items to the vanilla building blocks tab
+    if (tabKey.equals(CreativeModeTabs.BUILDING_BLOCKS)) {
+        output.accept(MyItems.CUSTOM_BRICK.get());
+        output.accept(MyItems.DECORATIVE_BLOCK.get());
+        output.accept(MyItems.MAGIC_BRICK.get(), 64); // Specify stack size
+    }
+
+    // Add items to the redstone tab
+    if (tabKey.equals(CreativeModeTabs.REDSTONE_BLOCKS)) {
+        output.accept(MyBlocks.POWERED_BLOCK.get());
+        output.accept(MyItems.REDSTONE_COMPONENT.get());
+    }
+
+    // Add items to combat tab
+    if (tabKey.equals(CreativeModeTabs.COMBAT)) {
+        output.accept(MyItems.ENHANCED_SWORD.get());
+        output.accept(MyItems.PROTECTION_HELMET.get());
+        output.accept(MyItems.MAGIC_SHIELD.get());
+    }
+
+    // Add to all tabs (useful for debug/dev items)
+    if (tabKey.equals(CreativeModeTabs.OPERATOR) || isDevMode()) {
+        output.accept(MyItems.DEBUG_ITEM.get());
+    }
+});
+```
+
+This event is particularly useful for:
+- Adding your mod's items to appropriate vanilla tabs
+- Organizing items by functionality instead of just having a separate tab
+- Adding items to other mods' tabs for better integration
+- Conditional display based on feature flags or mod configuration
 
 ## Server Tick Events
 
@@ -607,8 +877,81 @@ InputEvents.KEY_PRESS.register((keyCode, scanCode, action, modifiers) -> {
         toggleFeature();
         return true; // Cancel further processing
     }
-    
+
     return false;
+});
+```
+
+### START_CLIENT_TICK
+
+Fired at the start of each client tick.
+
+```java
+// This would typically be registered through a client-specific entry point
+ClientTickEvents.START_CLIENT_TICK.register(() -> {
+    Minecraft minecraft = Minecraft.getInstance();
+
+    // Logic that runs at the start of each client tick
+    tickCounter++;
+
+    // Update animations
+    updateAnimations();
+
+    // Handle particle effects
+    updateParticles();
+});
+```
+
+### END_CLIENT_TICK
+
+Fired at the end of each client tick.
+
+```java
+// This would typically be registered through a client-specific entry point
+ClientTickEvents.END_CLIENT_TICK.register(() -> {
+    Minecraft minecraft = Minecraft.getInstance();
+
+    // Logic that runs at the end of each client tick
+
+    // Update custom HUD data
+    updateHUDData();
+
+    // Log every 1000 ticks to avoid spam
+    if (tickCounter % 1000 == 0) {
+        Constants.LOG.info("Client has been running for {} ticks", tickCounter);
+    }
+});
+```
+
+### BLOCK_OUTLINE_RENDER
+
+Fired when a block outline is about to be rendered. Can be cancelled or used to customize the outline rendering.
+
+```java
+// This would typically be registered through a client-specific entry point
+RenderEvents.BLOCK_OUTLINE_RENDER.register((camera, bufferSource, poseStack, hitResult, pos, state) -> {
+    Minecraft minecraft = Minecraft.getInstance();
+
+    // Custom block outline rendering
+    if (state.is(MyBlocks.MAGIC_BLOCK.get())) {
+        // Render glowing outline for magic blocks
+        renderGlowingOutline(bufferSource, poseStack, pos, 0x00FFFF);
+        return InteractionResult.SUCCESS; // Cancel default outline
+    }
+
+    // Hide outline for specific blocks
+    if (state.is(MyBlocks.INVISIBLE_BLOCK.get())) {
+        return InteractionResult.FAIL; // Don't render outline
+    }
+
+    // Color-code outline based on block properties
+    if (state.getBlock() instanceof MyCustomBlock customBlock) {
+        int outlineColor = customBlock.getOutlineColor(state);
+        renderCustomOutline(bufferSource, poseStack, pos, outlineColor);
+        return InteractionResult.SUCCESS; // Cancel default outline
+    }
+
+    return InteractionResult.PASS; // Allow default outline rendering
 });
 ```
 
@@ -704,11 +1047,39 @@ public class MyMod {
 | `ITEM_DROP` | Item dropped | No | `(Player, ItemEntity)` |
 | `ITEM_PICKUP` | Item picked up | No | `(Player, ItemEntity, ItemStack)` |
 
+### Entity Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `ENTITY_SPAWN` | Entity spawns in world | No | `(Entity, Level)` |
+| `ENTITY_DEATH` | Living entity dies | No | `(LivingEntity, DamageSource)` |
+| `ENTITY_DAMAGE` | Entity takes damage (before applied) | Yes | `(LivingEntity, DamageSource, float)` |
+| `AFTER_DAMAGE` | After damage taken (not if killed) | No | `(LivingEntity, DamageSource, float, float, boolean)` |
+
+### Animal Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `ANIMAL_TAME` | Animal is being tamed | Yes | `(LivingEntity, Player)` |
+| `ANIMAL_BREED` | Baby animal spawned from breeding | No | `(Animal, Animal, AgeableMob)` |
+
 ### Loot Events
 
 | Event | When Fired | Cancellable | Parameters |
 |-------|------------|--------------|------------|
 | `MODIFY` | Loot table loaded | No | `(ResourceLocation, Consumer<LootPool.Builder>)` |
+
+### Command Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `EVENT` | Server registers commands | No | `(CommandDispatcher, CommandBuildContext, CommandSelection)` |
+
+### Creative Mode Tab Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `MODIFY_ENTRIES` | Items added to creative tab | No | `(ResourceKey<CreativeModeTab>, CreativeModeTab.Output)` |
 
 ### World Events
 
@@ -730,5 +1101,15 @@ public class MyMod {
 |-------|------------|--------------|------------|
 | `START_SERVER_TICK` | Start of server tick | No | `()` |
 | `END_SERVER_TICK` | End of server tick | No | `()` |
+
+### Client Events
+
+| Event | When Fired | Cancellable | Parameters |
+|-------|------------|--------------|------------|
+| `HUD_RENDER` | HUD is being rendered | No | `(GuiGraphics, float)` |
+| `KEY_PRESS` | Key is pressed | Yes | `(int, int, int, int)` |
+| `START_CLIENT_TICK` | Start of client tick | No | `()` |
+| `END_CLIENT_TICK` | End of client tick | No | `()` |
+| `BLOCK_OUTLINE_RENDER` | Block outline being rendered | Yes | `(Camera, MultiBufferSource, PoseStack, BlockHitResult, BlockPos, BlockState)` |
 
 The event system provides a clean, consistent API across all platforms, making it easy to handle game events without worrying about platform-specific differences.
