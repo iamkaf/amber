@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 9.0.3
+
+### Changed
+
+- Made Fabric Loader requirement less strict
+
+### Removed
+
+- Removed network test commands
+
 ## 9.0.2
 
 ### Fixed
