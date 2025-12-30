@@ -15,21 +15,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerPlayer;
 
 public class AmberCommands {
-
-    private static final LiteralArgumentBuilder<CommandSourceStack> PING_COMMAND =
-            Commands.literal("ping").requires(source -> source.hasPermission(2)).executes(commandContext -> {
-                if (commandContext.getSource().getPlayer() instanceof ServerPlayer serverPlayer) {
-                    AmberNetworking.testConnectivity(serverPlayer);
-                    commandContext.getSource().sendSuccess(() -> Component.literal("Sent ping to test connectivity"), false);
-                } else {
-                    commandContext.getSource().sendFailure(Component.literal("Command must be run by a player"));
-                }
-                return Command.SINGLE_SUCCESS;
-            });
-
     private static final LiteralArgumentBuilder<CommandSourceStack> DOCTOR_COMMAND =
             Commands.literal("doctor").executes(commandContext -> {
                 ModInfo modInfo = Platform.getModInfo(Constants.MOD_ID);
@@ -49,9 +36,6 @@ public class AmberCommands {
                                     .append(" - Minecraft: 1.21.10" + "\n")
                                     .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
                                             "Not " + "Initialized") + "\n")
-                                    .append(" - Total Pings: " + AmberNetworking.getTotalPings() + "\n")
-                                    .append(" - Avg Latency: " + (AmberNetworking.getAverageLatency() == -1 ? "No data" :
-                                            AmberNetworking.getAverageLatency() + "ms") + "\n\n")
                                     .append("Mixins: \n");
                             for (String mixin : AmberMod.AMBER_MIXINS) {
                                 message.append(Component.literal(mixin + "\n")
@@ -72,20 +56,11 @@ public class AmberCommands {
                 return Command.SINGLE_SUCCESS;
             });
 
-    private static final LiteralArgumentBuilder<CommandSourceStack> RESET_STATS_COMMAND =
-            Commands.literal("reset-stats").requires(source -> source.hasPermission(2)).executes(commandContext -> {
-                AmberNetworking.resetStats();
-                commandContext.getSource().sendSuccess(() -> Component.literal("Reset networking statistics"), false);
-                return Command.SINGLE_SUCCESS;
-            });
-
     public static void initialize() {
         CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
             Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
             dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID)
-                    .then(DOCTOR_COMMAND)
-                    .then(PING_COMMAND)
-                    .then(RESET_STATS_COMMAND));
+                    .then(DOCTOR_COMMAND));
         });
     }
 }
