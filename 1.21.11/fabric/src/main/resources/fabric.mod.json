@@ -8,24 +8,16 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://iamkaf.com",
-        "sources": "https://github.com/iamkaf/mochila2"
+        "homepage": "https://example.com",
+        "sources": "https://github.com/example/template"
     },
     "license": "${license}",
-    "icon": "icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.iamkaf.mochila.MochilaFabric"
-        ],
-        "fabric-datagen": [
-            "com.iamkaf.mochila.fabric.MochilaDatagen"
+            "com.example.template.TemplateFabric"
         ]
     },
-    "mixins": [
-        "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
-    ],
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
@@ -37,4 +29,3 @@
         "modmenu": ">=${mod_menu_version}"
     }
 }
-  

@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    // Uncomment this line if you want to use Amber
+    // Amber integration
     implementation libs.amber.neoforge
 }
 

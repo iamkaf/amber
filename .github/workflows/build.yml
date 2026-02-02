@@ -92,7 +92,7 @@ jobs:
         if: steps.loader_enabled.outputs.enabled == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: mochila-${{ matrix.version }}-${{ matrix.loader }}
+          name: template-${{ matrix.version }}-${{ matrix.loader }}
           path: ${{ matrix.version }}/${{ matrix.loader }}/build/libs/*.jar
           if-no-files-found: error
       
