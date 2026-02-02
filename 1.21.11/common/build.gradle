@@ -23,7 +23,7 @@ dependencies {
     annotationProcessor libs.mixin.extras
     implementation libs.gson
 
-    // Uncomment this line if you want to use Amber
+    // Amber integration
     implementation libs.amber
 }
 

@@ -26,3 +26,7 @@ runs
 
 # annoying
 .vscode
+
+# generated resources and caches
+common/src/main/generated/
+.cache/
