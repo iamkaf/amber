@@ -1,0 +1,40 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://iamkaf.com",
+        "sources": "https://github.com/iamkaf/mochila2"
+    },
+    "license": "${license}",
+    "icon": "icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.iamkaf.mochila.MochilaFabric"
+        ],
+        "fabric-datagen": [
+            "com.iamkaf.mochila.fabric.MochilaDatagen"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "${fabric_version_range}",
+        "java": ">=${java_version}",
+        "amber": ">=${amber_version}"
+    },
+    "suggests": {
+        "modmenu": ">=${mod_menu_version}"
+    }
+}
+  

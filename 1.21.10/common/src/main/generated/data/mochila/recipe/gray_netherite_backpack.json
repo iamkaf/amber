@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "minecraft:netherite_ingot",
+  "base": "mochila:gray_diamond_backpack",
+  "result": {
+    "id": "mochila:gray_netherite_backpack"
+  },
+  "template": "minecraft:netherite_upgrade_smithing_template"
+}
