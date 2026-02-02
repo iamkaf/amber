@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "L": "minecraft:leather",
+    "C": "minecraft:chest"
+  },
+  "pattern": [
+    "L L",
+    "LCL",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "mochila:leather_backpack"
+  }
+}
