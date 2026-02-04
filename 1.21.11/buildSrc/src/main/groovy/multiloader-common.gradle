@@ -56,6 +56,10 @@ repositories {
         name = "Kaf Maven"
         url = "https://maven.kaf.sh"
     }
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 // Declare capabilities on the outgoing configurations.
