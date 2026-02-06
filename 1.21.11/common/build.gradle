@@ -22,9 +22,6 @@ dependencies {
     compileOnly libs.mixin.extras
     annotationProcessor libs.mixin.extras
     implementation libs.gson
-
-    // Amber integration
-    implementation libs.amber
 }
 
 configurations {

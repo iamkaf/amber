@@ -57,4 +57,4 @@ rootProject.name = mod_name
 include('common')
 include('fabric')
 include('neoforge')
-// include('forge')
+// include('forge') // Temporarily disabled for Amber 1.21.11 (FG7 migration later)

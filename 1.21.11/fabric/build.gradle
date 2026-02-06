@@ -14,7 +14,6 @@ dependencies {
     modImplementation libs.fabric.api
     modImplementation libs.modmenu
     // Uncomment the next line if you want to use Amber
-    modImplementation libs.amber.fabric
 }
 
 //sourceSets.main.resources.srcDir('src/generated/resources')
