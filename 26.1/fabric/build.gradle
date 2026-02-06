@@ -1,19 +1,16 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
     id "com.hypherionmc.modutils.modpublisher"
 }
 
 dependencies {
     minecraft libs.minecraft
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment(libs.parchment)
-    }
-    modImplementation libs.fabric.loader
-    modImplementation libs.fabric.api
-    modImplementation libs.modmenu
-    // Uncomment the next line if you want to use Amber
+
+    // Non-obfuscated Loom: no mappings / remapping configuration.
+    implementation libs.fabric.loader
+    implementation libs.fabric.api
+    implementation libs.modmenu
 }
 
 //sourceSets.main.resources.srcDir('src/generated/resources')
@@ -26,6 +23,7 @@ fabricApi {
 }
 
 loom {
+    splitEnvironmentSourceSets()
     def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
