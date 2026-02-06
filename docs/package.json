@@ -1,0 +1,15 @@
+{
+  "name": "amber-docs",
+  "version": "1.0.0",
+  "description": "Documentation for Amber Minecraft modding library",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "vitepress": "^1.6.4"
+  }
+}

@@ -62,9 +62,6 @@ dependencies {
 
     // Forge's hack fix
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-
-    // Amber integration
-    implementation "com.iamkaf.amber:amber-forge:${libs.amber.forge.get().version.toString()}"
 }
 
 publishing {

@@ -8,24 +8,29 @@
         "${mod_author}"
     ],
     "contact": {
-        "homepage": "https://example.com",
-        "sources": "https://github.com/example/template"
+        "homepage": "https://fabricmc.net/",
+        "sources": "https://github.com/FabricMC/fabric-example-mod"
     },
     "license": "${license}",
+    "icon": "icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.template.TemplateFabric"
+            "com.iamkaf.amber.AmberFabric"
         ]
     },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
     "depends": {
-        "fabricloader": ">=${fabric_loader_version}",
+        "fabricloader": "*",
         "fabric-api": "*",
-        "minecraft": "${fabric_version_range}",
-        "java": ">=${java_version}",
-        "amber": ">=${amber_version}"
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
     },
     "suggests": {
         "modmenu": ">=${mod_menu_version}"
     }
 }
+  

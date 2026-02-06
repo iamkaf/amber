@@ -1,44 +1,57 @@
-# Template
+# Amber
 
-A reusable multi-loader Minecraft mod template with Amber integration.
+A cross-loader library for Minecraft mod development.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## ✨ About
 
-This repo is a minimal, reusable mod template built for Fabric, Forge, and NeoForge. It keeps the multi-loader setup intact, includes Amber as a dependency, and strips all gameplay content so you can start fresh.
+Amber is a foundation library that provides **unified APIs** for common modding tasks across **Fabric**, **Forge**, and **NeoForge**.
+It aims to make multi-loader development feel consistent by abstracting platform differences behind a clean common API.
+
+## 📦 What Amber Provides
+
+- Registry helpers (deferred registration / suppliers)
+- Event system (common + client events)
+- Networking utilities (simple packet/channel helpers)
+- Configuration utilities
+- Commands + small gameplay/dev helpers (HUD, keybind utilities, etc.)
+
+## 📚 Documentation
+
+Docs live in this repo at `docs/` and are published here:
+
+- https://iamkaf.github.io/amber/
 
 ## 🗂️ Monorepo Structure
 
+This repository contains multiple Minecraft versions of Amber:
+
 ```
-mod-template/
-├── 1.21.10/         # Minecraft 1.21.10 version
-│   ├── common/      # Shared code across loaders
-│   ├── fabric/      # Fabric-specific implementation
-│   ├── forge/       # Forge-specific implementation
-│   └── neoforge/    # NeoForge-specific implementation
-├── 1.21.11/         # Minecraft 1.21.11 version
-│   ├── common/
-│   ├── fabric/
-│   ├── forge/
-│   └── neoforge/
-└── README.md        # This file
+amber/
+├── 1.20.1/           # Minecraft 1.20.1
+├── 1.21.1/           # Minecraft 1.21.1
+├── 1.21.10/          # Minecraft 1.21.10
+├── 1.21.11/          # Minecraft 1.21.11
+├── 26.1/             # Placeholder for a future Minecraft version
+├── docs/             # Documentation site (VitePress)
+└── README.md         # This file
 ```
 
-## ✅ Supported Versions
+Each version directory follows the same layout:
 
-| Minecraft Version | Status | Directory |
-|-------------------|--------|-----------|
-| 1.21.10           | ✅ Active | `1.21.10/` |
-| 1.21.11           | ✅ Active | `1.21.11/` |
+- `common/` — shared code across loaders
+- `fabric/` — Fabric implementation
+- `forge/` — Forge implementation
+- `neoforge/` — NeoForge implementation
 
-## 🚀 Getting Started
+## 🚀 Supported Versions
 
-1. Pick a version folder (e.g. `1.21.11/`) and open it in your IDE.
-2. Update `gradle.properties` with your mod info:
-   - `mod_id`, `mod_name`, `mod_author`, `description`, `group`, and publishing IDs
-3. Update package names from `com.example.template` to your own group.
-4. Add your content in `common/src/main/java` and `common/src/main/resources`.
+- 1.20.1 — ✅ Supported (Fabric + Forge)
+- 1.21.1 — ✅ Supported
+- 1.21.10 — ✅ Supported
+- 1.21.11 — ✅ Supported (Forge temporarily disabled; FG7 migration planned)
+- 26.1 — 🚧 Placeholder (does not compile yet)
 
 ## 🛠️ Building
 
@@ -46,33 +59,44 @@ Use `just` from the repo root as the command runner.
 
 ```bash
 # Build all loaders for a specific version
-just build 1.21.11
+just build 1.21.10
 
-# Build all loaders across all versions
+# Build all supported versions
 just build
 
 # Build a specific loader for a specific version
-just run 1.21.11 :fabric:build
-just run 1.21.11 :forge:build
-just run 1.21.11 :neoforge:build
+just run 1.21.10 :fabric:build
+just run 1.21.10 :forge:build
+just run 1.21.10 :neoforge:build
 
-# Run tests
-just test 1.21.11
-just test
+# Run tests for a specific version
+just test 1.21.10
 ```
 
 Built jars will be in `<version>/<loader>/build/libs/`.
 
+## 💻 Development
+
+### Prerequisites
+
+- Java 21 or higher
+- Git
+- just (install: https://github.com/casey/just)
+
+### Setup
+
+```bash
+git clone https://github.com/iamkaf/amber.git
+cd amber
+idea 1.21.11
+```
+
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
-## 🔗 Links (placeholders)
+## 🔗 Links
 
-- **CurseForge**: https://www.curseforge.com/minecraft/mc-mods/your-mod
-- **Modrinth**: https://modrinth.com/mod/your-mod
-- **Issues**: https://github.com/example/template/issues
-
-## 🙏 Acknowledgments
-
-- Based on jaredlll08's MultiLoader-Template
+- **Docs**: https://iamkaf.github.io/amber/
+- **Issues**: https://github.com/iamkaf/amber/issues
+- **Modrinth**: https://modrinth.com/mod/amber
