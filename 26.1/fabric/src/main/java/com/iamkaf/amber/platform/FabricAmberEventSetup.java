@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
@@ -15,7 +16,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -123,8 +124,17 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         // Creative mode tab events
         // Register for all existing vanilla tabs
         for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
-            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, tab);
+            net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                    @Override
+                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                        // For unobfuscated 26.1, CreativeModeTab.TabVisibility is protected
+                        // We can only use the simple accept(stack) which defaults to PARENT_AND_SEARCH_TABS
+                        // or accept(stack, item) which also defaults to PARENT_AND_SEARCH_TABS
+                        // The visibility parameter is currently ignored due to Minecraft 26.1 access restrictions
+                        output.accept(stack);
+                    }
+                });
             });
         }
 
@@ -134,8 +144,21 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
                 builder.getId()
             );
-            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, tab);
+            net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
+                // Add items from the TabBuilder
+                for (var itemSupplier : builder.getItems()) {
+                    output.accept(itemSupplier.get());
+                }
+
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                    @Override
+                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                        // For unobfuscated 26.1, CreativeModeTab.TabVisibility is protected
+                        // We can only use the simple accept(stack) which defaults to PARENT_AND_SEARCH_TABS
+                        // The visibility parameter is currently ignored due to Minecraft 26.1 access restrictions
+                        output.accept(stack);
+                    }
+                });
             });
         }
     }
@@ -170,11 +193,11 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
 
         // World events
-        ServerWorldEvents.LOAD.register((server, world) -> {
-            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, world);
+        ServerLevelEvents.LOAD.register((server, level) -> {
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, level);
         });
-        ServerWorldEvents.UNLOAD.register((server, world) -> {
-            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, world);
+        ServerLevelEvents.UNLOAD.register((server, level) -> {
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, level);
         });
 
         // Player lifecycle events

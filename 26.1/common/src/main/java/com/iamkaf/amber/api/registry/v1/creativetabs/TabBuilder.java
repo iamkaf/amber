@@ -1,5 +1,6 @@
 package com.iamkaf.amber.api.registry.v1.creativetabs;
 
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -220,29 +221,17 @@ public class TabBuilder {
      * Builds the creative mode tab.
      * <p>
      * This is called internally during registration and should not be called directly.
-     * 
+     *
      * @return The built creative mode tab
      */
     CreativeModeTab build() {
         CreativeModeTab.Builder builder = CreativeModeTab.builder(row, column);
-        
+
         builder.title(title);
         builder.icon(icon);
-        builder.displayItems((params, output) -> {
-            // Add items registered through the builder
-            for (Supplier<ItemLike> item : items) {
-                output.accept(item.get());
-            }
-            
-            // Fire the MODIFY_ENTRIES event to allow additional items
-            ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(
-                Registries.CREATIVE_MODE_TAB, 
-                id
-            );
-            com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                .modifyEntries(tabKey, output);
-        });
-        
+        // Note: displayItems is not used here because CreativeModeTab.Output is protected in 26.1
+        // Items are added via the MODIFY_ENTRIES event in platform-specific implementations
+
         if (alignedRight) {
             builder.alignedRight();
         }
@@ -254,7 +243,7 @@ public class TabBuilder {
         }
         // Note: backgroundTexture and type methods are protected in Minecraft,
         // but they can be accessed through reflection in platform-specific implementations if needed
-        
+
         return builder.build();
     }
 
@@ -265,5 +254,14 @@ public class TabBuilder {
      */
     public Identifier getId() {
         return id;
+    }
+
+    /**
+     * Gets the items registered to this tab builder.
+     *
+     * @return The list of item suppliers
+     */
+    public List<Supplier<ItemLike>> getItems() {
+        return items;
     }
 }

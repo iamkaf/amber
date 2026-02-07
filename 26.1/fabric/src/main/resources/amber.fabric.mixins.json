@@ -10,7 +10,6 @@
     "BoneMealItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
-    "FarmBlockMixin",
     "ItemEntityMixin",
     "LightningBoltMixin",
     "PlayerMixin",
