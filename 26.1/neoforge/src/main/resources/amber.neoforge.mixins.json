@@ -6,8 +6,7 @@
   "mixins": [
     "BoneMealItemMixin",
     "CraftingPlayerMixin",
-    "CropBlockMixin",
-    "FarmBlockMixin"
+    "CropBlockMixin"
   ],
   "client": [
     "LevelRendererMixin",
