@@ -33,13 +33,20 @@ loader-enabled version loader:
 with-java version *args:
   @cd "{{version}}"; \
     java_version=$(sed -nE 's/^java_version=([0-9]+).*/\1/p' gradle.properties | head -n1); \
+    sdkman_path=""; \
     case "$java_version" in \
-      21) JAVA_HOME="$HOME/.sdkman/candidates/java/21.0.9-tem" ;; \
-      25) JAVA_HOME="$HOME/.sdkman/candidates/java/25.0.2-tem" ;; \
+      21) sdkman_path="$HOME/.sdkman/candidates/java/21.0.9-tem" ;; \
+      25) sdkman_path="$HOME/.sdkman/candidates/java/25.0.2-tem" ;; \
       *) echo "Unsupported or missing java_version=$java_version in {{version}}/gradle.properties"; exit 1 ;; \
     esac; \
-    export JAVA_HOME; \
-    export PATH="$JAVA_HOME/bin:$PATH"; \
+    if [ -d "$sdkman_path" ]; then \
+      export JAVA_HOME="$sdkman_path"; \
+      export PATH="$JAVA_HOME/bin:$PATH"; \
+    elif [ -n "$JAVA_HOME" ] && [ -d "$JAVA_HOME" ]; then \
+      echo "SDKMAN path not found; using existing JAVA_HOME=$JAVA_HOME"; \
+    else \
+      echo "No valid Java installation found for java_version=$java_version"; exit 1; \
+    fi; \
     ./gradlew {{args}}
 
 # Run arbitrary Gradle tasks.
