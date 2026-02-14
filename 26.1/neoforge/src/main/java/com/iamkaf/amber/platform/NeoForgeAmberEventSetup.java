@@ -8,6 +8,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
@@ -58,14 +59,15 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         @Override
+        @SuppressWarnings({"unchecked", "rawtypes"})
         public void modify(Item item, java.util.function.Consumer<DataComponentMap.Builder> builderConsumer) {
             event.modify(item, patchBuilder -> {
                 DataComponentMap.Builder tempBuilder = DataComponentMap.builder();
                 builderConsumer.accept(tempBuilder);
 
                 DataComponentMap modifiedComponents = tempBuilder.build();
-                for (TypedDataComponent<?> component : modifiedComponents) {
-                    patchBuilder.set(component);
+                for (TypedDataComponent component : modifiedComponents) {
+                    patchBuilder.set(component.type(), component.value());
                 }
             });
         }
@@ -298,8 +300,28 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
          */
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+            // Add items from TabBuilder if this is a custom tab
+            com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder = 
+                com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().identifier());
+            if (tabBuilder != null) {
+                for (var itemSupplier : tabBuilder.getItems()) {
+                    event.accept(itemSupplier.get());
+                }
+            }
+
+            CreativeModeTabOutput output = new CreativeModeTabOutput() {
+                @Override
+                public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                    net.minecraft.world.item.CreativeModeTab.TabVisibility mcVisibility = switch (visibility) {
+                        case PARENT_AND_SEARCH_TABS -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
+                        case PARENT_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_TAB_ONLY;
+                        case SEARCH_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY;
+                    };
+                    event.accept(stack, mcVisibility);
+                }
+            };
             CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                .modifyEntries(event.getTabKey(), event::accept);
+                .modifyEntries(event.getTabKey(), output);
         }
 
         /**

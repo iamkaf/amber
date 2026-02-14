@@ -1,19 +1,35 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.fabricmc.fabric-loom'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id "com.hypherionmc.modutils.modpublisher"
 }
 
 dependencies {
+    // Minecraft version - NO mappings line needed for unobfuscated 26.1
     minecraft libs.minecraft
-
-    // Non-obfuscated Loom: no mappings / remapping configuration.
+    
+    // HACK: Loom 1.15 creates an ASSETS-ONLY merged jar for unobfuscated 26.1! 
+    // The game code is missing! This is a confirmed Loom bug that will be fixed in 1.16.
+    // DO NOT REMOVE - runtime will fail with "couldn't locate the game" without these!
+    // Issue: https://github.com/FabricMC/fabric-loom/issues (search "unobfuscated 26.1")
+    runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-common-deobf/26.1-snapshot-6/minecraft-common-deobf-26.1-snapshot-6.jar')
+    runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-clientonly-deobf/26.1-snapshot-6/minecraft-clientonly-deobf-26.1-snapshot-6.jar')
+    
+    // Fabric Loader and API - use implementation for unobfuscated versions
     implementation libs.fabric.loader
     implementation libs.fabric.api
-    implementation libs.modmenu
+    
+    // Common module - don't exclude Minecraft, let Loom handle duplicates
+    implementation(project(':common'))
 }
 
 //sourceSets.main.resources.srcDir('src/generated/resources')
+
+// Disable javadoc for Fabric module - it has issues finding Minecraft classes
+// in the multiloader setup with unobfuscated 26.1
+tasks.withType(Javadoc) {
+    enabled = false
+}
 
 fabricApi {
     configureDataGeneration {
@@ -23,14 +39,17 @@ fabricApi {
 }
 
 loom {
-    splitEnvironmentSourceSets()
+    // Access widener for exposing protected members
+    // Note: For unobfuscated 26.1, access wideners work differently
     def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
+    
     mixin {
         defaultRefmapName.set("${mod_id}.refmap.json")
     }
+    
     runs {
         client {
             client()

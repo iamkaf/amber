@@ -12,6 +12,11 @@ configurations {
 }
 
 dependencies {
+    implementation(project(':common')) {
+        capabilities {
+            requireCapability "$group:$mod_id"
+        }
+    }
     compileOnly(project(':common')) {
         capabilities {
             requireCapability "$group:$mod_id"
@@ -24,6 +29,10 @@ dependencies {
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    // Include common's compile classpath (for Minecraft and other dependencies)
+    classpath += project(':common').configurations.compileClasspath
+    // Also include this module's own compile classpath (for loader-specific dependencies like Fabric API)
+    classpath += configurations.compileClasspath
 }
 
 processResources {
@@ -34,6 +43,8 @@ processResources {
 tasks.named('javadoc', Javadoc).configure {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    // Include common's compile classpath so javadoc can find Minecraft classes
+    classpath = project(':common').configurations.compileClasspath + configurations.compileClasspath
     options.addBooleanOption('Xdoclint:none', true)
     options.addBooleanOption('quiet', true)
 }

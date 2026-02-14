@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
@@ -317,8 +318,28 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
          * @param event The Forge event
          */
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+            // Add items from TabBuilder if this is a custom tab
+            com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder = 
+                com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().location());
+            if (tabBuilder != null) {
+                for (var itemSupplier : tabBuilder.getItems()) {
+                    event.accept(itemSupplier.get());
+                }
+            }
+
+            CreativeModeTabOutput output = new CreativeModeTabOutput() {
+                @Override
+                public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                    net.minecraft.world.item.CreativeModeTab.TabVisibility mcVisibility = switch (visibility) {
+                        case PARENT_AND_SEARCH_TABS -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
+                        case PARENT_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_TAB_ONLY;
+                        case SEARCH_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY;
+                    };
+                    event.accept(stack, mcVisibility);
+                }
+            };
             CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                .modifyEntries(event.getTabKey(), event::accept);
+                .modifyEntries(event.getTabKey(), output);
         }
 
         /**

@@ -43,10 +43,10 @@ public final class CreativeModeTabEvents {
          * <p>
          * Use the provided output interface to add items to the tab. You can add
          * items conditionally based on the tab key, feature flags, or other factors.
-         * 
+         *
          * @param tabKey The resource key of the tab being modified
          * @param output Output interface to add items to the tab
          */
-        void modifyEntries(ResourceKey<CreativeModeTab> tabKey, CreativeModeTab.Output output);
+        void modifyEntries(ResourceKey<CreativeModeTab> tabKey, CreativeModeTabOutput output);
     }
 }
