@@ -8,7 +8,6 @@ import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 /**
  * Fabric entry point.

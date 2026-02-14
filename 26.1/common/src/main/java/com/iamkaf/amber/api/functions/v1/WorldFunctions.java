@@ -334,7 +334,7 @@ public final class WorldFunctions {
      * @return The current time of day in ticks.
      */
     public static long getTimeOfDay(Level level) {
-        return level.getDayTime() % 24000L;
+        return level.getOverworldClockTime() % 24000L;
     }
 
     /**
@@ -375,7 +375,7 @@ public final class WorldFunctions {
      * @return The current moon phase (0=full moon, 4=new moon).
      */
     public static int getMoonPhase(Level level) {
-        return (int) ((level.getDayTime() / 24000L) % 8L);
+        return (int) ((level.getOverworldClockTime() / 24000L) % 8L);
     }
 
     /**
@@ -385,7 +385,7 @@ public final class WorldFunctions {
      * @return The total number of days passed.
      */
     public static long getDayCount(Level level) {
-        return level.getDayTime() / 24000L;
+        return level.getOverworldClockTime() / 24000L;
     }
 
     /**
