@@ -80,6 +80,12 @@ See the full changelog at https://github.com/iamkaf/amber
   - `BrewingHelper` - Never implemented brewing functionality that was planned but never developed
 - Removed deprecated `SmartTooltip.into()` method in favor of the Consumer-based implementation
 
+## 8.3.5
+
+### Fixed
+
+- Fixed Forge `EntityEvent.AFTER_DAMAGE` on 1.21.10 by correcting the `LivingEntity#hurtServer` local capture used by Amber's post-damage hook
+
 ## 8.3.4
 
 ### Fixed
