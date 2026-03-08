@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockEvents {
     /**
@@ -81,6 +82,17 @@ public class BlockEvents {
                     }
                 }
                 return InteractionResult.PASS; // Allow click by default
+            }
+    );
+
+    /**
+     * An informational event fired when a block is ignited.
+     */
+    public static final Event<IgniteBlock> IGNITE_BLOCK = EventFactory.createArrayBacked(
+            IgniteBlock.class, callbacks -> context -> {
+                for (IgniteBlock callback : callbacks) {
+                    callback.ignite(context);
+                }
             }
     );
 
@@ -155,5 +167,82 @@ public class BlockEvents {
          * @return an {@link InteractionResult} indicating whether the click should be allowed or cancelled
          */
         InteractionResult onBlockClick(Player player, Level level, InteractionHand hand, BlockPos pos, net.minecraft.core.Direction direction);
+    }
+
+    @FunctionalInterface
+    public interface IgniteBlock {
+        /**
+         * Called when a block is ignited.
+         *
+         * @param context the ignition context
+         */
+        void ignite(BlockIgnitionContext context);
+    }
+
+    public interface BlockIgnitionContext {
+        @Nullable Player getPlayer();
+
+        ItemStack getIgnitionItem();
+
+        BlockPos getIgnitedPosition();
+
+        BlockState getIgnitedBlockState();
+
+        Level getLevel();
+
+        BlockIgnitionSource getSource();
+    }
+
+    public enum BlockIgnitionSource {
+        FLINT_AND_STEEL,
+        FIRE_CHARGE,
+        FIRE_ARROW,
+        LAVA_SPREAD,
+        LIGHTNING,
+        FIRE_SPREAD,
+        ENVIRONMENTAL
+    }
+
+    public record SimpleBlockIgnitionContext(
+            @Nullable Player player,
+            ItemStack ignitionItem,
+            BlockPos ignitedPosition,
+            BlockState ignitedBlockState,
+            Level level,
+            BlockIgnitionSource source
+    ) implements BlockIgnitionContext {
+        public SimpleBlockIgnitionContext {
+            ignitionItem = ignitionItem.copy();
+        }
+
+        @Override
+        public @Nullable Player getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getIgnitionItem() {
+            return ignitionItem.copy();
+        }
+
+        @Override
+        public BlockPos getIgnitedPosition() {
+            return ignitedPosition;
+        }
+
+        @Override
+        public BlockState getIgnitedBlockState() {
+            return ignitedBlockState;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public BlockIgnitionSource getSource() {
+            return source;
+        }
     }
 }

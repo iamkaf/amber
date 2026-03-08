@@ -80,6 +80,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Shield block events
         ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
+            EntityEvent.AFTER_DAMAGE.invoker().afterDamage(entity, source, baseDamage, damageTaken, blocked);
             if (entity instanceof net.minecraft.world.entity.player.Player player && blocked) {
                 net.minecraft.world.item.ItemStack shield = findBlockingShield(player);
                 if (!shield.isEmpty()) {
@@ -182,6 +183,9 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(handler.getPlayer());
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            if (handler.getPlayer().fishing instanceof com.iamkaf.amber.event.internal.FishingHookEventBridge fishingHook) {
+                fishingHook.amber$fireStop(PlayerEvents.FishingStopReason.PLAYER_LOGOUT, false);
+            }
             PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(handler.getPlayer());
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {

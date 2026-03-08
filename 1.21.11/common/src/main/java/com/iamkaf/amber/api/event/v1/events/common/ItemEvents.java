@@ -2,11 +2,18 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+import java.util.List;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.inventory.SmithingMenu;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -67,6 +74,28 @@ public class ItemEvents {
             }
     );
 
+    /**
+     * An informational event fired when valid smithing inputs are present.
+     */
+    public static final Event<SmithingStart> SMITHING_START = EventFactory.createArrayBacked(
+            SmithingStart.class, callbacks -> context -> {
+                for (SmithingStart callback : callbacks) {
+                    callback.start(context);
+                }
+            }
+    );
+
+    /**
+     * An informational event fired when smithing is completed.
+     */
+    public static final Event<SmithingComplete> SMITHING_COMPLETE = EventFactory.createArrayBacked(
+            SmithingComplete.class, callbacks -> context -> {
+                for (SmithingComplete callback : callbacks) {
+                    callback.complete(context);
+                }
+            }
+    );
+
     @FunctionalInterface
     public interface ItemDrop {
         /**
@@ -110,6 +139,26 @@ public class ItemEvents {
         void modify(ComponentModificationContext context);
     }
 
+    @FunctionalInterface
+    public interface SmithingStart {
+        /**
+         * Called when a valid smithing recipe is available.
+         *
+         * @param context the smithing context
+         */
+        void start(SmithingContext context);
+    }
+
+    @FunctionalInterface
+    public interface SmithingComplete {
+        /**
+         * Called when a player takes a smithing result.
+         *
+         * @param context the completion context
+         */
+        void complete(SmithingCompleteContext context);
+    }
+
     /**
      * Interface providing access to modify default data components for items.
      * <p>
@@ -129,5 +178,160 @@ public class ItemEvents {
          * @param builderConsumer a consumer that accepts the component builder
          */
         void modify(Item item, Consumer<DataComponentMap.Builder> builderConsumer);
+    }
+
+    public interface SmithingContext {
+        ServerPlayer getPlayer();
+
+        SmithingMenu getSmithingMenu();
+
+        ItemStack getTemplate();
+
+        ItemStack getBaseItem();
+
+        ItemStack getAddition();
+
+        Level getLevel();
+    }
+
+    public interface SmithingCompleteContext extends SmithingContext {
+        ItemStack getResult();
+
+        List<ItemStack> getConsumedItems();
+
+        boolean wasSuccessful();
+
+        SmithingType getSmithingType();
+
+        @Nullable Recipe<?> getRecipe();
+    }
+
+    public enum SmithingType {
+        TRIMMING,
+        NETHERITE_UPGRADE,
+        TRANSFORMATION,
+        CUSTOM
+    }
+
+    public record SimpleSmithingContext(
+            ServerPlayer player,
+            SmithingMenu smithingMenu,
+            ItemStack template,
+            ItemStack baseItem,
+            ItemStack addition,
+            Level level
+    ) implements SmithingContext {
+        public SimpleSmithingContext {
+            template = template.copy();
+            baseItem = baseItem.copy();
+            addition = addition.copy();
+        }
+
+        @Override
+        public ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public SmithingMenu getSmithingMenu() {
+            return smithingMenu;
+        }
+
+        @Override
+        public ItemStack getTemplate() {
+            return template.copy();
+        }
+
+        @Override
+        public ItemStack getBaseItem() {
+            return baseItem.copy();
+        }
+
+        @Override
+        public ItemStack getAddition() {
+            return addition.copy();
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+    }
+
+    public record SimpleSmithingCompleteContext(
+            ServerPlayer player,
+            SmithingMenu smithingMenu,
+            ItemStack template,
+            ItemStack baseItem,
+            ItemStack addition,
+            Level level,
+            ItemStack result,
+            List<ItemStack> consumedItems,
+            boolean wasSuccessful,
+            SmithingType smithingType,
+            @Nullable Recipe<?> recipe
+    ) implements SmithingCompleteContext {
+        public SimpleSmithingCompleteContext {
+            template = template.copy();
+            baseItem = baseItem.copy();
+            addition = addition.copy();
+            result = result.copy();
+            consumedItems = consumedItems.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public SmithingMenu getSmithingMenu() {
+            return smithingMenu;
+        }
+
+        @Override
+        public ItemStack getTemplate() {
+            return template.copy();
+        }
+
+        @Override
+        public ItemStack getBaseItem() {
+            return baseItem.copy();
+        }
+
+        @Override
+        public ItemStack getAddition() {
+            return addition.copy();
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public ItemStack getResult() {
+            return result.copy();
+        }
+
+        @Override
+        public List<ItemStack> getConsumedItems() {
+            return consumedItems.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public boolean wasSuccessful() {
+            return wasSuccessful;
+        }
+
+        @Override
+        public SmithingType getSmithingType() {
+            return smithingType;
+        }
+
+        @Override
+        public @Nullable Recipe<?> getRecipe() {
+            return recipe;
+        }
     }
 }

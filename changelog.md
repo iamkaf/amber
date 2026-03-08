@@ -13,6 +13,13 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Removed 14 deprecated classes
 
+## 9.0.4
+
+### Fixed
+
+- Fixed `EntityEvent.AFTER_DAMAGE` not firing on Fabric, Forge, and NeoForge
+- Fixed NeoForge dispenser shears support on 1.21.11
+
 ## 9.0.3
 
 ### Changed
@@ -65,6 +72,13 @@ See the full changelog at https://github.com/iamkaf/amber
   - `AmberMod` (deprecated v1 version) - Unused legacy initialization class, replaced by `AmberInitializer`
   - `BrewingHelper` - Never implemented brewing functionality that was planned but never developed
 - Removed deprecated `SmartTooltip.into()` method in favor of the Consumer-based implementation
+
+## 8.3.4
+
+### Fixed
+
+- Fixed `EntityEvent.AFTER_DAMAGE` not firing on Fabric, Forge, and NeoForge
+- Fixed NeoForge dispenser shears support on 1.21.10
 
 ## 8.2.0
 
