@@ -61,12 +61,10 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir,
-            float originalDamage,
             ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
+            float damageBlocked
     ) {
-        this.amber$armAfterDamage(damage - this.lastHurt, damage, blocked);
+        this.amber$armAfterDamage(damage - this.lastHurt, damage, damageBlocked > 0.0F);
     }
 
     @Inject(
@@ -83,12 +81,10 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir,
-            float originalDamage,
             ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
+            float damageBlocked
     ) {
-        this.amber$armAfterDamage(damage, damage, blocked);
+        this.amber$armAfterDamage(damage, damage, damageBlocked > 0.0F);
     }
 
     @Inject(method = "hurtServer", at = @At("TAIL"))
