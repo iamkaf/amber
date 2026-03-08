@@ -2,11 +2,15 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+import java.util.List;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityEvent {
     /**
@@ -73,6 +77,17 @@ public class EntityEvent {
             }
     );
 
+    /**
+     * An informational event fired after an entity has been sheared.
+     */
+    public static final Event<Shear> SHEAR = EventFactory.createArrayBacked(
+            Shear.class, callbacks -> context -> {
+                for (Shear callback : callbacks) {
+                    callback.shear(context);
+                }
+            }
+    );
+
     @FunctionalInterface
     public interface EntitySpawn {
         /**
@@ -122,5 +137,105 @@ public class EntityEvent {
          */
         void afterDamage(LivingEntity entity, DamageSource source, float baseDamageTaken, float damageTaken,
                 boolean blocked);
+    }
+
+    @FunctionalInterface
+    public interface Shear {
+        /**
+         * Called after an entity is sheared.
+         *
+         * @param context the shearing context
+         */
+        void shear(ShearingContext context);
+    }
+
+    public interface ShearingContext {
+        @Nullable net.minecraft.server.level.ServerPlayer getPlayer();
+
+        ItemStack getShears();
+
+        Entity getTargetEntity();
+
+        Level getLevel();
+
+        ShearTarget getTargetType();
+
+        List<ItemStack> getDrops();
+
+        boolean wasSuccessful();
+
+        ShearSource getSource();
+    }
+
+    public enum ShearTarget {
+        SHEEP,
+        MUSHROOM_COW,
+        SNOW_GOLEM,
+        BOGGED,
+        COPPER_GOLEM,
+        OTHER
+    }
+
+    public enum ShearSource {
+        PLAYER,
+        DISPENSER,
+        AUTOMATION,
+        UNKNOWN
+    }
+
+    public record SimpleShearingContext(
+            @Nullable net.minecraft.server.level.ServerPlayer player,
+            ItemStack shears,
+            Entity targetEntity,
+            Level level,
+            ShearTarget targetType,
+            List<ItemStack> drops,
+            boolean successful,
+            ShearSource source
+    ) implements ShearingContext {
+        public SimpleShearingContext {
+            shears = shears.copy();
+            drops = drops.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public @Nullable net.minecraft.server.level.ServerPlayer getPlayer() {
+            return this.player;
+        }
+
+        @Override
+        public ItemStack getShears() {
+            return this.shears.copy();
+        }
+
+        @Override
+        public Entity getTargetEntity() {
+            return this.targetEntity;
+        }
+
+        @Override
+        public Level getLevel() {
+            return this.level;
+        }
+
+        @Override
+        public ShearTarget getTargetType() {
+            return this.targetType;
+        }
+
+        @Override
+        public List<ItemStack> getDrops() {
+            return this.drops.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public boolean wasSuccessful() {
+            return this.successful;
+        }
+
+        @Override
+        public ShearSource getSource() {
+            return this.source;
+        }
     }
 }
