@@ -81,6 +81,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Shield block events
         ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
+            EntityEvent.AFTER_DAMAGE.invoker().afterDamage(entity, source, baseDamage, damageTaken, blocked);
             if (entity instanceof net.minecraft.world.entity.player.Player player && blocked) {
                 net.minecraft.world.item.ItemStack shield = findBlockingShield(player);
                 if (!shield.isEmpty()) {

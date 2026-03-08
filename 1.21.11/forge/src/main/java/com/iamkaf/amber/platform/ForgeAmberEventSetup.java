@@ -238,6 +238,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
             if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                if (serverPlayer.fishing instanceof com.iamkaf.amber.event.internal.FishingHookEventBridge fishingHook) {
+                    fishingHook.amber$fireStop(PlayerEvents.FishingStopReason.PLAYER_LOGOUT, false);
+                }
                 PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(serverPlayer);
             }
         }

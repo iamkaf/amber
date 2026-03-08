@@ -3,12 +3,14 @@ package com.iamkaf.amber.api.event.v1.events.common;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -127,6 +129,50 @@ public class PlayerEvents {
     );
 
     /**
+     * An informational event fired when a player starts fishing.
+     */
+    public static final Event<FishingStart> FISHING_START = EventFactory.createArrayBacked(
+            FishingStart.class, callbacks -> context -> {
+                for (FishingStart callback : callbacks) {
+                    callback.start(context);
+                }
+            }
+    );
+
+    /**
+     * An informational event fired when a fishing hook gets a bite.
+     */
+    public static final Event<FishingBite> FISHING_BITE = EventFactory.createArrayBacked(
+            FishingBite.class, callbacks -> context -> {
+                for (FishingBite callback : callbacks) {
+                    callback.bite(context);
+                }
+            }
+    );
+
+    /**
+     * An informational event fired when fishing succeeds.
+     */
+    public static final Event<FishingSuccess> FISHING_SUCCESS = EventFactory.createArrayBacked(
+            FishingSuccess.class, callbacks -> context -> {
+                for (FishingSuccess callback : callbacks) {
+                    callback.success(context);
+                }
+            }
+    );
+
+    /**
+     * An informational event fired when fishing stops.
+     */
+    public static final Event<FishingStop> FISHING_STOP = EventFactory.createArrayBacked(
+            FishingStop.class, callbacks -> context -> {
+                for (FishingStop callback : callbacks) {
+                    callback.stop(context);
+                }
+            }
+    );
+
+    /**
      * Functional interface for handling {@link #ENTITY_INTERACT} callbacks.
      */
     @FunctionalInterface
@@ -224,5 +270,225 @@ public class PlayerEvents {
          * @param source the damage source that was blocked
          */
         void onShieldBlock(Player player, ItemStack shield, float blockedDamage, DamageSource source);
+    }
+
+    @FunctionalInterface
+    public interface FishingStart {
+        /**
+         * Called when a player casts a fishing line.
+         *
+         * @param context the fishing context
+         */
+        void start(FishingContext context);
+    }
+
+    @FunctionalInterface
+    public interface FishingBite {
+        /**
+         * Called when a fishing hook gets a bite.
+         *
+         * @param context the fishing context
+         */
+        void bite(FishingContext context);
+    }
+
+    @FunctionalInterface
+    public interface FishingSuccess {
+        /**
+         * Called when fishing successfully catches something.
+         *
+         * @param context the success context
+         */
+        void success(FishingSuccessContext context);
+    }
+
+    @FunctionalInterface
+    public interface FishingStop {
+        /**
+         * Called when fishing stops.
+         *
+         * @param context the stop context
+         */
+        void stop(FishingStopContext context);
+    }
+
+    public interface FishingContext {
+        ServerPlayer getPlayer();
+
+        ItemStack getFishingRod();
+
+        FishingHook getFishingHook();
+
+        Level getLevel();
+    }
+
+    public interface FishingSuccessContext extends FishingContext {
+        FishingResult getResult();
+
+        ItemStack getCaughtItem();
+
+        @Nullable Entity getCaughtEntity();
+
+        boolean isTreasure();
+
+        int getExperienceValue();
+    }
+
+    public interface FishingStopContext extends FishingContext {
+        FishingStopReason getReason();
+
+        boolean wasSuccessful();
+    }
+
+    public enum FishingResult {
+        FISH,
+        TREASURE,
+        JUNK,
+        ENTITY,
+        NOTHING
+    }
+
+    public enum FishingStopReason {
+        REELED_IN,
+        ROD_BROKE,
+        HOOK_ESCAPED,
+        TIME_OUT,
+        PLAYER_LOGOUT
+    }
+
+    public record SimpleFishingContext(
+            ServerPlayer player,
+            ItemStack fishingRod,
+            FishingHook fishingHook,
+            Level level
+    ) implements FishingContext {
+        public SimpleFishingContext {
+            fishingRod = fishingRod.copy();
+        }
+
+        @Override
+        public ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getFishingRod() {
+            return fishingRod.copy();
+        }
+
+        @Override
+        public FishingHook getFishingHook() {
+            return fishingHook;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+    }
+
+    public record SimpleFishingSuccessContext(
+            ServerPlayer player,
+            ItemStack fishingRod,
+            FishingHook fishingHook,
+            Level level,
+            FishingResult result,
+            ItemStack caughtItem,
+            @Nullable Entity caughtEntity,
+            boolean treasure,
+            int experienceValue
+    ) implements FishingSuccessContext {
+        public SimpleFishingSuccessContext {
+            fishingRod = fishingRod.copy();
+            caughtItem = caughtItem.copy();
+        }
+
+        @Override
+        public ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getFishingRod() {
+            return fishingRod.copy();
+        }
+
+        @Override
+        public FishingHook getFishingHook() {
+            return fishingHook;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public FishingResult getResult() {
+            return result;
+        }
+
+        @Override
+        public ItemStack getCaughtItem() {
+            return caughtItem.copy();
+        }
+
+        @Override
+        public @Nullable Entity getCaughtEntity() {
+            return caughtEntity;
+        }
+
+        @Override
+        public boolean isTreasure() {
+            return treasure;
+        }
+
+        @Override
+        public int getExperienceValue() {
+            return experienceValue;
+        }
+    }
+
+    public record SimpleFishingStopContext(
+            ServerPlayer player,
+            ItemStack fishingRod,
+            FishingHook fishingHook,
+            Level level,
+            FishingStopReason reason,
+            boolean wasSuccessful
+    ) implements FishingStopContext {
+        public SimpleFishingStopContext {
+            fishingRod = fishingRod.copy();
+        }
+
+        @Override
+        public ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getFishingRod() {
+            return fishingRod.copy();
+        }
+
+        @Override
+        public FishingHook getFishingHook() {
+            return fishingHook;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public FishingStopReason getReason() {
+            return reason;
+        }
+
+        @Override
+        public boolean wasSuccessful() {
+            return wasSuccessful;
+        }
     }
 }

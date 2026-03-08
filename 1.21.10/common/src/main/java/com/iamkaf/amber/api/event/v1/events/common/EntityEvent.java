@@ -2,11 +2,15 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+import java.util.List;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityEvent {
     /**
@@ -73,6 +77,28 @@ public class EntityEvent {
             }
     );
 
+    /**
+     * An informational event fired when an entity is ignited.
+     */
+    public static final Event<IgniteEntity> IGNITE_ENTITY = EventFactory.createArrayBacked(
+            IgniteEntity.class, callbacks -> context -> {
+                for (IgniteEntity callback : callbacks) {
+                    callback.ignite(context);
+                }
+            }
+    );
+
+    /**
+     * An informational event fired after an entity has been sheared.
+     */
+    public static final Event<Shear> SHEAR = EventFactory.createArrayBacked(
+            Shear.class, callbacks -> context -> {
+                for (Shear callback : callbacks) {
+                    callback.shear(context);
+                }
+            }
+    );
+
     @FunctionalInterface
     public interface EntitySpawn {
         /**
@@ -122,5 +148,174 @@ public class EntityEvent {
          */
         void afterDamage(LivingEntity entity, DamageSource source, float baseDamageTaken, float damageTaken,
                 boolean blocked);
+    }
+
+    @FunctionalInterface
+    public interface IgniteEntity {
+        /**
+         * Called when an entity is ignited.
+         *
+         * @param context the ignition context
+         */
+        void ignite(EntityIgnitionContext context);
+    }
+
+    @FunctionalInterface
+    public interface Shear {
+        /**
+         * Called after an entity is sheared.
+         *
+         * @param context the shearing context
+         */
+        void shear(ShearingContext context);
+    }
+
+    public interface EntityIgnitionContext {
+        @Nullable Player getPlayer();
+
+        ItemStack getIgnitionItem();
+
+        Entity getIgnitedEntity();
+
+        Level getLevel();
+
+        EntityIgnitionSource getSource();
+    }
+
+    public enum EntityIgnitionSource {
+        FLINT_AND_STEEL,
+        FIRE_CHARGE,
+        FIRE_ARROW,
+        LAVA,
+        LIGHTNING,
+        ENVIRONMENTAL,
+        FIRE_SPREAD
+    }
+
+    public interface ShearingContext {
+        @Nullable net.minecraft.server.level.ServerPlayer getPlayer();
+
+        ItemStack getShears();
+
+        Entity getTargetEntity();
+
+        Level getLevel();
+
+        ShearTarget getTargetType();
+
+        List<ItemStack> getDrops();
+
+        boolean wasSuccessful();
+
+        ShearSource getSource();
+    }
+
+    public enum ShearTarget {
+        SHEEP,
+        MUSHROOM_COW,
+        SNOW_GOLEM,
+        BEE_NEST,
+        BEEHIVE,
+        OTHER
+    }
+
+    public enum ShearSource {
+        PLAYER,
+        DISPENSER,
+        AUTOMATION,
+        UNKNOWN
+    }
+
+    public record SimpleEntityIgnitionContext(
+            @Nullable Player player,
+            ItemStack ignitionItem,
+            Entity ignitedEntity,
+            Level level,
+            EntityIgnitionSource source
+    ) implements EntityIgnitionContext {
+        public SimpleEntityIgnitionContext {
+            ignitionItem = ignitionItem.copy();
+        }
+
+        @Override
+        public @Nullable Player getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getIgnitionItem() {
+            return ignitionItem.copy();
+        }
+
+        @Override
+        public Entity getIgnitedEntity() {
+            return ignitedEntity;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public EntityIgnitionSource getSource() {
+            return source;
+        }
+    }
+
+    public record SimpleShearingContext(
+            @Nullable net.minecraft.server.level.ServerPlayer player,
+            ItemStack shears,
+            Entity targetEntity,
+            Level level,
+            ShearTarget targetType,
+            List<ItemStack> drops,
+            boolean wasSuccessful,
+            ShearSource source
+    ) implements ShearingContext {
+        public SimpleShearingContext {
+            shears = shears.copy();
+            drops = drops.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public @Nullable net.minecraft.server.level.ServerPlayer getPlayer() {
+            return player;
+        }
+
+        @Override
+        public ItemStack getShears() {
+            return shears.copy();
+        }
+
+        @Override
+        public Entity getTargetEntity() {
+            return targetEntity;
+        }
+
+        @Override
+        public Level getLevel() {
+            return level;
+        }
+
+        @Override
+        public ShearTarget getTargetType() {
+            return targetType;
+        }
+
+        @Override
+        public List<ItemStack> getDrops() {
+            return drops.stream().map(ItemStack::copy).toList();
+        }
+
+        @Override
+        public boolean wasSuccessful() {
+            return wasSuccessful;
+        }
+
+        @Override
+        public ShearSource getSource() {
+            return source;
+        }
     }
 }
