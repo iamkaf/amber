@@ -13,6 +13,13 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Removed 14 deprecated classes
 
+## 9.0.5
+
+### Fixed
+
+- Fixed Forge `EntityEvent.AFTER_DAMAGE` on 1.21.11 by correcting the `LivingEntity#hurtServer` local capture used by Amber's post-damage hook
+- Fixed the same Forge post-damage local capture issue in the 1.21.10 and 26.1 code lines
+
 ## 9.0.4
 
 ### Fixed
