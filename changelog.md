@@ -13,12 +13,6 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Removed 14 deprecated classes
 
-## 8.3.6
-
-### Fixed
-
-- Fixed the `LightningBoltIgnitionMixin` runtime injection on Fabric, Forge, and NeoForge for 1.21.10
-
 ## 9.0.5
 
 ### Fixed
@@ -85,6 +79,12 @@ See the full changelog at https://github.com/iamkaf/amber
   - `AmberMod` (deprecated v1 version) - Unused legacy initialization class, replaced by `AmberInitializer`
   - `BrewingHelper` - Never implemented brewing functionality that was planned but never developed
 - Removed deprecated `SmartTooltip.into()` method in favor of the Consumer-based implementation
+
+## 8.3.6
+
+### Fixed
+
+- Fixed the `LightningBoltIgnitionMixin` runtime injection on Fabric, Forge, and NeoForge
 
 ## 8.3.5
 
