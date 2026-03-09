@@ -13,6 +13,12 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Removed 14 deprecated classes
 
+## 8.3.6
+
+### Fixed
+
+- Fixed the `LightningBoltIgnitionMixin` runtime injection on Fabric, Forge, and NeoForge for 1.21.10
+
 ## 9.0.5
 
 ### Fixed

@@ -4,8 +4,8 @@ import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import com.iamkaf.amber.event.internal.CommonEventHooks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,11 +17,11 @@ public abstract class LightningBoltIgnitionMixin {
             method = "spawnFire",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
+                    target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
                     ordinal = 0
             )
     )
-    private boolean amber$onPrimaryLightningFire(ServerLevel level, BlockPos pos, BlockState state) {
+    private boolean amber$onPrimaryLightningFire(Level level, BlockPos pos, BlockState state) {
         boolean result = level.setBlockAndUpdate(pos, state);
         if (result) {
             CommonEventHooks.fireBlockIgnite(
@@ -40,11 +40,11 @@ public abstract class LightningBoltIgnitionMixin {
             method = "spawnFire",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
+                    target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
                     ordinal = 1
             )
     )
-    private boolean amber$onSecondaryLightningFire(ServerLevel level, BlockPos pos, BlockState state) {
+    private boolean amber$onSecondaryLightningFire(Level level, BlockPos pos, BlockState state) {
         boolean result = level.setBlockAndUpdate(pos, state);
         if (result) {
             CommonEventHooks.fireBlockIgnite(
