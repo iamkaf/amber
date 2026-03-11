@@ -1,5 +1,5 @@
 plugins {
-    id 'multiloader-common'
+    id 'com.iamkaf.multiloader.common'
     id 'net.neoforged.moddev'
 }
 
@@ -24,18 +24,3 @@ dependencies {
     implementation libs.gson
 }
 
-configurations {
-    commonJava {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-    commonResources {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-}
-
-artifacts {
-    commonJava sourceSets.main.java.sourceDirectories.singleFile
-    commonResources sourceSets.main.resources.sourceDirectories.files
-}
