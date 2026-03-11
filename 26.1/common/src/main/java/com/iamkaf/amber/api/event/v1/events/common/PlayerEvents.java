@@ -21,7 +21,7 @@ public class PlayerEvents {
      * <p>
      *
      * <p>
-     * It is invoked from {@link Player#interactOn(Entity, InteractionHand)} before the target
+     * It is invoked from the player entity interaction path before the target
      * entity's own interaction logic is executed.
      * </p>
      *

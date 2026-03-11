@@ -1,32 +1,16 @@
 plugins {
-    id 'multiloader-loader'
+    id 'com.iamkaf.multiloader.platform'
     id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
-    id "com.hypherionmc.modutils.modpublisher"
 }
 
 dependencies {
-    // Minecraft version - NO mappings line needed for unobfuscated 26.1
     minecraft libs.minecraft
-    
-    // HACK: Loom 1.15 creates an ASSETS-ONLY merged jar for unobfuscated 26.1! 
-    // The game code is missing! This is a confirmed Loom bug that will be fixed in 1.16.
-    // DO NOT REMOVE - runtime will fail with "couldn't locate the game" without these!
-    // Issue: https://github.com/FabricMC/fabric-loom/issues (search "unobfuscated 26.1")
     runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-common-deobf/26.1-snapshot-6/minecraft-common-deobf-26.1-snapshot-6.jar')
     runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-clientonly-deobf/26.1-snapshot-6/minecraft-clientonly-deobf-26.1-snapshot-6.jar')
-    
-    // Fabric Loader and API - use implementation for unobfuscated versions
     implementation libs.fabric.loader
     implementation libs.fabric.api
-    
-    // Common module - don't exclude Minecraft, let Loom handle duplicates
-    implementation(project(':common'))
 }
 
-//sourceSets.main.resources.srcDir('src/generated/resources')
-
-// Disable javadoc for Fabric module - it has issues finding Minecraft classes
-// in the multiloader setup with unobfuscated 26.1
 tasks.withType(Javadoc) {
     enabled = false
 }
@@ -39,17 +23,16 @@ fabricApi {
 }
 
 loom {
-    // Access widener for exposing protected members
-    // Note: For unobfuscated 26.1, access wideners work differently
-    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    def modId = project.findProperty('mod.id')
+    def aw = project(':common').file("src/main/resources/${modId}.accesswidener")
     if (aw.exists()) {
         accessWidenerPath.set(aw)
     }
-    
+
     mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
+        defaultRefmapName.set("${modId}.refmap.json")
     }
-    
+
     runs {
         client {
             client()
@@ -62,79 +45,6 @@ loom {
             setConfigName('Fabric Server')
             ideConfigGenerated(true)
             runDir('runs/server')
-        }
-    }
-}
-
-publisher {
-    // Setup the required API keys. You only need to define the keys for
-    // the platforms you plan on uploading to
-    apiKeys {
-        // Modrinth Token
-        modrinth System.getenv("MODRINTH_TOKEN")
-        // Curseforge Token
-        curseforge System.getenv("CURSEFORGE_TOKEN")
-    }
-
-    // Enable Debug mode. When enabled, no files will actually be uploaded
-    setDebug(Boolean.valueOf(dry_run))
-
-    // Curseforge Project ID
-    setCurseID(curse_id)
-
-    // Modrinth Project ID
-    setModrinthID(modrinth_id)
-
-    // Type of release. beta, alpha or release
-    // You can also use VersionType.BETA, VersionType.ALPHA or VersionType.RELEASE
-    setVersionType(release_type)
-
-    setChangelog(extractHeaderLatestFooterFromChangelog(file('../../changelog.md').text))
-
-    // Required for Modrinth/GitHub
-    setProjectVersion(rootProject.version)
-
-    // Fancy display name for the upload.
-    // Will default to the project version if not set
-    setDisplayName("$mod_id-$project.name-$project.version")
-
-    // The supported game versions
-    setGameVersions(game_versions.split(','))
-
-    // The modloaders your upload supports.
-    // This can also be an Enum from ModLoader,
-    // like setLoaders(ModLoader.FABRIC, ModLoader.FORGE)
-    setLoaders("fabric")
-
-    // The new Curseforge Environment tag. Optional
-    // Valid values are "server", "client" or "both"
-    // You can also use CurseEnvironment.BOTH, or CurseEnvironment.SERVER or CurseEnvironment.CLIENT
-    setCurseEnvironment(mod_environment)
-
-    // Upload the release, but keep it "private" until you are ready
-    // Unreleased feature on CurseForge, working on Modrinth
-    setIsManualRelease(false)
-
-    // The file to be uploaded. This can be a file, task, or string.
-    // setArtifact("build/libs/mymod.jar")
-    // setArtifact(jar.getArchiveFile().get())
-    // If this is a task, the task specified will be executed before publishing
-    setArtifact("build/libs/${mod_id}-${project.name}-${project.version}.jar")
-    setDisableEmptyJarCheck(false)
-
-    // Add supported java versions. Currently only used by CurseForge
-    // Supports anything that can be parsed using JavaVersion.toVersion()
-    setJavaVersions(JavaVersion.VERSION_21, JavaVersion.VERSION_22)
-
-    if (mod_modrinth_depends?.trim()) {
-        modrinthDepends {
-            required(mod_modrinth_depends.split(','))
-        }
-    }
-
-    if (mod_curse_depends?.trim()) {
-        curseDepends {
-            required(mod_curse_depends.split(','))
         }
     }
 }
