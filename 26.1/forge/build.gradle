@@ -1,23 +1,14 @@
 plugins {
     id 'com.iamkaf.multiloader.forge'
-    id 'org.spongepowered.mixin'
-}
-
-mixin {
-    config("${mod_id}.mixins.json")
-    config("${mod_id}.forge.mixins.json")
 }
 jar {
     manifest {
-        attributes["MixinConfigs"] = "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+        def modId = project.findProperty('mod.id')
+        attributes["MixinConfigs"] = "${modId}.mixins.json,${modId}.forge.mixins.json"
     }
 }
 
 dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-}
-
-minecraft {
-    reobf = false
 }

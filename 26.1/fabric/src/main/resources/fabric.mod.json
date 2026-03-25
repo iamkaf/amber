@@ -28,9 +28,6 @@
         "fabric-api": "*",
         "minecraft": "*",
         "java": ">=${java_version}"
-    },
-    "suggests": {
-        "modmenu": ">=${mod_menu_version}"
     }
 }
   

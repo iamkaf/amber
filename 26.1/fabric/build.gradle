@@ -1,50 +1,9 @@
 plugins {
-    id 'com.iamkaf.multiloader.platform'
-    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
+    id 'com.iamkaf.multiloader.fabric'
 }
 
 dependencies {
-    minecraft libs.minecraft
-    runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-common-deobf/26.1-snapshot-6/minecraft-common-deobf-26.1-snapshot-6.jar')
-    runtimeOnly files(gradle.gradleUserHomeDir.toString() + '/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-clientonly-deobf/26.1-snapshot-6/minecraft-clientonly-deobf-26.1-snapshot-6.jar')
-    implementation libs.fabric.loader
     implementation libs.fabric.api
 }
 
-tasks.withType(Javadoc) {
-    enabled = false
-}
-
-fabricApi {
-    configureDataGeneration {
-        client = true
-        outputDirectory = file('../common/src/main/generated')
-    }
-}
-
-loom {
-    def modId = project.findProperty('mod.id')
-    def aw = project(':common').file("src/main/resources/${modId}.accesswidener")
-    if (aw.exists()) {
-        accessWidenerPath.set(aw)
-    }
-
-    mixin {
-        defaultRefmapName.set("${modId}.refmap.json")
-    }
-
-    runs {
-        client {
-            client()
-            setConfigName('Fabric Client')
-            ideConfigGenerated(true)
-            runDir('runs/client')
-        }
-        server {
-            server()
-            setConfigName('Fabric Server')
-            ideConfigGenerated(true)
-            runDir('runs/server')
-        }
-    }
-}
+enableCommonFabricDatagen.call()

@@ -464,7 +464,7 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendMessage(Player player, Component message) {
-        player.displayClientMessage(message, false);
+        player.sendSystemMessage(message);
     }
 
     /**
@@ -474,7 +474,7 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendActionBarMessage(Player player, Component message) {
-        player.displayClientMessage(message, true);
+        player.sendOverlayMessage(message);
     }
 
     /**
@@ -484,7 +484,7 @@ public final class PlayerFunctions {
      * @param message The action bar message to send.
      */
     public static void sendActionBar(Player player, Component message) {
-        player.displayClientMessage(message, true);
+        player.sendOverlayMessage(message);
     }
 
     /**
