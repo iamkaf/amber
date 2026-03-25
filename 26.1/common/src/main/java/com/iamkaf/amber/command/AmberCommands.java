@@ -34,7 +34,7 @@ public class AmberCommands {
                                     .append(" - Version: " + modInfo.version() + "\n")
                                     .append(" - Platform: " + Platform.getPlatformName() + "\n")
                                     // FIXME: Kaf PLEASE find a way to get this number automatically omg PLEASE
-                                    .append(" - Minecraft: 1.21.11" + "\n")
+                                    .append(" - Minecraft: 26.1" + "\n")
                                     .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
                                             "Not " + "Initialized") + "\n")
                                     .append("Mixins: \n");

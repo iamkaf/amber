@@ -4,7 +4,7 @@ import com.iamkaf.amber.Constants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -67,8 +67,8 @@ public final class ClientFunctions {
      * @param y       the y-coordinate where to start writing.
      * @param color   the color to use for rendering the text (specify an alpha value, or it will be invisible).
      */
-    public static void renderText(GuiGraphics context, Font font, Component message, int x, int y, int color) {
-        context.drawString(font, message, x, y, color);
+    public static void renderText(GuiGraphicsExtractor context, Font font, Component message, int x, int y, int color) {
+        context.text(font, message, x, y, color);
     }
 
     /**
@@ -79,7 +79,7 @@ public final class ClientFunctions {
      * @param x           The x-coordinate for rendering the tooltip.
      * @param y           The y-coordinate for rendering the tooltip.
      */
-    public static void renderTooltip(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
+    public static void renderTooltip(GuiGraphicsExtractor guiGraphics, ItemStack stack, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
 
         if (mc == null) {
@@ -97,7 +97,7 @@ public final class ClientFunctions {
                 .map(ClientTooltipComponent::create)
                 .toList();
 
-        guiGraphics.renderTooltip(
+        guiGraphics.tooltip(
                 mc.font,
                 tooltipComponents,
                 x,
@@ -219,7 +219,7 @@ public final class ClientFunctions {
      * </code></pre>
      */
     public static final class TextWriter {
-        private final GuiGraphics context;
+        private final GuiGraphicsExtractor context;
         private final Font font;
 
         private int cursorX = 0; // Current cursor X position
@@ -234,7 +234,7 @@ public final class ClientFunctions {
          * @param context the GuiGraphics context to draw text
          * @param font    the Font renderer
          */
-        public TextWriter(GuiGraphics context, Font font) {
+        public TextWriter(GuiGraphicsExtractor context, Font font) {
             this.context = context;
             this.font = font;
         }
@@ -247,7 +247,7 @@ public final class ClientFunctions {
          * @param x       the initial X coordinate for the cursor
          * @param y       the initial Y coordinate for the cursor
          */
-        public TextWriter(GuiGraphics context, Font font, int x, int y) {
+        public TextWriter(GuiGraphicsExtractor context, Font font, int x, int y) {
             this(context, font);
             this.cursorX = x;
             this.cursorY = y;

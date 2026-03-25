@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,13 +49,12 @@ public class LevelRendererMixin {
             LevelRenderState levelRenderState,
             CallbackInfo ci
     ) {
-        // Only fire on the non-translucent pass to avoid double firing
-        if (translucentPass) {
+        // Get the block outline render state from levelRenderState
+        if (levelRenderState.blockOutlineRenderState == null) {
             return;
         }
 
-        // Get the block outline render state from levelRenderState
-        if (levelRenderState.blockOutlineRenderState == null) {
+        if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
 

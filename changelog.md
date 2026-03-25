@@ -13,6 +13,16 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Removed 14 deprecated classes
 
+### Added
+
+- Ported Amber to Minecraft **26.1** on Fabric and NeoForge
+- Kept the shared HUD and block outline rendering hooks working on the `26.1` client rendering stack
+
+### Changed
+
+- Amber `26.1` now targets Java **25**
+- Forge support for `26.1` is temporarily disabled while the Forge toolchain work is still in progress
+
 ## 9.0.5
 
 ### Fixed

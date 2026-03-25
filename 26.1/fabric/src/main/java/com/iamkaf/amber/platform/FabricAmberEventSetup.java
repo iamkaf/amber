@@ -3,15 +3,18 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
+import com.iamkaf.amber.Constants;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -27,10 +30,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.function.Consumer;
 
@@ -170,8 +176,33 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
-        HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
-            HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta);
+        HudElementRegistry.addLast(
+                Identifier.fromNamespaceAndPath(Constants.MOD_ID, "render_hud"),
+                (guiGraphics, tickDelta) -> HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta)
+        );
+        LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, blockOutlineState) -> {
+            if (!(net.minecraft.client.Minecraft.getInstance().hitResult instanceof BlockHitResult blockHitResult)) {
+                return true;
+            }
+
+            if (blockHitResult.getType() == HitResult.Type.MISS) {
+                return true;
+            }
+
+            var level = net.minecraft.client.Minecraft.getInstance().level;
+            if (level == null) {
+                return true;
+            }
+
+            InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+                    context.gameRenderer().getMainCamera(),
+                    context.bufferSource(),
+                    context.poseStack(),
+                    blockHitResult,
+                    blockOutlineState.pos(),
+                    level.getBlockState(blockOutlineState.pos())
+            );
+            return result == InteractionResult.PASS;
         });
         ClientTickEvents.START_CLIENT_TICK.register(minecraft -> {
             com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
