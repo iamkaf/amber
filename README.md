@@ -49,7 +49,6 @@ Each version directory follows the same layout:
 
 - 1.20.1 — ✅ Supported (Fabric + Forge)
 - 1.21.1 — ✅ Supported
-- 1.21.10 — ✅ Supported
 - 1.21.11 — ✅ Supported (Forge temporarily disabled; FG7 migration planned)
 - 26.1 — 🚧 Placeholder (does not compile yet)
 
