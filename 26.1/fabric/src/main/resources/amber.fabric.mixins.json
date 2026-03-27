@@ -17,6 +17,7 @@
     "TamableAnimalMixin"
   ],
   "client": [
+    "LevelRendererMixin",
     "MouseHandlerMixin"
   ],
   "server": [],
