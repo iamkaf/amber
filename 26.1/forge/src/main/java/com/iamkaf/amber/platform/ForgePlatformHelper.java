@@ -3,16 +3,13 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.util.Env;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.fml.loading.LoadingModList;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ForgePlatformHelper implements IPlatformHelper {
@@ -24,8 +21,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isModLoaded(String modId) {
-
-        return ModList.get().isLoaded(modId);
+        return LoadingModList.getModFileById(modId) != null;
     }
 
     @Override
@@ -56,20 +52,23 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public Collection<String> getModIds() {
-        return ModList.get().getMods().stream().map(IModInfo::getModId).collect(Collectors.toList());
+        return LoadingModList.getMods().stream()
+                .map(net.minecraftforge.fml.loading.moddiscovery.ModInfo::getModId)
+                .collect(Collectors.toList());
     }
 
     @Override
     public @Nullable com.iamkaf.amber.api.platform.v1.ModInfo getModInfo(String modId) {
-        Optional<ModContainer> maybeContainer =
-                ModList.get().getLoadedMods().stream().filter(c -> c.getModId().equals(modId)).findFirst();
-        if (maybeContainer.isPresent()) {
-            ModContainer container = maybeContainer.get();
+        net.minecraftforge.fml.loading.moddiscovery.ModInfo maybeInfo = LoadingModList.getMods().stream()
+                .filter(c -> c.getModId().equals(modId))
+                .findFirst()
+                .orElse(null);
+        if (maybeInfo != null) {
             return new ModInfo(
-                    container.getModId(),
-                    container.getModInfo().getDisplayName(),
-                    container.getModInfo().getVersion().toString(),
-                    container.getModInfo().getDescription()
+                    maybeInfo.getModId(),
+                    maybeInfo.getDisplayName(),
+                    maybeInfo.getVersion().toString(),
+                    maybeInfo.getDescription()
             );
         }
         return null;

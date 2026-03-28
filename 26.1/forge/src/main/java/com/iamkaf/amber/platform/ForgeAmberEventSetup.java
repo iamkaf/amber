@@ -68,7 +68,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerCommon() {
         LootTableLoadEvent.BUS.addListener(EventHandlerCommon::onLootTableEvent);
-        PlayerInteractEvent.EntityInteract.BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
+        PlayerInteractEvent.EntityInteractSpecific.BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
         RegisterCommandsEvent.BUS.addListener(EventHandlerCommon::onCommandRegistration);
         EntityJoinLevelEvent.BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
         LivingDeathEvent.BUS.addListener(EventHandlerCommon::onLivingDeath);
@@ -134,7 +134,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             LootEvents.MODIFY.invoker().modify(event.getName(), lootPool -> event.getTable().addPool(lootPool.build()));
         }
 
-        public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
                     .interact(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
 
@@ -319,8 +319,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
          */
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
             // Add items from TabBuilder if this is a custom tab
-            com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder = 
-                com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().location());
+            com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder =
+                com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().identifier());
             if (tabBuilder != null) {
                 for (var itemSupplier : tabBuilder.getItems()) {
                     event.accept(itemSupplier.get());
