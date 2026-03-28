@@ -67,7 +67,7 @@ public final class CreativeModeTabRegistry {
      */
     public static RegistrySupplier<CreativeModeTab> register(TabBuilder builder) {
         TAB_BUILDERS.put(builder.getId(), builder);
-        return com.iamkaf.amber.api.registry.v1.RegistrarManager.get(Constants.MOD_ID)
+        return com.iamkaf.amber.api.registry.v1.RegistrarManager.get(builder.getId().getNamespace())
             .get(Registries.CREATIVE_MODE_TAB)
             .register(builder.getId(), builder::build);
     }
