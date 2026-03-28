@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 10.0.2
+
+### Fixed
+
+- Fixed creative tab registration namespace on 26.1
+
 ## 10.0.1
 
 ### Fixed
