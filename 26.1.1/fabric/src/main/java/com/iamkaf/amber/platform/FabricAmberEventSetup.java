@@ -131,10 +131,10 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
                     @Override
                     public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        // For unobfuscated 26.1, CreativeModeTab.TabVisibility is protected
+                        // For unobfuscated 26.x, CreativeModeTab.TabVisibility is protected
                         // We can only use the simple accept(stack) which defaults to PARENT_AND_SEARCH_TABS
                         // or accept(stack, item) which also defaults to PARENT_AND_SEARCH_TABS
-                        // The visibility parameter is currently ignored due to Minecraft 26.1 access restrictions
+                        // The visibility parameter is currently ignored due to Minecraft 26.x access restrictions
                         output.accept(stack);
                     }
                 });
@@ -156,9 +156,9 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
                     @Override
                     public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        // For unobfuscated 26.1, CreativeModeTab.TabVisibility is protected
+                        // For unobfuscated 26.x, CreativeModeTab.TabVisibility is protected
                         // We can only use the simple accept(stack) which defaults to PARENT_AND_SEARCH_TABS
-                        // The visibility parameter is currently ignored due to Minecraft 26.1 access restrictions
+                        // The visibility parameter is currently ignored due to Minecraft 26.x access restrictions
                         output.accept(stack);
                     }
                 });
