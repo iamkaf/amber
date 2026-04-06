@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * A public interface that mirrors the functionality of CreativeModeTab.Output.
  * <p>
- * This interface exists because CreativeModeTab.Output became protected in Minecraft 26.1,
+ * This interface exists because CreativeModeTab.Output became protected in Minecraft 26.x,
  * making it impossible to use directly in public APIs. This interface provides the same
  * functionality and is implemented by platform-specific adapters.
  *

@@ -229,7 +229,7 @@ public class TabBuilder {
 
         builder.title(title);
         builder.icon(icon);
-        // Note: displayItems is not used here because CreativeModeTab.Output is protected in 26.1
+        // Note: displayItems is not used here because CreativeModeTab.Output is protected in 26.x
         // Items are added via the MODIFY_ENTRIES event in platform-specific implementations
 
         if (alignedRight) {
