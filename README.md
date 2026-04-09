@@ -33,7 +33,7 @@ amber/
 ├── 1.21.1/           # Minecraft 1.21.1
 ├── 1.21.10/          # Minecraft 1.21.10
 ├── 1.21.11/          # Minecraft 1.21.11
-├── 26.1.1/           # Minecraft 26.1.1
+├── 26.1.2/           # Minecraft 26.1.2
 ├── docs/             # Documentation site (VitePress)
 └── README.md         # This file
 ```
@@ -50,7 +50,7 @@ Each version directory follows the same layout:
 - 1.20.1 — ✅ Supported (Fabric + Forge)
 - 1.21.1 — ✅ Supported
 - 1.21.11 — ✅ Supported (Forge temporarily disabled; FG7 migration planned)
-- 26.1.1 — active (`26.1.1/`)
+- 26.1.2 — active (`26.1.2/`)
 
 ## 🛠️ Building
 
