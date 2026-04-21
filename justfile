@@ -16,7 +16,7 @@ projects:
   @./gradlew projects --console=plain
 
 clean-generated:
-  @rm -rf build common/versions fabric/versions forge/versions neoforge/versions
+  @rm -rf build versions/*/build common/versions fabric/versions forge/versions neoforge/versions
 
 run first="" second="" *rest:
   @if [ -z "{{first}}" ]; then \
