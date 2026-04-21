@@ -1,0 +1,38 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://fabricmc.net/",
+        "sources": "https://github.com/FabricMC/fabric-example-mod"
+    },
+    "license": "${license}",
+    "icon": "icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.iamkaf.amber.AmberFabric"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": "*",
+        "fabric-api-base": "*",
+        "fabric-events-interaction-v0": "*",
+        "fabric-key-binding-api-v1": "*",
+        "fabric-lifecycle-events-v1": "*",
+        "fabric-loot-tables-v1": "*",
+        "fabric-networking-api-v1": "*",
+        "fabric-rendering-v1": "*",
+        "minecraft": "*",
+        "java": ">=${java_version}"
+    }
+}

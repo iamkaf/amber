@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.iamkaf.amber.mixin",
+  "compatibilityLevel": "${mixin_compat_common}",
+  "mixins": [],
+  "client": [
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
