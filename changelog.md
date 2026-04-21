@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.0.0
+
+### Changed
+
+- Unified Amber on the branch-based Stonecutter layout used by the rest of the workspace.
+- Standardized the current Amber release line as `11.0.0+<mc>` across all supported Minecraft versions.
+
+### Removed
+
+- Removed the dead Gson-backed config API and the stale flat per-version project roots.
+
+### Fixed
+
+- Restored bounded boot-check coverage on the legacy Forge `1.18` and `1.18.1` lines.
+- Fixed the modern Fabric `Player#drop` mixin seam for `1.21.5+`.
+
 ## 10.0.2
 
 ### Fixed
