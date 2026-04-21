@@ -16,7 +16,6 @@ jar {
 
 dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-    compileOnly 'org.jetbrains:annotations:24.1.0'
     if (useLegacy1171To1182ForgeRunHack) {
         runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
     }
