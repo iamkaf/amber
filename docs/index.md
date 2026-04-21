@@ -44,6 +44,8 @@ features:
 
 ---
 
+> These docs are for Amber consumers and API usage. For the repo's build, release, and publishing workflow, use the root `README.md` and the live `justfile` in the GitHub repo.
+
 ## Documentation Versions
 
 ::: tip Choose Your Amber Version
