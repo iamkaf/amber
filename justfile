@@ -46,7 +46,7 @@ run first="" second="" *rest:
     local version="$1"; \
     shift; \
     local props="versions/$version/gradle.properties"; \
-    local java_version sdkman_dir best_match java_home; \
+    local java_version sdkman_dir best_match java_home use_configure_on_demand task_arg; \
     if [ ! -f "$props" ]; then \
       echo "Version $version not found."; \
       exit 1; \
@@ -64,7 +64,18 @@ run first="" second="" *rest:
         export PATH="$JAVA_HOME/bin:$PATH"; \
       fi; \
     fi; \
-    ./gradlew --configure-on-demand "$@" --console=plain; \
+    use_configure_on_demand=1; \
+    for task_arg in "$@"; do \
+      if [[ "$task_arg" != :* && "$task_arg" != -* ]]; then \
+        use_configure_on_demand=0; \
+        break; \
+      fi; \
+    done; \
+    if [ "$use_configure_on_demand" -eq 1 ]; then \
+      ./gradlew --configure-on-demand "$@" --console=plain; \
+    else \
+      ./gradlew "$@" --console=plain; \
+    fi; \
   }; \
   if [ -d "versions/$first" ]; then \
     version="$first"; \
