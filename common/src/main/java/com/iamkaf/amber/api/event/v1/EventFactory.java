@@ -1,7 +1,11 @@
 package com.iamkaf.amber.api.event.v1;
 
 import com.iamkaf.amber.event.EventFactoryImpl;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 
 import java.util.function.Function;
 
@@ -85,7 +89,11 @@ public final class EventFactory {
      * @return The Event instance.
      */
     public static <T> Event<T> createWithPhases(Class<? super T> type, Function<T[], T> invokerFactory,
+            //? if <1.21.11 {
+            /*ResourceLocation... defaultPhases) {*/
+            //?} else {
             Identifier... defaultPhases) {
+            //?}
         EventFactoryImpl.ensureContainsDefault(defaultPhases);
         EventFactoryImpl.ensureNoDuplicates(defaultPhases);
 

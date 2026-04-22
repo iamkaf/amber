@@ -2,7 +2,11 @@ package com.iamkaf.amber.api.networking.v1.examples;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.NetworkChannel;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -19,7 +23,13 @@ public class NetworkingExample {
     
     // Create a network channel - this works on all platforms automatically
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
+        //? if <=1.20.6 {
+        /*new ResourceLocation("amber", "example")*/
+        //?} else if <1.21.11 {
+        /*ResourceLocation.fromNamespaceAndPath("amber", "example")*/
+        //?} else {
         Identifier.fromNamespaceAndPath("amber", "example")
+        //?}
     );
     
     /**

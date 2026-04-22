@@ -1,5 +1,7 @@
 package com.iamkaf.amber.api.functions.v1;
 
+import net.minecraft.util.Mth;
+
 import java.util.Map;
 import java.util.Random;
 
@@ -67,7 +69,7 @@ public final class MathFunctions {
      * @return A clamped probability value from 0 to 1.
      */
     public static float clampProbability(float percent) {
-        return Math.clamp(percent, 0f, 1f);
+        return Mth.clamp(percent, 0f, 1f);
     }
 
     // ==================== RANDOM NUMBER OPERATIONS ====================
@@ -235,7 +237,7 @@ public final class MathFunctions {
      * @return The interpolated value.
      */
     public static double lerp(double a, double b, double t) {
-        return a + (b - a) * Math.clamp(t, 0.0, 1.0);
+        return a + (b - a) * Mth.clamp(t, 0.0, 1.0);
     }
 
     /**

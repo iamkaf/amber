@@ -37,13 +37,16 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public Env getEnvironment() {
-        // wat?
-        return switch (FabricLoader.getInstance().getEnvironmentType()) {
-            case CLIENT -> Env.CLIENT;
-            case SERVER -> Env.SERVER;
-            default -> throw new IllegalStateException("Unknown environment type: " + FabricLoader.getInstance()
-                    .getEnvironmentType());
-        };
+        switch (FabricLoader.getInstance().getEnvironmentType()) {
+            case CLIENT:
+                return Env.CLIENT;
+            case SERVER:
+                return Env.SERVER;
+            default:
+                throw new IllegalStateException(
+                        "Unknown environment type: " + FabricLoader.getInstance().getEnvironmentType()
+                );
+        }
     }
 
     @Override

@@ -11,11 +11,23 @@ import net.minecraft.network.FriendlyByteBuf;
 /**
  * Ping packet for Amber's networking diagnostics.
  * Sent from server to client to measure latency and connectivity.
- *
- * @param timestamp the timestamp when the ping was sent
- * @param message the message payload for debugging purposes
  */
-public record PingPacket(long timestamp, String message) implements Packet<PingPacket> {
+public final class PingPacket implements Packet<PingPacket> {
+    private final long timestamp;
+    private final String message;
+
+    public PingPacket(long timestamp, String message) {
+        this.timestamp = timestamp;
+        this.message = message;
+    }
+
+    public long timestamp() {
+        return this.timestamp;
+    }
+
+    public String message() {
+        return this.message;
+    }
     
     public static final PacketEncoder<PingPacket> ENCODER = (packet, buffer) -> {
         buffer.writeVarLong(packet.timestamp);

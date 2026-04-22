@@ -4,7 +4,11 @@ import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+//? if <=1.15.2 {
+/*import net.minecraft.world.entity.global.LightningBolt;*/
+//?} else {
 import net.minecraft.world.entity.LightningBolt;
+//?}
 
 /**
  * Events that occur during weather and environmental phenomena.

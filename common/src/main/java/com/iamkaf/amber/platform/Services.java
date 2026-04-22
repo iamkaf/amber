@@ -69,12 +69,18 @@ public class Services {
      * @throws NullPointerException if no service implementation is found
      */
     public static <T> T load(Class<T> clazz) {
-        ServiceLoader<T> services = ServiceLoader.load(clazz);
+        //? if >=1.18 {
+        final T loadedService = ServiceLoader.load(clazz)
+                .findFirst()
+                .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
+        //?} else {
+        /*ServiceLoader<T> services = ServiceLoader.load(clazz);
         java.util.Iterator<T> iterator = services.iterator();
         if (!iterator.hasNext()) {
             throw new NullPointerException("Failed to load service for " + clazz.getName());
         }
         final T loadedService = iterator.next();
+        *///?}
         Constants.LOG.debug("Loaded {} for service {}", loadedService, clazz);
         return loadedService;
     }

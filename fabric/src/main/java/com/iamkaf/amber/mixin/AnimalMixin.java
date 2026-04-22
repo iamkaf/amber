@@ -2,8 +2,13 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.AnimalEvents;
+//? if <=1.16.5 {
+/*import net.minecraft.world.entity.AgableMob;
+import net.minecraft.world.level.Level;*/
+//?} else {
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
+//?}
 import net.minecraft.world.entity.animal.Animal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,8 +19,13 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Animal.class)
 public abstract class AnimalMixin {
 
+    //? if <=1.16.5 {
+    /*@Inject(method = "spawnChildFromBreeding", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void onAnimalBreed(Level level, Animal partner, CallbackInfo ci, AgableMob baby) {*/
+    //?} else {
     @Inject(method = "spawnChildFromBreeding", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void onAnimalBreed(ServerLevel level, Animal partner, CallbackInfo ci, AgeableMob baby) {
+    //?}
         Animal parentA = (Animal) (Object) this;
 
         AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(

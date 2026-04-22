@@ -3,7 +3,9 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import com.mojang.brigadier.CommandDispatcher;
+//? if >1.20.4 {
 import net.minecraft.commands.CommandBuildContext;
+//?}
 import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,6 +34,9 @@ public interface ClientCommandEvents {
      * May not work on Fabric.
      */
     @ApiStatus.Experimental
+    //? if <=1.20.4 {
+    /*void register(CommandDispatcher<CommandSourceStack> dispatcher, Object registryAccess);*/
+    //?} else {
     void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess);
+    //?}
 }
-

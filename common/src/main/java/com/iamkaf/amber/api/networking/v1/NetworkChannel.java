@@ -1,6 +1,10 @@
 package com.iamkaf.amber.api.networking.v1;
 
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -28,7 +32,11 @@ public interface NetworkChannel {
      * @param channelId unique identifier for this channel
      * @return a new network channel instance
      */
+    //? if <1.21.11 {
+    /*static NetworkChannel create(ResourceLocation channelId) {*/
+    //?} else {
     static NetworkChannel create(Identifier channelId) {
+    //?}
         return NetworkChannelImpl.create(channelId);
     }
     
@@ -91,5 +99,9 @@ public interface NetworkChannel {
      * 
      * @return the channel identifier
      */
+    //? if <1.21.11 {
+    /*ResourceLocation getChannelId();*/
+    //?} else {
     Identifier getChannelId();
+    //?}
 }

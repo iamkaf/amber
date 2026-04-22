@@ -1,7 +1,11 @@
 package com.iamkaf.amber.api.event.v1;
 
 import com.iamkaf.amber.event.toposort.NodeSorting;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -13,7 +17,11 @@ public class ArrayBackedEvent<T> extends Event<T> {
     /**
      * Registered event phases.
      */
+    //? if <1.21.11 {
+    /*private final Map<ResourceLocation, EventPhaseData<T>> phases = new LinkedHashMap<>();*/
+    //?} else {
     private final Map<Identifier, EventPhaseData<T>> phases = new LinkedHashMap<>();
+    //?}
     /**
      * Phases sorted in the correct dependency order.
      */
@@ -37,7 +45,11 @@ public class ArrayBackedEvent<T> extends Event<T> {
     }
 
     @Override
+    //? if <1.21.11 {
+    /*public void register(ResourceLocation phaseIdentifier, T listener) {*/
+    //?} else {
     public void register(Identifier phaseIdentifier, T listener) {
+    //?}
         Objects.requireNonNull(phaseIdentifier, "Tried to register a listener for a null phase!");
         Objects.requireNonNull(listener, "Tried to register a null listener!");
 
@@ -47,7 +59,11 @@ public class ArrayBackedEvent<T> extends Event<T> {
         }
     }
 
+    //? if <1.21.11 {
+    /*private EventPhaseData<T> getOrCreatePhase(ResourceLocation id, boolean sortIfCreate) {*/
+    //?} else {
     private EventPhaseData<T> getOrCreatePhase(Identifier id, boolean sortIfCreate) {
+    //?}
         EventPhaseData<T> phase = phases.get(id);
 
         if (phase == null) {
@@ -87,7 +103,11 @@ public class ArrayBackedEvent<T> extends Event<T> {
     }
 
     @Override
+    //? if <1.21.11 {
+    /*public void addPhaseOrdering(ResourceLocation firstPhase, ResourceLocation secondPhase) {*/
+    //?} else {
     public void addPhaseOrdering(Identifier firstPhase, Identifier secondPhase) {
+    //?}
         Objects.requireNonNull(firstPhase, "Tried to add an ordering for a null phase.");
         Objects.requireNonNull(secondPhase, "Tried to add an ordering for a null phase.");
         if (firstPhase.equals(secondPhase))
