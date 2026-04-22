@@ -6,7 +6,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
+//? if <=1.16.1 {
+/*import net.minecraft.world.item.UseOnContext;*/
+//?} else {
 import net.minecraft.world.item.context.UseOnContext;
+//?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;

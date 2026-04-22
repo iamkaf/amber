@@ -3,7 +3,11 @@ package com.iamkaf.amber.api.event.v1.events.common;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.world.InteractionResult;
+//? if <=1.16.5 {
+/*import net.minecraft.world.entity.AgableMob;*/
+//?} else {
 import net.minecraft.world.entity.AgeableMob;
+//?}
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
@@ -90,6 +94,10 @@ public class AnimalEvents {
          * @param parentB the second parent animal
          * @param baby    the baby animal that was spawned
          */
+        //? if <=1.16.5 {
+        /*void onAnimalBreed(Animal parentA, Animal parentB, AgableMob baby);*/
+        //?} else {
         void onAnimalBreed(Animal parentA, Animal parentB, AgeableMob baby);
+        //?}
     }
 }

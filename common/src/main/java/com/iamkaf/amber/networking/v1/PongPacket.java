@@ -11,12 +11,29 @@ import net.minecraft.network.FriendlyByteBuf;
 /**
  * Pong packet for Amber's networking diagnostics.
  * Sent from client to server in response to a PingPacket.
- *
- * @param originalTimestamp the timestamp from the original ping packet
- * @param responseTimestamp the timestamp when the pong was created
- * @param message the message payload for debugging purposes
  */
-public record PongPacket(long originalTimestamp, long responseTimestamp, String message) implements Packet<PongPacket> {
+public final class PongPacket implements Packet<PongPacket> {
+    private final long originalTimestamp;
+    private final long responseTimestamp;
+    private final String message;
+
+    public PongPacket(long originalTimestamp, long responseTimestamp, String message) {
+        this.originalTimestamp = originalTimestamp;
+        this.responseTimestamp = responseTimestamp;
+        this.message = message;
+    }
+
+    public long originalTimestamp() {
+        return this.originalTimestamp;
+    }
+
+    public long responseTimestamp() {
+        return this.responseTimestamp;
+    }
+
+    public String message() {
+        return this.message;
+    }
     
     public static final PacketEncoder<PongPacket> ENCODER = (packet, buffer) -> {
         buffer.writeVarLong(packet.originalTimestamp);

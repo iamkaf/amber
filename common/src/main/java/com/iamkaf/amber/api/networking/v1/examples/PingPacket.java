@@ -8,7 +8,22 @@ import net.minecraft.network.FriendlyByteBuf;
  * Example ping packet demonstrating the new networking API.
  * This packet is sent from server to client to measure latency.
  */
-public record PingPacket(long timestamp, String message) implements Packet<PingPacket> {
+public final class PingPacket implements Packet<PingPacket> {
+    private final long timestamp;
+    private final String message;
+
+    public PingPacket(long timestamp, String message) {
+        this.timestamp = timestamp;
+        this.message = message;
+    }
+
+    public long timestamp() {
+        return this.timestamp;
+    }
+
+    public String message() {
+        return this.message;
+    }
     
     /**
      * Encodes this packet to the network buffer.

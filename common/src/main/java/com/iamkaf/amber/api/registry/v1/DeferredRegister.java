@@ -3,7 +3,11 @@ package com.iamkaf.amber.api.registry.v1;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -71,7 +75,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
+        return register(createId(modId, id), supplier);
     }
 
     /**
@@ -87,7 +91,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
+        return register(createId(modId, id), supplier);
     }
 
     /**
@@ -95,7 +99,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * has its {@code Properties} id set.
      */
     @SuppressWarnings("unchecked")
+    //? if <1.21.11 {
+    /*public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {*/
+    //?} else {
     public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
+    //?}
         Entry<T> entry = new Entry<>(id, (Supplier<T>) supplier);
         entries.add(entry);
         if (registered) {
@@ -111,7 +119,11 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * @param id       the full identifier of the entry
      * @param supplier a factory taking the entry key
      */
+    //? if <1.21.11 {
+    /*public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Function<ResourceKey<T>, ? extends R> supplier) {*/
+    //?} else {
     public <R extends T> RegistrySupplier<R> register(Identifier id, Function<ResourceKey<T>, ? extends R> supplier) {
+    //?}
         return register(id, (Supplier<? extends R>) () -> supplier.apply(ResourceKey.create(this.key, id)));
     }
 
@@ -143,11 +155,19 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
     }
 
     private class Entry<R> implements RegistrySupplier<R> {
+        //? if <1.21.11 {
+        /*private final ResourceLocation id;*/
+        //?} else {
         private final Identifier id;
+        //?}
         private final Supplier<R> supplier;
         private RegistrySupplier<R> value;
 
+        //? if <1.21.11 {
+        /*Entry(ResourceLocation id, Supplier<R> supplier) {*/
+        //?} else {
         Entry(Identifier id, Supplier<R> supplier) {
+        //?}
             this.id = id;
             this.supplier = supplier;
         }
@@ -166,12 +186,21 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public ResourceLocation getRegistryId() {
+            return getRegistrar().key().location();*/
+        //?} else {
         public Identifier getRegistryId() {
             return getRegistrar().key().identifier();
+        //?}
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public ResourceLocation getId() {*/
+        //?} else {
         public Identifier getId() {
+        //?}
             return id;
         }
 
@@ -180,4 +209,22 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             return (Registrar<R>) DeferredRegister.this.getRegistrar();
         }
     }
+
+    //? if <=1.20.6 {
+    /*private static ResourceLocation createId(String modId, String id) {
+        return new ResourceLocation(modId, id);
+    }
+    *///?}
+
+    //? if >1.20.6 && <1.21.11 {
+    /*private static ResourceLocation createId(String modId, String id) {
+        return ResourceLocation.fromNamespaceAndPath(modId, id);
+    }
+    *///?}
+
+    //? if >=1.21.11 {
+    private static Identifier createId(String modId, String id) {
+        return Identifier.fromNamespaceAndPath(modId, id);
+    }
+    //?}
 }

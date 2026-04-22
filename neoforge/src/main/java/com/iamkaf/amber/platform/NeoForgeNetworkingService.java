@@ -3,7 +3,11 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.networking.v1.PlatformNetworkChannel;
 import com.iamkaf.amber.networking.neoforge.NeoForgeNetworkChannelImpl;
 import com.iamkaf.amber.platform.services.INetworkingService;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.ArrayList;
@@ -17,7 +21,11 @@ public class NeoForgeNetworkingService implements INetworkingService {
     private final List<NeoForgeNetworkChannelImpl> channels = new ArrayList<>();
     
     @Override
+    //? if <1.21.11 {
+    /*public PlatformNetworkChannel createChannel(ResourceLocation channelId) {*/
+    //?} else {
     public PlatformNetworkChannel createChannel(Identifier channelId) {
+    //?}
         NeoForgeNetworkChannelImpl channel = new NeoForgeNetworkChannelImpl(channelId);
         channels.add(channel);
         return channel;

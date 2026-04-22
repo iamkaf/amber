@@ -42,7 +42,7 @@ public interface PacketContext {
      */
     default ServerPlayer getServerPlayer() {
         Player player = getPlayer();
-        return player instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+        return player instanceof ServerPlayer ? (ServerPlayer) player : null;
     }
     
     /**

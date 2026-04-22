@@ -1,7 +1,6 @@
 package com.iamkaf.amber.networking.neoforge;
 
 import com.iamkaf.amber.api.networking.v1.PacketContext;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -29,23 +28,47 @@ public class NeoForgePacketContext implements PacketContext {
     
     @Override
     public void execute(Runnable task) {
-        // In NeoForge, we need to ensure execution on the correct thread
         if (isClientSide) {
-            // Client-side execution
-            if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
-                net.minecraft.client.Minecraft.getInstance().execute(task);
-            } else {
-                // Fallback
-                task.run();
-            }
+            executeClient(task);
         } else {
-            // Server-side execution
-            if (player instanceof ServerPlayer serverPlayer && serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                serverLevel.getServer().execute(task);
-            } else {
-                // Fallback to immediate execution
-                task.run();
-            }
+            executeServer(task);
         }
     }
+
+    //? if <=1.21.8 {
+    /*private void executeClient(Runnable task) {
+        if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+            net.minecraft.client.Minecraft.getInstance().execute(task);
+        } else {
+            task.run();
+        }
+    }
+
+    private void executeServer(Runnable task) {
+        if (player != null && player.getServer() != null) {
+            player.getServer().execute(task);
+        } else {
+            task.run();
+        }
+    }
+    *///?}
+
+    //? if >1.21.8 {
+    private void executeClient(Runnable task) {
+        if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
+            net.minecraft.client.Minecraft.getInstance().execute(task);
+        } else {
+            task.run();
+        }
+    }
+
+    private void executeServer(Runnable task) {
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer
+                && serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            serverLevel.getServer().execute(task);
+        } else {
+            task.run();
+        }
+    }
+    //?}
 }

@@ -2,7 +2,11 @@ package com.iamkaf.amber.networking.v1;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.NetworkChannel;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,7 +19,13 @@ public class AmberNetworking {
     
     // Network channel for internal Amber networking
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
+        //? if <=1.20.6 {
+        /*new ResourceLocation(Constants.MOD_ID, "internal")*/
+        //?} else if <1.21.11 {
+        /*ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "internal")*/
+        //?} else {
         Identifier.fromNamespaceAndPath(Constants.MOD_ID, "internal")
+        //?}
     );
     
     // Latency tracking

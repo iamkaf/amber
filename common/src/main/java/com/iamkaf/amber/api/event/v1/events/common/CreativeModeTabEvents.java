@@ -2,10 +2,8 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.level.ItemLike;
 
 /**
  * Events related to creative mode tabs.

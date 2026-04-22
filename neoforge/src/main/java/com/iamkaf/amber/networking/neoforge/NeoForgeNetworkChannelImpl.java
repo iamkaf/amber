@@ -4,7 +4,11 @@ import com.iamkaf.amber.api.networking.v1.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -19,14 +23,26 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
+    //? if <1.21.11 {
+    /*private final ResourceLocation channelId;*/
+    //?} else {
     private final Identifier channelId;
+    //?}
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     private final ConcurrentMap<Class<?>, PayloadTypePair<?>> packetToPayloadTypes = new ConcurrentHashMap<>();
     private PayloadRegistrar registrar;
     private boolean initialized = false;
+    //? if <1.21.11 {
+    /*private static final ConcurrentMap<ResourceLocation, Boolean> registeredPayloads = new ConcurrentHashMap<>();*/
+    //?} else {
     private static final ConcurrentMap<Identifier, Boolean> registeredPayloads = new ConcurrentHashMap<>();
+    //?}
     
+    //? if <1.21.11 {
+    /*public NeoForgeNetworkChannelImpl(ResourceLocation channelId) {*/
+    //?} else {
     public NeoForgeNetworkChannelImpl(Identifier channelId) {
+    //?}
         this.channelId = channelId;
         // Note: PayloadRegistrar will be set later during RegisterPayloadHandlersEvent
     }
@@ -66,6 +82,16 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         Class<T> typedPacketClass = (Class<T>) packetClass;
         
         // Create separate packet types for each direction
+        //? if <1.21.11 {
+        /*ResourceLocation c2sPacketId = ResourceLocation.fromNamespaceAndPath(
+            channelId.getNamespace(), 
+            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_c2s"
+        );
+        ResourceLocation s2cPacketId = ResourceLocation.fromNamespaceAndPath(
+            channelId.getNamespace(), 
+            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_s2c"
+        );*/
+        //?} else {
         Identifier c2sPacketId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_c2s"
@@ -74,6 +100,7 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_s2c"
         );
+        //?}
         
         // Check if these payloads have already been registered
         if (registeredPayloads.putIfAbsent(c2sPacketId, true) != null || 
@@ -145,7 +172,7 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.c2sType);
         
         // Send to server using client connection
-        if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
+        if (isClientSide()) {
             net.minecraft.client.Minecraft.getInstance().getConnection().send(wrapper);
         } else {
             throw new IllegalStateException("sendToServer can only be called from client side");
@@ -213,16 +240,40 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
         
         // Send to all players on the server, excluding the specified player
-        if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
+        forEachOtherPlayer(except, wrapper);
+    }
+    
+    //? if <=1.21.8 {
+    /*private <T extends Packet<T>> void forEachOtherPlayer(ServerPlayer except, NeoForgePacketWrapper<T> wrapper) {
+        if (except.getServer() != null) {
+            for (ServerPlayer player : except.getServer().getPlayerList().getPlayers()) {
                 if (!player.equals(except)) {
-                    // Send to specific player using their connection
                     player.connection.send(wrapper);
                 }
             }
         }
     }
-    
+
+    private boolean isClientSide() {
+        try {
+            return net.neoforged.fml.loading.FMLEnvironment.dist.isClient();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    *///?}
+
+    //? if >1.21.8 {
+    private <T extends Packet<T>> void forEachOtherPlayer(ServerPlayer except, NeoForgePacketWrapper<T> wrapper) {
+        if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
+                if (!player.equals(except)) {
+                    player.connection.send(wrapper);
+                }
+            }
+        }
+    }
+
     private boolean isClientSide() {
         try {
             return net.neoforged.fml.loading.FMLEnvironment.getDist().isClient();
@@ -230,6 +281,7 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             return false;
         }
     }
+    //?}
     
     /**
      * Internal packet registration data.

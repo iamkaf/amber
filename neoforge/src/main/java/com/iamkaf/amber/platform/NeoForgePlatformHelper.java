@@ -26,11 +26,19 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         return ModList.get().isLoaded(modId);
     }
 
+    //? if <=1.21.8 {
+    /*@Override
+    public boolean isDevelopmentEnvironment() {
+
+        return !FMLLoader.isProduction();
+    }
+    *///?} else {
     @Override
     public boolean isDevelopmentEnvironment() {
 
         return !FMLLoader.getCurrent().isProduction();
     }
+    //?}
 
     @Override
     public Path getConfigDirectory() {
@@ -39,6 +47,27 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public Env getEnvironment() {
+        return getEnvironmentFromLoader();
+    }
+
+    //? if <=1.21.8 {
+    /*private Env getEnvironmentFromLoader() {
+        switch (FMLLoader.getDist()) {
+            case CLIENT -> {
+                return Env.CLIENT;
+            }
+            case DEDICATED_SERVER -> {
+                return Env.SERVER;
+            }
+            default -> {
+                throw new IllegalStateException("Unknown environment type: " + FMLLoader.getDist());
+            }
+        }
+    }
+    *///?}
+
+    //? if >1.21.8 {
+    private Env getEnvironmentFromLoader() {
         switch (FMLLoader.getCurrent().getDist()) {
             case CLIENT -> {
                 return Env.CLIENT;
@@ -51,6 +80,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
             }
         }
     }
+    //?}
 
     @Override
     public Collection<String> getModIds() {

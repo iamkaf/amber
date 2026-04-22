@@ -8,7 +8,28 @@ import net.minecraft.network.FriendlyByteBuf;
  * Example pong packet demonstrating the new networking API.
  * This packet is sent from client to server in response to a ping.
  */
-public record PongPacket(long originalTimestamp, long responseTimestamp, String message) implements Packet<PongPacket> {
+public final class PongPacket implements Packet<PongPacket> {
+    private final long originalTimestamp;
+    private final long responseTimestamp;
+    private final String message;
+
+    public PongPacket(long originalTimestamp, long responseTimestamp, String message) {
+        this.originalTimestamp = originalTimestamp;
+        this.responseTimestamp = responseTimestamp;
+        this.message = message;
+    }
+
+    public long originalTimestamp() {
+        return this.originalTimestamp;
+    }
+
+    public long responseTimestamp() {
+        return this.responseTimestamp;
+    }
+
+    public String message() {
+        return this.message;
+    }
     
     /**
      * Encodes this packet to the network buffer.

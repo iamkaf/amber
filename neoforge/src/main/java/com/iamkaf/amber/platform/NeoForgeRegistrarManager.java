@@ -7,7 +7,11 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+//? if <1.21.11 {
+/*import net.minecraft.resources.ResourceLocation;*/
+//?} else {
 import net.minecraft.resources.Identifier;
+//?}
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -49,9 +53,13 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public <R extends T> RegistrySupplier<R> register(ResourceLocation id, Supplier<? extends R> supplier) {*/
+        //?} else {
         public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
+        //?}
             DeferredHolder<T, R> holder = register.register(id.getPath(), supplier);
-            return new NeoForgeRegistrySupplier<>(key.identifier(), id, holder);
+            return new NeoForgeRegistrySupplier<>(registryId(), id, holder);
         }
 
         @Override
@@ -60,22 +68,54 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public Optional<Holder.Reference<T>> get(ResourceLocation id) {
+            return registry().get(id);*/
+        //?} else {
         public Optional<Holder.Reference<T>> get(Identifier id) {
             return registry().get(id);
+        //?}
         }
 
+        //? if <1.21.11 {
+        /*private ResourceLocation registryId() {
+            return key.location();*/
+        //?} else {
+        private Identifier registryId() {
+            return key.identifier();
+        //?}
+        }
+
+        //? if <1.21.11 {
+        /*@SuppressWarnings("unchecked")
+        private Registry<T> registry() {
+            return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());
+        }
+        *///?}
+
+        //? if >=1.21.11 {
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
             return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
         }
+        //?}
     }
 
     private static class NeoForgeRegistrySupplier<T, R extends T> implements RegistrySupplier<R> {
+        //? if <1.21.11 {
+        /*private final ResourceLocation registryId;
+        private final ResourceLocation id;*/
+        //?} else {
         private final Identifier registryId;
         private final Identifier id;
+        //?}
         private final DeferredHolder<T, R> holder;
 
+        //? if <1.21.11 {
+        /*NeoForgeRegistrySupplier(ResourceLocation registryId, ResourceLocation id, DeferredHolder<T, R> holder) {*/
+        //?} else {
         NeoForgeRegistrySupplier(Identifier registryId, Identifier id, DeferredHolder<T, R> holder) {
+        //?}
             this.registryId = registryId;
             this.id = id;
             this.holder = holder;
@@ -92,12 +132,20 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public ResourceLocation getRegistryId() {*/
+        //?} else {
         public Identifier getRegistryId() {
+        //?}
             return registryId;
         }
 
         @Override
+        //? if <1.21.11 {
+        /*public ResourceLocation getId() {*/
+        //?} else {
         public Identifier getId() {
+        //?}
             return id;
         }
     }
