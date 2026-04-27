@@ -101,6 +101,7 @@ public final class ClientFunctions {
             return;
         }
 
+        //? if >=1.21.6 {
         // converts a list of components to a list of ClientTooltipComponents
         List<ClientTooltipComponent> tooltipComponents = Screen.getTooltipFromItem(mc, stack)
                 .stream()
@@ -127,6 +128,8 @@ public final class ClientFunctions {
                 stack.get(DataComponents.TOOLTIP_STYLE)
         );*/
         //?}
+        //?} else
+        /*guiGraphics.renderTooltip(mc.font, stack, x, y);*/
     }
 
     // ==================== SMART TOOLTIP OPERATIONS ====================

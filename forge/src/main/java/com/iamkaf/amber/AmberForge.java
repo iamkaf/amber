@@ -10,7 +10,10 @@ public class AmberForge {
     public AmberForge(FMLJavaModLoadingContext ctx) {
         AmberInitializer.initialize(Constants.MOD_ID);
         // Store the event bus internally for Amber's use
+        //? if >=1.21.6
         AmberInitializer.setEventBus(Constants.MOD_ID, ctx.getModBusGroup());
+        //? if <1.21.6
+        /*AmberInitializer.setEventBus(Constants.MOD_ID, ctx.getModEventBus());*/
         
         // Register networking event listeners if needed in the future
         // This is a placeholder for potential future Forge networking event registration
