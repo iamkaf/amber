@@ -618,7 +618,10 @@ public final class WorldFunctions {
      * @return true if the position has the specified precipitation, false otherwise.
      */
     public static boolean hasPrecipitation(Level level, BlockPos position, Biome.Precipitation precipitation) {
+        //? if >=1.21.2
         return level.getBiome(position).value().getPrecipitationAt(position, level.getSeaLevel()) == precipitation;
+        //? if <1.21.2
+        /*return level.getBiome(position).value().getPrecipitationAt(position) == precipitation;*/
     }
 
     /**
@@ -691,7 +694,10 @@ public final class WorldFunctions {
      */
     private static final class BoundingBoxMerger {
         private static final Long2ObjectMap<Direction> DIRECTION_LOOKUP = Arrays.stream(Direction.values())
+                //? if >=1.21.2
                 .collect(Collectors.toMap(dir -> new BlockPos(dir.getUnitVec3i()).asLong(),
+                //? if <1.21.2
+                /*.collect(Collectors.toMap(dir -> new BlockPos(dir.getNormal()).asLong(),*/
                         dir -> dir,
                         (a, b) -> {
                             throw new IllegalStateException("Duplicate direction detected.");
@@ -751,7 +757,10 @@ public final class WorldFunctions {
          */
         private boolean tryCombineAdjacent(Vec3 center, AABB box) {
             for (Direction direction : Direction.values()) {
+                //? if >=1.21.2
                 Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getUnitVec3i()));
+                //? if <1.21.2
+                /*Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getNormal()));*/
                 AABB adjacentBox = positionToBox.get(adjacentCenter);
 
                 if (adjacentBox != null && isAligned(box, adjacentBox, direction)) {

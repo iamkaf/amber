@@ -12,6 +12,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+//? if <1.21.2
+/*import net.minecraft.world.item.ArmorItem;*/
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -265,10 +267,12 @@ public final class ItemFunctions {
         ItemStack[] items = ingredient.items()
                 .map(itemHolder -> itemHolder.value().getDefaultInstance())
                 .toArray(ItemStack[]::new);
-        //?} else {
+        //?} else if >=1.21.2 {
         /*ItemStack[] items = ingredient.items().stream()
                 .map(itemHolder -> itemHolder.value().getDefaultInstance())
                 .toArray(ItemStack[]::new);
+        *///?} else {
+        /*ItemStack[] items = ingredient.getItems();
         *///?}
 
         if (items.length == 1) {
@@ -542,7 +546,10 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isArmor(ItemStack stack) {
+        //? if >=1.21.2
         return stack.has(DataComponents.EQUIPPABLE);
+        //? if <1.21.2
+        /*return stack.getItem() instanceof ArmorItem;*/
     }
 
     /**
@@ -555,7 +562,10 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isArmor(Item item) {
+        //? if >=1.21.2
         return item.getDefaultInstance().has(DataComponents.EQUIPPABLE);
+        //? if <1.21.2
+        /*return item instanceof ArmorItem;*/
     }
 
     // ==================== ARMOR TIER OPERATIONS ====================

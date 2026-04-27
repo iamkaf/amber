@@ -2,6 +2,8 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
+//? if <1.21.2
+/*import com.mojang.blaze3d.vertex.VertexConsumer;*/
 import com.mojang.blaze3d.vertex.PoseStack;
 //? if <1.21.9
 /*import net.minecraft.client.Camera;*/
@@ -14,6 +16,8 @@ import net.minecraft.client.renderer.state.level.LevelRenderState;
 /*import net.minecraft.client.renderer.state.LevelRenderState;*/
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+//? if <1.21.2
+/*import net.minecraft.world.entity.Entity;*/
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -32,11 +36,24 @@ public class LevelRendererMixin {
     private Minecraft minecraft;
 
     @Inject(
+        //? if >=1.21.2
         method = "renderBlockOutline",
+        //? if <1.21.2
+        /*method = "renderHitOutline",*/
         at = @At("HEAD"),
         cancellable = true
     )
     private void onRenderBlockOutline(
+            //? if <1.21.2 {
+            /*PoseStack poseStack,
+            VertexConsumer vertexConsumer,
+            Entity entity,
+            double cameraX,
+            double cameraY,
+            double cameraZ,
+            BlockPos outlinePos,
+            BlockState outlineState,
+            *///?} else {
             //? if <1.21.9
             /*Camera camera,*/
             MultiBufferSource.BufferSource bufferSource,
@@ -44,8 +61,31 @@ public class LevelRendererMixin {
             boolean translucentPass,
             //? if >=1.21.9
             LevelRenderState levelRenderState,
+            //?}
             CallbackInfo ci
     ) {
+        //? if <1.21.2 {
+        /*if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+            return;
+        }
+
+        if (blockHitResult.getType() == HitResult.Type.MISS) {
+            return;
+        }
+
+        InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+                this.minecraft.gameRenderer.getMainCamera(),
+                this.minecraft.renderBuffers().bufferSource(),
+                poseStack,
+                blockHitResult,
+                outlinePos,
+                outlineState
+        );
+
+        if (result != InteractionResult.PASS) {
+            ci.cancel();
+        }
+        *///?} else {
         //? if >=1.21.9 {
         if (levelRenderState.blockOutlineRenderState == null) {
             return;
@@ -91,6 +131,7 @@ public class LevelRendererMixin {
         if (result != InteractionResult.PASS) {
             ci.cancel();
         }
+        //?}
     }
 
     static {
