@@ -46,70 +46,6 @@ Notes:
 - `just build-all` runs the root `./gradlew build`.
 - `boot-check` uses a bounded client run and checks the run log for the expected startup marker.
 
-## Release workflow
-
-The docs site is primarily consumer and API documentation. For actual Amber release work, use the repo root workflow here.
-
-Recommended release sequence:
-
-1. Update release notes in `changelog.md`.
-2. Build the full matrix:
-
-```bash
-just build-all
-```
-
-3. Run bounded runtime checks for the nodes touched by the release. Common Amber checks:
-
-```bash
-just boot-check 1.17.1-forge 25
-just boot-check 1.21.11-forge 60
-just boot-check 26.1.2-neoforge 90
-```
-
-4. Publish the target Minecraft line to Kaf Maven:
-
-```bash
-just run 26.1.2 publish
-```
-
-This publishes `common` plus every enabled loader for that Minecraft line to the configured Kaf Maven repository.
-
-5. Do any manual production-instance validation you need before storefront publishing.
-
-6. Publish to Modrinth and CurseForge for the target line:
-
-```bash
-just run 26.1.2 publishRelease
-```
-
-Useful publish variants:
-
-```bash
-# Publish one loader for one Minecraft line to Kaf Maven
-just run 26.1.2 neoforge publish
-
-# Dry-run storefront publishing for one Minecraft line
-just run 26.1.2 publishRelease -Ppublish.dry-run=true
-
-# Publish only one storefront for one Minecraft line
-just run 26.1.2 publishModrinth
-just run 26.1.2 publishCurseforge
-
-# Publish only one loader on one Minecraft line to one storefront
-just run 26.1.2 neoforge publishModrinth
-just run 26.1.2 neoforge publishCurseforge
-
-# Dry-run one loader on one Minecraft line
-just run 26.1.2 neoforge publishModrinth -Ppublish.dry-run=true
-```
-
-Notes:
-- `publishRelease` runs both CurseForge and Modrinth tasks for the enabled loaders on that line.
-- Repo default is currently `publish.dry-run=false` in `gradle.properties`, so pass `-Ppublish.dry-run=true` explicitly when you want a dry run.
-- If a release depends on updated shared artifacts such as `version-catalog` or `multiloader-conventions`, publish those first.
-- For the authoritative loader matrix, use `just list-nodes`.
-
 ## Build output
 
 Normal build outputs go under the active branch projects, for example:
@@ -127,7 +63,6 @@ Published docs:
 - https://iamkaf.github.io/amber/
 
 Some docs under `docs/v8/` still describe the older release line and older dependency coordinates. Treat the code and current build graph as the source of truth if docs and repo structure disagree.
-The docs site is aimed at Amber consumers. Release, build, and publishing operations should follow this README and the repo's live `justfile`/Gradle tasks.
 
 ## Development notes
 
