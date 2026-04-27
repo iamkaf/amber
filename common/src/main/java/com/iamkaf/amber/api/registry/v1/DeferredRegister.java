@@ -167,7 +167,10 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
 
         @Override
         public Identifier getRegistryId() {
+            //? if >=1.21.11
             return getRegistrar().key().identifier();
+            //? if <1.21.11
+            /*return getRegistrar().key().location();*/
         }
 
         @Override

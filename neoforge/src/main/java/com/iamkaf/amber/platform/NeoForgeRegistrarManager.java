@@ -51,7 +51,10 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
         @Override
         public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
             DeferredHolder<T, R> holder = register.register(id.getPath(), supplier);
+            //? if >=1.21.11
             return new NeoForgeRegistrySupplier<>(key.identifier(), id, holder);
+            //? if <1.21.11
+            /*return new NeoForgeRegistrySupplier<>(key.location(), id, holder);*/
         }
 
         @Override
@@ -66,7 +69,10 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
+            //? if >=1.21.11
             return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
+            //? if <1.21.11
+            /*return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());*/
         }
     }
 
