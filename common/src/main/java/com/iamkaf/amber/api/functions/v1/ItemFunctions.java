@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -500,7 +501,14 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(ItemStack stack) {
+        //? if >=1.21.5
         return stack.has(DataComponents.WEAPON);
+        //? if <1.21.5
+        /*return stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
+                .modifiers()
+                .stream()
+                .anyMatch(modifier -> modifier.attribute().equals(Attributes.ATTACK_DAMAGE)
+                        && modifier.modifier().amount() > 0.0D);*/
     }
 
     /**
@@ -512,7 +520,10 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(Item item) {
+        //? if >=1.21.5
         return item.getDefaultInstance().has(DataComponents.WEAPON);
+        //? if <1.21.5
+        /*return isWeapon(item.getDefaultInstance());*/
     }
 
     /**

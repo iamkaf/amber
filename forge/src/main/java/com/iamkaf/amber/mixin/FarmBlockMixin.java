@@ -26,9 +26,19 @@ public abstract class FarmBlockMixin {
     @Inject(method = "fallOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/FarmlandBlock;turnToDirt(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"), cancellable = true)
     //? if <26.1
     /*@Inject(method = "fallOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/FarmBlock;turnToDirt(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"), cancellable = true)*/
+    //? if >=1.21.5 {
     private void onFarmlandTrample(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance, CallbackInfo ci) {
+        handleFarmlandTrample(level, state, pos, entity, (float) fallDistance, ci);
+    }
+    //?} else {
+    /*private void onFarmlandTrample(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
+        handleFarmlandTrample(level, state, pos, entity, fallDistance, ci);
+    }
+    *///?}
+
+    private void handleFarmlandTrample(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
         InteractionResult result = FarmingEvents.FARMLAND_TRAMPLE.invoker().onFarmlandTrample(
-                level, pos, state, (float) fallDistance, entity
+                level, pos, state, fallDistance, entity
         );
 
         if (result != InteractionResult.PASS) {

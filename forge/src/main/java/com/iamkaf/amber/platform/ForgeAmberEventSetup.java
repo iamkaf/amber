@@ -350,7 +350,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static void onShieldBlock(ShieldBlockEvent event) {
             if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player) {
+                //? if >=1.21.5
                 net.minecraft.world.item.ItemStack shield = event.getBlockedWith();
+                //? if <1.21.5
+                /*net.minecraft.world.item.ItemStack shield = player.getUseItem();*/
                 if (!shield.isEmpty()) {
                     PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(
                         player, shield, event.getOriginalBlockedDamage(), event.getDamageSource()
