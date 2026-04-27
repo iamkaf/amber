@@ -35,7 +35,7 @@ public class TabBuilder {
     private Component title = Component.empty();
     private Supplier<ItemStack> icon = () -> ItemStack.EMPTY;
     private final List<Supplier<ItemLike>> items = new ArrayList<>();
-    private Identifier backgroundTexture = Identifier.withDefaultNamespace("textures/gui/container/creative_inventory/tab_items.png");
+    private Identifier backgroundTexture = defaultId("textures/gui/container/creative_inventory/tab_items.png");
     private boolean canScroll = true;
     private boolean showTitle = true;
     private boolean alignedRight = false;
@@ -45,6 +45,13 @@ public class TabBuilder {
 
     TabBuilder(Identifier id) {
         this.id = id;
+    }
+
+    private static Identifier defaultId(String path) {
+        //? if >=1.21
+        return Identifier.withDefaultNamespace(path);
+        //? if <1.21
+        /*return new Identifier("minecraft", path);*/
     }
 
     /**

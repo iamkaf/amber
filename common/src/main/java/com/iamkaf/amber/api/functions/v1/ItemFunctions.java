@@ -304,7 +304,7 @@ public final class ItemFunctions {
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
         var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<Identifier> added = new HashSet<>();
+        Set<Object> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
             if (!added.contains(mod.modifier().id())) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
@@ -339,7 +339,10 @@ public final class ItemFunctions {
         }
         var list = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         assert list != null;
+        //? if >=1.21
         return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));
+        //? if <1.21
+        /*return list.modifiers().stream().anyMatch(m -> m.modifier().name().equals(id.toString()));*/
     }
 
     /**

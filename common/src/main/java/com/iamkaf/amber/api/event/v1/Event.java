@@ -44,7 +44,14 @@ public abstract class Event<T> {
      * The identifier of the default phase.
      * Have a look at {@link EventFactory#createWithPhases} for an explanation of event phases.
      */
-    public static final Identifier DEFAULT_PHASE = Identifier.fromNamespaceAndPath("fabric", "default");
+    public static final Identifier DEFAULT_PHASE = id("fabric", "default");
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
+    }
 
     /**
      * Register a listener to the event for the specified phase.

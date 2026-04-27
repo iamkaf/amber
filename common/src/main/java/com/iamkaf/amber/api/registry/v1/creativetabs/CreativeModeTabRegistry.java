@@ -41,7 +41,14 @@ public final class CreativeModeTabRegistry {
      * @return A tab builder
      */
     public static TabBuilder builder(String id) {
-        return builder(Identifier.fromNamespaceAndPath(Constants.MOD_ID, id));
+        return builder(id(Constants.MOD_ID, id));
+    }
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
     }
     
     /**

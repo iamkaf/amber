@@ -155,7 +155,7 @@ public final class WorldFunctions {
      * @param sound The sound event to play.
      */
     public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound) {
-        level.playSound(null, position.x(), position.y(), position.z(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
+        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     /**
@@ -167,7 +167,7 @@ public final class WorldFunctions {
      * @param source The sound source category.
      */
     public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source) {
-        level.playSound(null, position.x(), position.y(), position.z(), sound, source, 1.0f, 1.0f);
+        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, 1.0f, 1.0f);
     }
 
     /**
@@ -180,7 +180,7 @@ public final class WorldFunctions {
      * @param volume The volume level (1.0 = normal volume).
      */
     public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source, float volume) {
-        level.playSound(null, position.x(), position.y(), position.z(), sound, source, volume, 1.0f);
+        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, 1.0f);
     }
 
     /**
@@ -194,7 +194,7 @@ public final class WorldFunctions {
      * @param pitch The pitch multiplier (1.0 = normal pitch).
      */
     public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
-        level.playSound(null, position.x(), position.y(), position.z(), sound, source, volume, pitch);
+        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, pitch);
     }
 
     /**
@@ -206,7 +206,7 @@ public final class WorldFunctions {
      * @param source The sound source category.
      */
     public static void playSoundAt(Level level, BlockPos position, Holder<SoundEvent> sound, SoundSource source) {
-        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, sound, source, 1.0f, 1.0f);
+        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, 1.0f, 1.0f);
     }
 
     /**
@@ -220,7 +220,14 @@ public final class WorldFunctions {
      * @param pitch The pitch multiplier (1.0 = normal pitch).
      */
     public static void playSoundAt(Level level, BlockPos position, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
-        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, sound, source, volume, pitch);
+        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, volume, pitch);
+    }
+
+    private static SoundEvent soundEvent(Holder<SoundEvent> sound) {
+        //? if >=1.21
+        return sound.value();
+        //? if <1.21
+        /*return sound.value();*/
     }
 
     // ==================== DIMENSION UTILITIES ====================
