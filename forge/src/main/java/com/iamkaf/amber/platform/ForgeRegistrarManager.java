@@ -25,7 +25,10 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> map = registers.computeIfAbsent(modId, m -> new HashMap<>());
         return (DeferredRegister<T>) map.computeIfAbsent(key, k -> {
             DeferredRegister<T> reg = DeferredRegister.create(key, modId);
+            //? if >=1.21.6
             reg.register(FMLJavaModLoadingContext.get().getModBusGroup());
+            //? if <1.21.6
+            /*reg.register(FMLJavaModLoadingContext.get().getModEventBus());*/
             return reg;
         });
     }

@@ -35,6 +35,8 @@ import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.event.GatherComponentsEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+//? if <1.21.6
+/*import net.minecraftforge.common.MinecraftForge;*/
 
 import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
@@ -68,6 +70,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
     @Override
     public void registerCommon() {
+        //? if >=1.21.6 {
         LootTableLoadEvent.BUS.addListener(EventHandlerCommon::onLootTableEvent);
         PlayerInteractEvent.EntityInteractSpecific.BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
         RegisterCommandsEvent.BUS.addListener(EventHandlerCommon::onCommandRegistration);
@@ -95,27 +98,71 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         // Shield block events
         ShieldBlockEvent.BUS.addListener(EventHandlerCommon::onShieldBlock);
+        //?} else {
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLootTableEvent);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onCommandRegistration);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLivingDeath);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLivingAttack);
+
+        // World events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onWorldLoad);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onWorldUnload);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onWorldSave);
+
+        // Weather events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLightningStrike);
+
+        // Block events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onBlockBreak);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onBlockPlace);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onBlockInteract);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onBlockClick);
+
+        // Animal events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onAnimalTame);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onAnimalBreed);
+
+        // Shield block events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onShieldBlock);*/
+        //?}
 
         // Creative mode tab events (register with high priority)
         //? if >=1.21.10
         BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
-        //? if <1.21.10
+        //? if >=1.21.6 && <1.21.10
         /*BuildCreativeModeTabContentsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerCommon::buildContents);*/
+        //? if <1.21.6
+        /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerCommon::buildContents);*/
 
         // Default item components event
+        //? if >=1.21.6
         GatherComponentsEvent.Item.BUS.addListener(EventHandlerCommon::onGatherComponents);
+        //? if <1.21.6
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onGatherComponents);*/
     }
 
     @Override
     public void registerClient() {
+        //? if >=1.21.6
         RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
+        //? if <1.21.6
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onCommandRegistration);*/
         // mod bus events
         //? if >=1.21.10
         RegisterKeyMappingsEvent.BUS.addListener(EventHandlerClient::onKeybindRegistration);
-        //? if <1.21.10
+        //? if >=1.21.6 && <1.21.10
         /*RegisterKeyMappingsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerClient::onKeybindRegistration);*/
+        //? if <1.21.6
+        /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerClient::onKeybindRegistration);*/
+        //? if >=1.21.6 {
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
+        //?} else {
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPre);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPost);*/
+        //?}
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
@@ -123,6 +170,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerServer() {
         // Server tick events
+        //? if >=1.21.6 {
         TickEvent.ServerTickEvent.Pre.BUS.addListener(EventHandlerServer::onServerTickEventPre);
         TickEvent.ServerTickEvent.Post.BUS.addListener(EventHandlerServer::onServerTickEventPost);
 
@@ -134,6 +182,19 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         // Item events
         ItemTossEvent.BUS.addListener(EventHandlerCommon::onItemDrop);
         EntityItemPickupEvent.BUS.addListener(EventHandlerCommon::onItemPickup);
+        //?} else {
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerServer::onServerTickEventPre);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerServer::onServerTickEventPost);
+
+        // Player lifecycle events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerJoin);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerLeave);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerRespawn);
+
+        // Item events
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onItemDrop);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onItemPickup);*/
+        //?}
     }
 
     static public class EventHandlerCommon {

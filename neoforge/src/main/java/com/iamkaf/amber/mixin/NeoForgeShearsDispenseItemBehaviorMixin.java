@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class NeoForgeShearsDispenseItemBehaviorMixin {
     @Redirect(
             method = "tryShearEntity",
+            require = 0,
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/neoforged/neoforge/common/IShearable;onSheared(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Ljava/util/List;"
