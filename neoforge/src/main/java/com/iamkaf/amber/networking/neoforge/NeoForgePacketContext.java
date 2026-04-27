@@ -32,7 +32,10 @@ public class NeoForgePacketContext implements PacketContext {
         // In NeoForge, we need to ensure execution on the correct thread
         if (isClientSide) {
             // Client-side execution
+            //? if >=1.21.9
             if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
+            //? if <1.21.9
+            /*if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {*/
                 net.minecraft.client.Minecraft.getInstance().execute(task);
             } else {
                 // Fallback
