@@ -90,16 +90,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             return result == InteractionResult.PASS; // Only allow damage if PASS is returned
         });
 
-        // Shield block events
-        ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
-            EntityEvent.AFTER_DAMAGE.invoker().afterDamage(entity, source, baseDamage, damageTaken, blocked);
-            if (entity instanceof net.minecraft.world.entity.player.Player player && blocked) {
-                net.minecraft.world.item.ItemStack shield = findBlockingShield(player);
-                if (!shield.isEmpty()) {
-                    PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, baseDamage, source);
-                }
-            }
-        });
+        // After-damage and shield block events are implemented by LivingEntityAfterDamageMixin.
 
         // Block events
         PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
@@ -266,28 +257,4 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
     }
 
-    /**
-     * Finds the shield a player is blocking with.
-     * @param player The player to check
-     * @return The shield ItemStack, or empty if not blocking with a shield
-     */
-    private static net.minecraft.world.item.ItemStack findBlockingShield(net.minecraft.world.entity.player.Player player) {
-        if (!player.isBlocking()) {
-            return net.minecraft.world.item.ItemStack.EMPTY;
-        }
-
-        // Check main hand first (most common)
-        net.minecraft.world.item.ItemStack mainHand = player.getMainHandItem();
-        if (mainHand.getItem() instanceof net.minecraft.world.item.ShieldItem) {
-            return mainHand;
-        }
-
-        // Check off hand
-        net.minecraft.world.item.ItemStack offHand = player.getOffhandItem();
-        if (offHand.getItem() instanceof net.minecraft.world.item.ShieldItem) {
-            return offHand;
-        }
-
-        return net.minecraft.world.item.ItemStack.EMPTY;
-    }
 }

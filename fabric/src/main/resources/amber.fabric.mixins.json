@@ -12,6 +12,7 @@
     "CropBlockMixin",
     "ItemEntityMixin",
     "LightningBoltMixin",
+    "LivingEntityAfterDamageMixin",
     "PlayerMixin",
     "ServerLevelMixin",
     "TamableAnimalMixin"

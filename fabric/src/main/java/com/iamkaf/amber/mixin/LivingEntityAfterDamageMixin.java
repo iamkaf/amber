@@ -1,0 +1,195 @@
+package com.iamkaf.amber.mixin;
+
+import com.iamkaf.amber.AmberMod;
+import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+@Mixin(LivingEntity.class)
+public abstract class LivingEntityAfterDamageMixin {
+    @Shadow
+    protected float lastHurt;
+
+    @Shadow
+    public abstract boolean isDeadOrDying();
+
+    @Unique
+    private boolean amber$afterDamagePending;
+
+    @Unique
+    private float amber$baseDamageTaken;
+
+    @Unique
+    private float amber$damageTaken;
+
+    @Unique
+    private boolean amber$blocked;
+
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At("HEAD")
+    )
+    private void amber$resetAfterDamageState(
+            //? if >=1.21.2
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        this.amber$afterDamagePending = false;
+        this.amber$baseDamageTaken = 0.0F;
+        this.amber$damageTaken = 0.0F;
+        this.amber$blocked = false;
+    }
+
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At(
+                    value = "INVOKE",
+                    target =
+                    //? if >=1.21.2
+                    "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    //? if <1.21.2
+                    /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
+                    ordinal = 0
+            )
+            //? if >=1.21.9
+            , locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    private void amber$captureReducedDamage(
+            //? if >=1.21.2
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+            //? if >=1.21.9 {
+            ,
+            ItemStack itemInUse,
+            float damageBlocked
+            //?}
+    ) {
+        //? if >=1.21.9
+        this.amber$armAfterDamage(damage - this.lastHurt, damage, damageBlocked > 0.0F);
+        //? if <1.21.9
+        /*this.amber$armAfterDamage(damage - this.lastHurt, damage, false);*/
+    }
+
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At(
+                    value = "INVOKE",
+                    target =
+                    //? if >=1.21.2
+                    "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    //? if <1.21.2
+                    /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
+                    ordinal = 1
+            )
+            //? if >=1.21.9
+            , locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    private void amber$captureFullDamage(
+            //? if >=1.21.2
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+            //? if >=1.21.9 {
+            ,
+            ItemStack itemInUse,
+            float damageBlocked
+            //?}
+    ) {
+        //? if >=1.21.9
+        this.amber$armAfterDamage(damage, damage, damageBlocked > 0.0F);
+        //? if <1.21.9
+        /*this.amber$armAfterDamage(damage, damage, false);*/
+    }
+
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At("TAIL")
+    )
+    private void amber$fireAfterDamage(
+            //? if >=1.21.2
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (!this.amber$afterDamagePending || !cir.getReturnValueZ() || this.isDeadOrDying()) {
+            return;
+        }
+
+        LivingEntity entity = (LivingEntity) (Object) this;
+        EntityEvent.AFTER_DAMAGE.invoker().afterDamage(
+                entity,
+                source,
+                this.amber$baseDamageTaken,
+                this.amber$damageTaken,
+                this.amber$blocked
+        );
+
+        if (entity instanceof Player player && this.amber$blocked) {
+            ItemStack shield = amber$findBlockingShield(player);
+            if (!shield.isEmpty()) {
+                PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, this.amber$baseDamageTaken, source);
+            }
+        }
+    }
+
+    @Unique
+    private void amber$armAfterDamage(float baseDamageTaken, float damageTaken, boolean blocked) {
+        this.amber$afterDamagePending = true;
+        this.amber$baseDamageTaken = baseDamageTaken;
+        this.amber$damageTaken = damageTaken;
+        this.amber$blocked = blocked;
+    }
+
+    @Unique
+    private static ItemStack amber$findBlockingShield(Player player) {
+        if (!player.isBlocking()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack mainHand = player.getMainHandItem();
+        if (mainHand.getItem() instanceof ShieldItem) {
+            return mainHand;
+        }
+
+        ItemStack offHand = player.getOffhandItem();
+        if (offHand.getItem() instanceof ShieldItem) {
+            return offHand;
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    static {
+        AmberMod.AMBER_MIXINS.add("LivingEntityAfterDamageMixin");
+    }
+}
