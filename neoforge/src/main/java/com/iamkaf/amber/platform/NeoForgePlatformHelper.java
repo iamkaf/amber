@@ -29,7 +29,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
 
+        //? if >=1.21.9
         return !FMLLoader.getCurrent().isProduction();
+        //? if <1.21.9
+        /*return !FMLLoader.isProduction();*/
     }
 
     @Override
@@ -39,7 +42,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public Env getEnvironment() {
+        //? if >=1.21.9
         switch (FMLLoader.getCurrent().getDist()) {
+        //? if <1.21.9
+        /*switch (net.neoforged.fml.loading.FMLEnvironment.dist) {*/
             case CLIENT -> {
                 return Env.CLIENT;
             }
@@ -47,7 +53,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
                 return Env.SERVER;
             }
             default -> {
+                //? if >=1.21.9
                 throw new IllegalStateException("Unknown environment type: " + FMLLoader.getCurrent().getDist());
+                //? if <1.21.9
+                /*throw new IllegalStateException("Unknown environment type: " + net.neoforged.fml.loading.FMLEnvironment.dist);*/
             }
         }
     }

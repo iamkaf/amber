@@ -3,12 +3,14 @@ package com.iamkaf.amber.mixin;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.mojang.blaze3d.vertex.PoseStack;
+//? if <1.21.9
+/*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
-//? if <26.1
+//? if >=1.21.9 && <26.1
 /*import net.minecraft.client.renderer.state.LevelRenderState;*/
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -46,16 +48,21 @@ public class LevelRendererMixin {
         cancellable = true
     )
     private void onRenderBlockOutline(
+            //? if <1.21.9
+            /*Camera camera,*/
             MultiBufferSource.BufferSource bufferSource,
             PoseStack poseStack,
             boolean translucentPass,
+            //? if >=1.21.9
             LevelRenderState levelRenderState,
             CallbackInfo ci
     ) {
         // Get the block outline render state from levelRenderState
+        //? if >=1.21.9 {
         if (levelRenderState.blockOutlineRenderState == null) {
             return;
         }
+        //?}
 
         //? if >=26.1 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
@@ -76,12 +83,18 @@ public class LevelRendererMixin {
             return;
         }
 
+        //? if >=1.21.9
         BlockPos pos = levelRenderState.blockOutlineRenderState.pos();
+        //? if <1.21.9
+        /*BlockPos pos = blockHitResult.getBlockPos();*/
         BlockState state = this.minecraft.level.getBlockState(pos);
 
         // Fire the Amber BLOCK_OUTLINE_RENDER event with full rendering context
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+            //? if >=1.21.9
             this.minecraft.gameRenderer.getMainCamera(),
+            //? if <1.21.9
+            /*camera,*/
             bufferSource,
             poseStack,
             blockHitResult,

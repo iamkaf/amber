@@ -145,7 +145,10 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.c2sType);
         
         // Send to server using client connection
+        //? if >=1.21.9
         if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
+        //? if <1.21.9
+        /*if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {*/
             net.minecraft.client.Minecraft.getInstance().getConnection().send(wrapper);
         } else {
             throw new IllegalStateException("sendToServer can only be called from client side");
@@ -225,7 +228,10 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     private boolean isClientSide() {
         try {
+            //? if >=1.21.9
             return net.neoforged.fml.loading.FMLEnvironment.getDist().isClient();
+            //? if <1.21.9
+            /*return net.neoforged.fml.loading.FMLEnvironment.dist.isClient();*/
         } catch (Exception e) {
             return false;
         }

@@ -53,20 +53,27 @@ public abstract class LivingEntityAfterDamageMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
                     ordinal = 0
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD
+            )
+            //? if >=1.21.9
+            , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureReducedDamage(
             ServerLevel level,
             DamageSource source,
             float damage,
-            CallbackInfoReturnable<Boolean> cir,
+            CallbackInfoReturnable<Boolean> cir
+            //? if >=1.21.9 {
+            ,
             ItemStack itemInUse,
             float damageBlocked,
             boolean blocked,
             boolean tookFullDamage
+            //?}
     ) {
+        //? if >=1.21.9
         this.amber$armAfterDamage(damage - this.lastHurt, damage, blocked);
+        //? if <1.21.9
+        /*this.amber$armAfterDamage(damage - this.lastHurt, damage, false);*/
     }
 
     @Inject(
@@ -75,20 +82,27 @@ public abstract class LivingEntityAfterDamageMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
                     ordinal = 1
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD
+            )
+            //? if >=1.21.9
+            , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureFullDamage(
             ServerLevel level,
             DamageSource source,
             float damage,
-            CallbackInfoReturnable<Boolean> cir,
+            CallbackInfoReturnable<Boolean> cir
+            //? if >=1.21.9 {
+            ,
             ItemStack itemInUse,
             float damageBlocked,
             boolean blocked,
             boolean tookFullDamage
+            //?}
     ) {
+        //? if >=1.21.9
         this.amber$armAfterDamage(damage, damage, blocked);
+        //? if <1.21.9
+        /*this.amber$armAfterDamage(damage, damage, false);*/
     }
 
     @Inject(method = "hurtServer", at = @At("TAIL"))

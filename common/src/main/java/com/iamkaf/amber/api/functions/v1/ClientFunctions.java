@@ -215,7 +215,10 @@ public final class ClientFunctions {
          * @return true if the Shift key is held down.
          */
         private static boolean hasShiftDown() {
+            //? if >=1.21.9
             return Minecraft.getInstance().hasShiftDown();
+            //? if <1.21.9
+            /*return Screen.hasShiftDown();*/
         }
     }
 
