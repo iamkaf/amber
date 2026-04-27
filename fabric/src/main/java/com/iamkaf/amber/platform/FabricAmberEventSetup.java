@@ -28,8 +28,14 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+//? if >=1.21
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+//? if >=1.21
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
+//? if <1.21
+/*import net.fabricmc.fabric.api.loot.v2.LootTableEvents;*/
+//? if <1.21
+/*import net.fabricmc.fabric.api.loot.v2.LootTableSource;*/
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.HolderLookup;
@@ -68,7 +74,10 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
     @Override
     public void registerCommon() {
         LootTableEvents.MODIFY.register((ResourceKey<LootTable> resourceKey, LootTable.Builder builder,
-                LootTableSource lootTableSource, HolderLookup.Provider provider) -> {
+                LootTableSource lootTableSource
+                //? if >=1.21
+                , HolderLookup.Provider provider
+        ) -> {
             //? if >=1.21.11
             LootEvents.MODIFY.invoker().modify(resourceKey.identifier(), builder::withPool);
             //? if <1.21.11

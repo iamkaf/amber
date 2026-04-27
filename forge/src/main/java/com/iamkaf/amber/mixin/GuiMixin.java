@@ -2,6 +2,7 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+//? if >=1.21
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -31,7 +32,7 @@ public class GuiMixin {
      * solution if Forge ever provides a better way to handle HUD rendering events, or I roll my own.
      *
      * @param guiGraphics   the GUI graphics instance used for rendering
-     * @param deltaTracker  the {@link DeltaTracker} instance used for tracking deltas
+     * @param deltaTracker  the HUD tick counter
      * @param ci            the callback info
      */
     //? if >=26.1
@@ -40,8 +41,10 @@ public class GuiMixin {
     /*@Inject(method = "render", at = @At("RETURN"), remap = false)*/
     //? if >=26.1
     public void amber$render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-    //? if <26.1
+    //? if <26.1 && >=1.21
     /*public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {*/
+    //? if <1.21
+    /*public void amber$render(GuiGraphics guiGraphics, float deltaTracker, CallbackInfo ci) {*/
         // this check mirrors the vanilla check
         if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, deltaTracker);

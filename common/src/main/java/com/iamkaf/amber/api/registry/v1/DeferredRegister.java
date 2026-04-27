@@ -71,7 +71,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
+        return register(id(modId, id), supplier);
     }
 
     /**
@@ -87,7 +87,14 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
         if (modId == null) {
             throw new NullPointerException("DeferredRegister created without mod id");
         }
-        return register(Identifier.fromNamespaceAndPath(modId, id), supplier);
+        return register(id(modId, id), supplier);
+    }
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
     }
 
     /**

@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+//? if >=1.21
 import net.minecraft.client.DeltaTracker;
 //? if >=26.1
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -32,11 +33,13 @@ public class HudEvents {
          * Called after rendering the whole hud, which is displayed in game, in a world.
          *
          * @param guiGraphics the GUI graphics instance
-         * @param tickCounter the {@link DeltaTracker} instance
+         * @param tickCounter the HUD tick counter
          */
         //? if >=26.1
         void onHudRender(GuiGraphicsExtractor guiGraphics, DeltaTracker tickCounter);
-        //? if <26.1
+        //? if <26.1 && >=1.21
         /*void onHudRender(GuiGraphics guiGraphics, DeltaTracker tickCounter);*/
+        //? if <1.21
+        /*void onHudRender(GuiGraphics guiGraphics, float tickCounter);*/
     }
 }

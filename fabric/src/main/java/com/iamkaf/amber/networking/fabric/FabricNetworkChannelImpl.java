@@ -38,7 +38,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         registrations.put(packetClass, registration);
         
         // Create packet type for this packet class
-        Identifier packetId = Identifier.fromNamespaceAndPath(
+        Identifier packetId = id(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase()
         );
@@ -88,7 +88,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        Identifier packetId = Identifier.fromNamespaceAndPath(
+        Identifier packetId = id(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -108,7 +108,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        Identifier packetId = Identifier.fromNamespaceAndPath(
+        Identifier packetId = id(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -128,7 +128,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        Identifier packetId = Identifier.fromNamespaceAndPath(
+        Identifier packetId = id(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -150,7 +150,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
         
-        Identifier packetId = Identifier.fromNamespaceAndPath(
+        Identifier packetId = id(
             channelId.getNamespace(), 
             channelId.getPath() + "/" + packet.getClass().getSimpleName().toLowerCase()
         );
@@ -172,6 +172,13 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
     }
     
     /**

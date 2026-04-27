@@ -15,8 +15,15 @@ public class AmberNetworking {
     
     // Network channel for internal Amber networking
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
-        Identifier.fromNamespaceAndPath(Constants.MOD_ID, "internal")
+        id(Constants.MOD_ID, "internal")
     );
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
+    }
     
     // Latency tracking
     private static final AtomicLong totalPings = new AtomicLong(0);

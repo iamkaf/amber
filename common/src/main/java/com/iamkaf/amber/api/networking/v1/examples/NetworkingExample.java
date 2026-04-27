@@ -19,8 +19,15 @@ public class NetworkingExample {
     
     // Create a network channel - this works on all platforms automatically
     public static final NetworkChannel CHANNEL = NetworkChannel.create(
-        Identifier.fromNamespaceAndPath("amber", "example")
+        id("amber", "example")
     );
+
+    private static Identifier id(String namespace, String path) {
+        //? if >=1.21
+        return Identifier.fromNamespaceAndPath(namespace, path);
+        //? if <1.21
+        /*return new Identifier(namespace, path);*/
+    }
     
     /**
      * Initialize the networking example.
