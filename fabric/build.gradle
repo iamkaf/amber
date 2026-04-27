@@ -1,0 +1,15 @@
+plugins {
+    id 'com.iamkaf.multiloader.fabric'
+}
+
+def minecraftVersion = requiredProp(project, 'project.minecraft')
+def libs = catalogFor(project, minecraftVersion)
+
+dependencies {
+    implementation library(libs, 'fabric-api')
+    if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
+        runtimeOnly library(libs, 'teakit-fabric')
+    }
+}
+
+enableCommonFabricDatagen.call()

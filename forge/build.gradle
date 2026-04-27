@@ -1,0 +1,20 @@
+plugins {
+    id 'com.iamkaf.multiloader.forge'
+}
+
+def minecraftVersion = requiredProp(project, 'project.minecraft')
+def libs = catalogFor(project, minecraftVersion)
+
+jar {
+    manifest {
+        def modId = project.findProperty('mod.id')
+        attributes["MixinConfigs"] = "${modId}.mixins.json,${modId}.forge.mixins.json"
+    }
+}
+
+dependencies {
+    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+    if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
+        runtimeOnly library(libs, 'teakit-forge')
+    }
+}

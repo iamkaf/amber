@@ -1,0 +1,24 @@
+{
+  "name": "amber-doctor-smoke",
+  "setup": [
+    {
+      "action": "command",
+      "command": "/gamemode creative"
+    }
+  ],
+  "steps": [
+    {
+      "action": "command",
+      "command": "/amber doctor"
+    },
+    {
+      "action": "wait_ms",
+      "durationMs": 500
+    },
+    {
+      "action": "screenshot",
+      "name": "amber-doctor-smoke"
+    }
+  ],
+  "cleanup": []
+}
