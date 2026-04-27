@@ -34,6 +34,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.event.GatherComponentsEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
@@ -96,7 +97,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ShieldBlockEvent.BUS.addListener(EventHandlerCommon::onShieldBlock);
 
         // Creative mode tab events (register with high priority)
+        //? if >=1.21.10
         BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
+        //? if <1.21.10
+        /*BuildCreativeModeTabContentsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerCommon::buildContents);*/
 
         // Default item components event
         GatherComponentsEvent.Item.BUS.addListener(EventHandlerCommon::onGatherComponents);
@@ -106,7 +110,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     public void registerClient() {
         RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
         // mod bus events
+        //? if >=1.21.10
         RegisterKeyMappingsEvent.BUS.addListener(EventHandlerClient::onKeybindRegistration);
+        //? if <1.21.10
+        /*RegisterKeyMappingsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerClient::onKeybindRegistration);*/
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
     }
