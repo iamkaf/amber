@@ -36,7 +36,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -179,7 +178,7 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onBlockBreak(BreakBlockEvent event) {
+        public static void onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
                     event.getPlayer().level(),
                     event.getPlayer(),
