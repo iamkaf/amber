@@ -6,7 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+//? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
+//? if <26.1
+/*import net.minecraft.client.renderer.state.LevelRenderState;*/
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,9 +57,15 @@ public class LevelRendererMixin {
             return;
         }
 
+        //? if >=26.1 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
+        //?} else {
+        /*if (translucentPass) {
+            return;
+        }
+        *///?}
 
         // Check if we have a block hit result
         if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {

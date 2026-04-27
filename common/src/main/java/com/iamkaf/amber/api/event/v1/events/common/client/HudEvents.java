@@ -3,7 +3,10 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.client.DeltaTracker;
+//? if >=26.1
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//? if <26.1
+/*import net.minecraft.client.gui.GuiGraphics;*/
 import org.jetbrains.annotations.ApiStatus;
 
 public class HudEvents {
@@ -28,9 +31,12 @@ public class HudEvents {
         /**
          * Called after rendering the whole hud, which is displayed in game, in a world.
          *
-         * @param guiGraphics the {@link GuiGraphicsExtractor} instance
+         * @param guiGraphics the GUI graphics instance
          * @param tickCounter the {@link DeltaTracker} instance
          */
+        //? if >=26.1
         void onHudRender(GuiGraphicsExtractor guiGraphics, DeltaTracker tickCounter);
+        //? if <26.1
+        /*void onHudRender(GuiGraphics guiGraphics, DeltaTracker tickCounter);*/
     }
 }

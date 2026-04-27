@@ -5,7 +5,10 @@ import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+//? if >=26.1
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//? if <26.1
+/*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,12 +30,18 @@ public class GuiMixin {
      * This matches the Fabric code for HudRenderCallback, which is deprecated. I'll change to a more robust
      * solution if Forge ever provides a better way to handle HUD rendering events, or I roll my own.
      *
-     * @param guiGraphics   the {@link GuiGraphicsExtractor} instance used for rendering
+     * @param guiGraphics   the GUI graphics instance used for rendering
      * @param deltaTracker  the {@link DeltaTracker} instance used for tracking deltas
      * @param ci            the callback info
      */
+    //? if >=26.1
     @Inject(method = "extractRenderState", at = @At("RETURN"))
+    //? if <26.1
+    /*@Inject(method = "render", at = @At("RETURN"), remap = false)*/
+    //? if >=26.1
     public void amber$render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    //? if <26.1
+    /*public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {*/
         // this check mirrors the vanilla check
         if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, deltaTracker);
