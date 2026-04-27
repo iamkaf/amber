@@ -11,6 +11,7 @@ import com.iamkaf.amber.networking.v1.AmberNetworking;
 import com.iamkaf.amber.platform.Services;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.SharedConstants;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -33,8 +34,7 @@ public class AmberCommands {
                             MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
                                     .append(" - Version: " + modInfo.version() + "\n")
                                     .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                                    // FIXME: Kaf PLEASE find a way to get this number automatically omg PLEASE
-                                    .append(" - Minecraft: 26.1.2" + "\n")
+                                    .append(" - Minecraft: " + SharedConstants.getCurrentVersion().name() + "\n")
                                     .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
                                             "Not " + "Initialized") + "\n")
                                     .append("Mixins: \n");
