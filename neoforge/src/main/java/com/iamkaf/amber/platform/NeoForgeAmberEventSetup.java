@@ -34,6 +34,7 @@ import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+//? if >=26.1.2
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -179,7 +180,10 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
+        //? if >=26.1.2
         public static void onBlockBreak(BreakBlockEvent event) {
+        //? if <26.1.2
+        /*public static void onBlockBreak(BlockEvent.BreakEvent event) {*/
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
                     event.getPlayer().level(),
                     event.getPlayer(),
