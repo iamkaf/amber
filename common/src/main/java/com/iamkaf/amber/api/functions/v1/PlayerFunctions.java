@@ -374,7 +374,10 @@ public final class PlayerFunctions {
      * @return The selected hotbar slot (0-8).
      */
     public static int getSelectedSlot(Player player) {
+        //? if >=1.21.5
         return player.getInventory().getSelectedSlot();
+        //? if <1.21.5
+        /*return player.getInventory().selected;*/
     }
 
     /**
@@ -385,7 +388,10 @@ public final class PlayerFunctions {
      */
     public static void setSelectedSlot(Player player, int slot) {
         if (slot >= 0 && slot <= 8) {
+            //? if >=1.21.5
             player.getInventory().setSelectedSlot(slot);
+            //? if <1.21.5
+            /*player.getInventory().setSelectedHotbarSlot(slot);*/
         }
     }
 

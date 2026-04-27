@@ -25,7 +25,10 @@ public abstract class CraftingPlayerMixin {
     private CraftingContainer craftSlots;
 
     @Inject(method = "checkTakeAchievements", at = @At(value = "INVOKE",
+            //? if >=1.21.5
             target = "Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/entity/player/Player;I)V",
+            //? if <1.21.5
+            /*target = "Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;I)V",*/
             shift = At.Shift.AFTER))
     private void amber$onItemCrafted(ItemStack craftedItem, CallbackInfo ci) {
         if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {

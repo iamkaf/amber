@@ -13,10 +13,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//? if >=1.21.5
 @Mixin(LivingEntity.class)
+//? if <1.21.5
+/*@Mixin(Player.class)*/
 public abstract class PlayerMixin {
 
-    // Target the 3-parameter drop method in LivingEntity which is used by Player
+    // Target the 3-parameter drop method used by Player item tosses.
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At("RETURN"))
     private void onItemDrop(ItemStack stack, boolean randomizeMotion, boolean includeThrower, CallbackInfoReturnable<ItemEntity> cir) {
