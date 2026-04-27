@@ -47,7 +47,10 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         @Override
         public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
             RegistryObject<R> obj = register.register(id.getPath(), supplier);
+            //? if >=1.21.11
             return new ForgeRegistrySupplier<>(key.identifier(), id, obj);
+            //? if <1.21.11
+            /*return new ForgeRegistrySupplier<>(key.location(), id, obj);*/
         }
 
         @Override
@@ -62,7 +65,10 @@ public class ForgeRegistrarManager implements IRegistrarManager {
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
+            //? if >=1.21.11
             return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
+            //? if <1.21.11
+            /*return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());*/
         }
     }
 

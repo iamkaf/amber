@@ -30,12 +30,18 @@ public class FabricRegistrarManager implements IRegistrarManager {
             Registry<T> registry = registry();
             R value = supplier.get();
             Registry.register(registry, id, value);
+            //? if >=1.21.11
             return new FabricRegistrySupplier<>(key.identifier(), id, value);
+            //? if <1.21.11
+            /*return new FabricRegistrySupplier<>(key.location(), id, value);*/
         }
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
+            //? if >=1.21.11
             return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
+            //? if <1.21.11
+            /*return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());*/
         }
 
         @Override

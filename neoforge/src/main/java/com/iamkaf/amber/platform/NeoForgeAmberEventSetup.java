@@ -307,7 +307,10 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
             // Add items from TabBuilder if this is a custom tab
             com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder = 
+                //? if >=1.21.11
                 com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().identifier());
+                //? if <1.21.11
+                /*com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().location());*/
             if (tabBuilder != null) {
                 for (var itemSupplier : tabBuilder.getItems()) {
                     event.accept(itemSupplier.get());
