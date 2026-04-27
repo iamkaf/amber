@@ -3,12 +3,22 @@ plugins {
 }
 
 def minecraftVersion = requiredProp(project, 'project.minecraft')
+def isModernLine = !minecraftVersion.startsWith('1.')
 def libs = catalogFor(project, minecraftVersion)
 
 dependencies {
-    implementation library(libs, 'fabric-api')
+    if (isModernLine) {
+        implementation library(libs, 'fabric-api')
+    } else {
+        modImplementation library(libs, 'fabric-api')
+        modLocalRuntime library(libs, 'fabric-api')
+    }
     if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
-        runtimeOnly library(libs, 'teakit-fabric')
+        if (isModernLine) {
+            runtimeOnly library(libs, 'teakit-fabric')
+        } else {
+            modLocalRuntime library(libs, 'teakit-fabric')
+        }
     }
 }
 

@@ -54,8 +54,13 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             );
         
         // First register the payload type
+        //? if >=26.1 {
         net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.clientboundPlay().register(payloadType, streamCodec);
         net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.serverboundPlay().register(payloadType, streamCodec);
+        //?} else {
+        /*net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.playS2C().register(payloadType, streamCodec);
+        net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry.playC2S().register(payloadType, streamCodec);
+        *///?}
         
         // Then register handlers
         // Register server-side receiver (receives packets from clients)

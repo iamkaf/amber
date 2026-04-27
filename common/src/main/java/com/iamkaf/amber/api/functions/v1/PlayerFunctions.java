@@ -464,7 +464,10 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendMessage(Player player, Component message) {
+        //? if >=26.1
         player.sendSystemMessage(message);
+        //? if <26.1
+        /*player.displayClientMessage(message, false);*/
     }
 
     /**
@@ -474,7 +477,10 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendActionBarMessage(Player player, Component message) {
+        //? if >=26.1
         player.sendOverlayMessage(message);
+        //? if <26.1
+        /*player.displayClientMessage(message, true);*/
     }
 
     /**
@@ -484,7 +490,10 @@ public final class PlayerFunctions {
      * @param message The action bar message to send.
      */
     public static void sendActionBar(Player player, Component message) {
+        //? if >=26.1
         player.sendOverlayMessage(message);
+        //? if <26.1
+        /*player.displayClientMessage(message, true);*/
     }
 
     /**

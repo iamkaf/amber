@@ -12,12 +12,18 @@ import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+//? if >=26.1
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+//? if <26.1
+/*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;*/
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+//? if >=26.1
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
+//? if <26.1
+/*import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;*/
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -127,6 +133,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         // Creative mode tab events
         // Register for all existing vanilla tabs
         for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
+            //? if >=26.1 {
             net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
                 CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
                     @Override
@@ -139,6 +146,16 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                     }
                 });
             });
+            //?} else {
+            /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                    @Override
+                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                        tab.accept(stack);
+                    }
+                });
+            });
+            *///?}
         }
 
         // Register for our custom tabs
@@ -147,6 +164,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
                 builder.getId()
             );
+            //? if >=26.1 {
             net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
                 // Add items from the TabBuilder
                 for (var itemSupplier : builder.getItems()) {
@@ -163,6 +181,20 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                     }
                 });
             });
+            //?} else {
+            /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
+                for (var itemSupplier : builder.getItems()) {
+                    tab.accept(itemSupplier.get());
+                }
+
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                    @Override
+                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                        tab.accept(stack);
+                    }
+                });
+            });
+            *///?}
         }
     }
 
@@ -172,10 +204,16 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
+        //? if >=26.1 {
         HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "render_hud"),
                 (guiGraphics, tickDelta) -> HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta)
         );
+        //?} else {
+        /*HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
+            HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta);
+        });
+        *///?}
         ClientTickEvents.START_CLIENT_TICK.register(minecraft -> {
             com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
         });
@@ -197,12 +235,21 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
 
         // World events
+        //? if >=26.1 {
         ServerLevelEvents.LOAD.register((server, level) -> {
             WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, level);
         });
         ServerLevelEvents.UNLOAD.register((server, level) -> {
             WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, level);
         });
+        //?} else {
+        /*ServerWorldEvents.LOAD.register((server, world) -> {
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, world);
+        });
+        ServerWorldEvents.UNLOAD.register((server, world) -> {
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, world);
+        });
+        *///?}
 
         // Player lifecycle events
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
