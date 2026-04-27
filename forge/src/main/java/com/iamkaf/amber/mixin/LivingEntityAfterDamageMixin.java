@@ -34,8 +34,15 @@ public abstract class LivingEntityAfterDamageMixin {
     @Unique
     private boolean amber$blocked;
 
-    @Inject(method = "hurtServer", at = @At("HEAD"))
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At("HEAD")
+    )
     private void amber$resetAfterDamageState(
+            //? if >=1.21.2
             ServerLevel level,
             DamageSource source,
             float damage,
@@ -48,16 +55,24 @@ public abstract class LivingEntityAfterDamageMixin {
     }
 
     @Inject(
+            //? if >=1.21.2
             method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    target =
+                    //? if >=1.21.2
+                    "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    //? if <1.21.2
+                    /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 0
             )
             //? if >=1.21.9
             , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureReducedDamage(
+            //? if >=1.21.2
             ServerLevel level,
             DamageSource source,
             float damage,
@@ -75,16 +90,24 @@ public abstract class LivingEntityAfterDamageMixin {
     }
 
     @Inject(
+            //? if >=1.21.2
             method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    target =
+                    //? if >=1.21.2
+                    "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)V",
+                    //? if <1.21.2
+                    /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 1
             )
             //? if >=1.21.9
             , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureFullDamage(
+            //? if >=1.21.2
             ServerLevel level,
             DamageSource source,
             float damage,
@@ -101,8 +124,15 @@ public abstract class LivingEntityAfterDamageMixin {
         /*this.amber$armAfterDamage(damage, damage, false);*/
     }
 
-    @Inject(method = "hurtServer", at = @At("TAIL"))
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At("TAIL")
+    )
     private void amber$fireAfterDamage(
+            //? if >=1.21.2
             ServerLevel level,
             DamageSource source,
             float damage,

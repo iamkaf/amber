@@ -4,8 +4,7 @@ import com.iamkaf.amber.api.platform.v1.ModInfo;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.util.Env;
 //? if <26.1 {
-/*import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
+/*import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 *///?}
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -16,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collection;
-//? if <26.1
-/*import java.util.Optional;*/
 import java.util.stream.Collectors;
 
 public class ForgePlatformHelper implements IPlatformHelper {
@@ -89,15 +86,16 @@ public class ForgePlatformHelper implements IPlatformHelper {
         }
         return null;
         //?} else {
-        /*Optional<ModContainer> maybeContainer =
-                ModList.get().getLoadedMods().stream().filter(c -> c.getModId().equals(modId)).findFirst();
-        if (maybeContainer.isPresent()) {
-            ModContainer container = maybeContainer.get();
+        /*IModInfo maybeInfo = ModList.get().getMods().stream()
+                .filter(c -> c.getModId().equals(modId))
+                .findFirst()
+                .orElse(null);
+        if (maybeInfo != null) {
             return new ModInfo(
-                    container.getModId(),
-                    container.getModInfo().getDisplayName(),
-                    container.getModInfo().getVersion().toString(),
-                    container.getModInfo().getDescription()
+                    maybeInfo.getModId(),
+                    maybeInfo.getDisplayName(),
+                    maybeInfo.getVersion().toString(),
+                    maybeInfo.getDescription()
             );
         }
         return null;*/

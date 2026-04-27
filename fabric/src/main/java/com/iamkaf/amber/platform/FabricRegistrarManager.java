@@ -40,8 +40,10 @@ public class FabricRegistrarManager implements IRegistrarManager {
         private Registry<T> registry() {
             //? if >=1.21.11
             return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
-            //? if <1.21.11
+            //? if <1.21.11 && >=1.21.2
             /*return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.location());*/
+            //? if <1.21.2
+            /*return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());*/
         }
 
         @Override
@@ -51,7 +53,10 @@ public class FabricRegistrarManager implements IRegistrarManager {
 
         @Override
         public Optional<Holder.Reference<T>> get(Identifier id) {
+            //? if >=1.21.2
             return registry().get(id);
+            //? if <1.21.2
+            /*return registry().getHolder(id);*/
         }
     }
 

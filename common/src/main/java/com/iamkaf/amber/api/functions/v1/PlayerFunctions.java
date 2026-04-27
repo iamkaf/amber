@@ -390,8 +390,10 @@ public final class PlayerFunctions {
         if (slot >= 0 && slot <= 8) {
             //? if >=1.21.5
             player.getInventory().setSelectedSlot(slot);
-            //? if <1.21.5
+            //? if <1.21.5 && >=1.21.2
             /*player.getInventory().setSelectedHotbarSlot(slot);*/
+            //? if <1.21.2
+            /*player.getInventory().selected = slot;*/
         }
     }
 
