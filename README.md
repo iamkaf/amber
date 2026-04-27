@@ -23,62 +23,42 @@ Docs live in this repo at `docs/` and are published here:
 
 - https://iamkaf.github.io/amber/
 
-## 🗂️ Monorepo Structure
+## Repository Structure
 
-This repository contains multiple Minecraft versions of Amber:
+Amber uses a Stonecutter-driven multiloader layout. The supported matrix is defined by `versions/*/gradle.properties` and exposed by `just list-nodes`.
 
 ```
 amber/
-├── 1.20.1/           # Minecraft 1.20.1
-├── 1.21.1/           # Minecraft 1.21.1
-├── 1.21.10/          # Minecraft 1.21.10
-├── 1.21.11/          # Minecraft 1.21.11
-├── 26.1.2/           # Minecraft 26.1.2
-├── docs/             # Documentation site (VitePress)
-└── README.md         # This file
+├── common/           # shared code
+├── fabric/           # Fabric implementation
+├── forge/            # Forge implementation
+├── neoforge/         # NeoForge implementation
+├── versions/26.1.2/  # active Minecraft line metadata and overlays
+└── docs/             # documentation site
 ```
 
-Each version directory follows the same layout:
+## Supported Versions
 
-- `common/` — shared code across loaders
-- `fabric/` — Fabric implementation
-- `forge/` — Forge implementation
-- `neoforge/` — NeoForge implementation
-
-## 🚀 Supported Versions
-
-- 1.20.1 — ✅ Supported (Fabric + Forge)
-- 1.21.1 — ✅ Supported
-- 1.21.11 — ✅ Supported (Forge temporarily disabled; FG7 migration planned)
-- 26.1.2 — active (`26.1.2/`)
+- 26.1.2: Fabric, Forge, NeoForge
 
 ## 🛠️ Building
 
 Use `just` from the repo root as the command runner.
 
 ```bash
-# Build all loaders for a specific version
-just build 1.21.10
-
-# Build all supported versions
-just build
-
-# Build a specific loader for a specific version
-just run 1.21.10 :fabric:build
-just run 1.21.10 :forge:build
-just run 1.21.10 :neoforge:build
-
-# Run tests for a specific version
-just test 1.21.10
+just list-nodes
+just compile-all
+just build 26.1.2-fabric
+just boot-check 26.1.2-neoforge
 ```
 
-Built jars will be in `<version>/<loader>/build/libs/`.
+Built jars will be in `<loader>/versions/<version>/build/libs/`.
 
 ## 💻 Development
 
 ### Prerequisites
 
-- Java 21 or higher
+- Java 25 or higher
 - Git
 - just (install: https://github.com/casey/just)
 
@@ -87,7 +67,7 @@ Built jars will be in `<version>/<loader>/build/libs/`.
 ```bash
 git clone https://github.com/iamkaf/amber.git
 cd amber
-idea 1.21.11
+./gradlew projects
 ```
 
 ## 📝 License
