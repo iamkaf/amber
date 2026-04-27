@@ -1,0 +1,48 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.iamkaf.amber.mixin",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractArrowMixin",
+    "AnimalMixin",
+    "BaseFireBlockMixin",
+    "BlockItemMixin",
+    "BoneMealItemMixin",
+    "CreeperMixin",
+    "CraftingPlayerMixin",
+    "CropBlockMixin",
+    "EntityMixin",
+    "FireBlockMixin",
+    "FireChargeItemMixin",
+    "FarmBlockMixin",
+    "FishingHookMixin",
+    "FishingRodItemMixin",
+    "FlintAndSteelItemMixin",
+    "ItemEntityMixin",
+    "ItemCombinerMenuAccessor",
+    "LavaFluidMixin",
+    "LightningBoltIgnitionMixin",
+    "LightningBoltMixin",
+    "PlayerMixin",
+    "ServerLevelItemCaptureMixin",
+    "ServerLevelMixin",
+    "ShearableEntityMixin",
+    "ShearableMobInteractMixin",
+    "ShearsDispenseItemBehaviorMixin",
+    "SmallFireballMixin",
+    "SmithingMenuMixin",
+    "TntBlockMixin",
+    "TamableAnimalMixin"
+  ],
+  "client": [
+    "LevelRendererMixin",
+    "MouseHandlerMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
+  
