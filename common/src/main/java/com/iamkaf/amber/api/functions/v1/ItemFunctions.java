@@ -261,9 +261,15 @@ public final class ItemFunctions {
      * @return A string containing the display name(s) of the ingredient's items.
      */
     public static String getIngredientDisplayName(Ingredient ingredient) {
+        //? if >=1.21.4 {
         ItemStack[] items = ingredient.items()
                 .map(itemHolder -> itemHolder.value().getDefaultInstance())
                 .toArray(ItemStack[]::new);
+        //?} else {
+        /*ItemStack[] items = ingredient.items().stream()
+                .map(itemHolder -> itemHolder.value().getDefaultInstance())
+                .toArray(ItemStack[]::new);
+        *///?}
 
         if (items.length == 1) {
             return items[0].getDisplayName().getString();
