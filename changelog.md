@@ -22,7 +22,6 @@ See the full changelog at https://github.com/iamkaf/amber
 
 - Restored bounded boot-check coverage on the legacy Forge `1.18` and `1.18.1` lines.
 - Fixed the modern Fabric `Player#drop` mixin seam for `1.21.5+`.
-- `26.1.2` `NeoForge`: Fixed block break event compatibility after NeoForge moved `BlockEvent.BreakEvent` to `BreakBlockEvent`.
 
 ## 10.0.2
 
