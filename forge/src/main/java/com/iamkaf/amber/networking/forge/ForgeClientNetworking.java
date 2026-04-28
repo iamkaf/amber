@@ -2,6 +2,7 @@ package com.iamkaf.amber.networking.forge;
 
 import com.iamkaf.amber.api.networking.v1.Packet;
 import com.iamkaf.amber.api.networking.v1.PacketHandler;
+//? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraftforge.fml.loading.FMLLoader;
 
@@ -15,6 +16,7 @@ public class ForgeClientNetworking {
      * Register a client-side packet receiver.
      * This method should only be called on the client side.
      */
+    //? if >=1.20.5 {
     public static <T extends Packet<T>> void registerClientReceiver(
             CustomPacketPayload.Type<ForgePacketWrapper<T>> payloadType,
             PacketHandler<T> handler
@@ -39,4 +41,5 @@ public class ForgeClientNetworking {
         // The actual sending will be handled by the SimpleChannel in the main implementation
         // This is a placeholder for the actual sending logic
     }
+    //?}
 }

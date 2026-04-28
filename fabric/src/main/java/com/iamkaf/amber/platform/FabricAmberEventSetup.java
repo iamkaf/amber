@@ -7,6 +7,7 @@ import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import com.iamkaf.amber.Constants;
+//? if >=1.20.6
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
@@ -39,6 +40,7 @@ import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.HolderLookup;
+//? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -46,6 +48,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.LootTable;
 
+//? if >=1.20.5
 import java.util.function.Consumer;
 
 public class FabricAmberEventSetup implements IAmberEventSetup {
@@ -53,6 +56,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
     /**
      * Fabric-specific wrapper for DefaultItemComponentEvents.ModifyContext.
      */
+    //? if >=1.20.6 {
     private static class FabricComponentModificationContext implements ItemEvents.ComponentModificationContext {
         private final DefaultItemComponentEvents.ModifyContext modifyContext;
 
@@ -70,9 +74,11 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             });
         }
     }
+    //?}
 
     @Override
     public void registerCommon() {
+        //? if >=1.20.5 {
         LootTableEvents.MODIFY.register((ResourceKey<LootTable> resourceKey, LootTable.Builder builder,
                 LootTableSource lootTableSource
                 //? if >=1.21
@@ -80,9 +86,14 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         ) -> {
             //? if >=1.21.11
             LootEvents.MODIFY.invoker().modify(resourceKey.identifier(), builder::withPool);
-            //? if <1.21.11
+            //? if <1.21.11 && >=1.21
             /*LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);*/
         });
+        //?} else {
+        /*LootTableEvents.MODIFY.register((resourceManager, lootManager, id, builder, lootTableSource) -> {
+            LootEvents.MODIFY.invoker().modify(id, lootPool -> builder.withPool(lootPool));
+        });*/
+        //?}
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
             return PlayerEvents.ENTITY_INTERACT.invoker().interact(player, level, hand, entity);
         });
@@ -127,11 +138,13 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         // Fabric doesn't have native animal taming, breeding, or villager trade events
         
         // Default item components event
+        //? if >=1.20.6 {
         DefaultItemComponentEvents.MODIFY.register(modifyContext -> {
             ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
                 new FabricComponentModificationContext(modifyContext)
             );
         });
+        //?}
 
         // Creative mode tab events
         // Register for all existing vanilla tabs

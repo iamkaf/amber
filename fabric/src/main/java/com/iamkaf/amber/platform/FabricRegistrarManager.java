@@ -56,7 +56,7 @@ public class FabricRegistrarManager implements IRegistrarManager {
             //? if >=1.21.2
             return registry().get(id);
             //? if <1.21.2
-            /*return registry().getHolder(id);*/
+            /*return registry().getHolder(ResourceKey.create(key, id));*/
         }
     }
 

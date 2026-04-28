@@ -1,3 +1,4 @@
+//? if >=1.20.5 {
 package com.iamkaf.amber.networking.forge;
 
 import com.iamkaf.amber.api.networking.v1.Packet;
@@ -22,3 +23,4 @@ public class ForgePacketWrapper<T extends Packet<T>> implements CustomPacketPayl
         return type;
     }
 }
+//?}
