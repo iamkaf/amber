@@ -23,7 +23,7 @@ dependencies {
 }
 
 tasks.withType(ProcessResources).configureEach {
-    if (minecraftVersion == '1.19.1') {
+    if (minecraftVersion == '1.19' || minecraftVersion == '1.19.1') {
         def fabricApiModuleDepends = '''"fabric-api-base": "*",
         "fabric-command-api-v2": "*",
         "fabric-entity-events-v1": "*",
