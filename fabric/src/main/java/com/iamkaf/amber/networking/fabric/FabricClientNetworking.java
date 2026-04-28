@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.networking.v1.PacketHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+//? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
@@ -14,6 +15,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 @Environment(EnvType.CLIENT)
 public class FabricClientNetworking {
     
+    //? if >=1.20.5 {
     public static <T extends Packet<T>> void registerClientReceiver(
             CustomPacketPayload.Type<FabricNetworkChannelImpl.FabricPacketWrapper<T>> payloadType,
             PacketHandler<T> handler
@@ -27,4 +29,5 @@ public class FabricClientNetworking {
     public static <T extends Packet<T>> void sendToServer(FabricNetworkChannelImpl.FabricPacketWrapper<T> wrapper) {
         ClientPlayNetworking.send(wrapper);
     }
+    //?}
 }

@@ -4,7 +4,9 @@ import com.iamkaf.amber.api.networking.v1.*;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
+//? if >=1.20.5
 import net.minecraft.network.codec.StreamCodec;
+//? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,6 +38,9 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
     ) {
         PacketRegistration<T> registration = new PacketRegistration<>(encoder, decoder, handler);
         registrations.put(packetClass, registration);
+        //? if <1.20.5 {
+        throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");
+        //?} else {
         
         // Create packet type for this packet class
         Identifier packetId = id(
@@ -73,6 +78,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (isClientEnvironment()) {
             FabricClientNetworking.registerClientReceiver(payloadType, handler);
         }
+        //?}
     }
     
     
@@ -87,6 +93,9 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (registration == null) {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
+        //? if <1.20.5 {
+        throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");
+        //?} else {
         
         Identifier packetId = id(
             channelId.getNamespace(), 
@@ -98,6 +107,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         FabricPacketWrapper<T> wrapper = new FabricPacketWrapper<>(packet, payloadType);
         
         FabricClientNetworking.sendToServer(wrapper);
+        //?}
     }
     
     @Override
@@ -107,6 +117,9 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (registration == null) {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
+        //? if <1.20.5 {
+        throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");
+        //?} else {
         
         Identifier packetId = id(
             channelId.getNamespace(), 
@@ -118,6 +131,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         FabricPacketWrapper<T> wrapper = new FabricPacketWrapper<>(packet, payloadType);
         
         ServerPlayNetworking.send(player, wrapper);
+        //?}
     }
     
     @Override
@@ -127,6 +141,9 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (registration == null) {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
+        //? if <1.20.5 {
+        throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");
+        //?} else {
         
         Identifier packetId = id(
             channelId.getNamespace(), 
@@ -140,6 +157,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         for (ServerPlayer player : PlayerLookup.all(null)) {
             ServerPlayNetworking.send(player, wrapper);
         }
+        //?}
     }
     
     @Override
@@ -149,6 +167,9 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (registration == null) {
             throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         }
+        //? if <1.20.5 {
+        throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");
+        //?} else {
         
         Identifier packetId = id(
             channelId.getNamespace(), 
@@ -164,6 +185,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
                 ServerPlayNetworking.send(player, wrapper);
             }
         }
+        //?}
     }
     
     private boolean isClientEnvironment() {
@@ -199,6 +221,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
     /**
      * Wrapper for Fabric's CustomPacketPayload system.
      */
+    //? if >=1.20.5 {
     public static class FabricPacketWrapper<T extends Packet<T>> implements CustomPacketPayload {
         public final T packet;
         private final Type<FabricPacketWrapper<T>> type;
@@ -213,4 +236,5 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             return type;
         }
     }
+    //?}
 }

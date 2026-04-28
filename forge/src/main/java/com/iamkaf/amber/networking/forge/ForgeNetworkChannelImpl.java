@@ -2,8 +2,6 @@ package com.iamkaf.amber.networking.forge;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.*;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.Channel;
@@ -45,12 +43,6 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     ) {
         PacketRegistration<T> registration = new PacketRegistration<>(encoder, decoder, handler);
         registrations.put(packetClass, registration);
-        
-        // Create StreamCodec for the packet
-        StreamCodec<FriendlyByteBuf, T> codec = StreamCodec.of(
-            (buffer, packet) -> encoder.encode(packet, buffer),
-            buffer -> decoder.decode(buffer)
-        );
         
         // Register bidirectional packet handling using the deprecated MessageBuilder API
         // This is needed for compatibility with the current Forge version

@@ -2,10 +2,12 @@ package com.iamkaf.amber.api.functions.v1;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
+//? if >=1.20.5
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
+//? if >=1.20.5
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -18,7 +20,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.crafting.Ingredient;
+//? if >=1.20.5
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+//? if >=1.20.5
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 
@@ -299,7 +303,13 @@ public final class ItemFunctions {
      * @see EquipmentSlotGroup
      */
     public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier,
+            //? if >=1.20.5
             EquipmentSlotGroup slotGroup) {
+            //? if <1.20.5
+            /*EquipmentSlot slotGroup) {*/
+        //? if <1.20.5 {
+        stack.addAttributeModifier(attribute.value(), modifier, slotGroup);
+        //?} else {
         ItemAttributeModifiers extraModifiers = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
@@ -324,6 +334,7 @@ public final class ItemFunctions {
         }
         attributeBuilder.add(attribute, modifier, slotGroup);
         stack.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeBuilder.build());
+        //?}
     }
 
     /**
@@ -334,6 +345,15 @@ public final class ItemFunctions {
      * @return {@code} true if the modifier with the id is present.
      */
     public static boolean hasModifier(ItemStack stack, Identifier id) {
+        //? if <1.20.5 {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (stack.getAttributeModifiers(slot).entries().stream()
+                    .anyMatch(entry -> entry.getValue().save().getString("Name").equals(id.toString()))) {
+                return true;
+            }
+        }
+        return false;
+        //?} else {
         if (!stack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
             return false;
         }
@@ -343,6 +363,7 @@ public final class ItemFunctions {
         return list.modifiers().stream().anyMatch(m -> m.modifier().id().equals(id));
         //? if <1.21
         /*return list.modifiers().stream().anyMatch(m -> m.modifier().name().equals(id.toString()));*/
+        //?}
     }
 
     /**
@@ -351,6 +372,7 @@ public final class ItemFunctions {
      * @param stack The ItemStack to get default modifiers for.
      * @return The default attribute modifiers.
      */
+    //? if >=1.20.5 {
     public static ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
         Item item = stack.getItem();
 
@@ -358,6 +380,7 @@ public final class ItemFunctions {
 
         return defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
     }
+    //?}
 
     // ==================== ENCHANTMENT OPERATIONS ====================
 
@@ -370,6 +393,11 @@ public final class ItemFunctions {
      * @return true if the item has the specified enchantment, false otherwise.
      */
     public static boolean containsEnchantment(ItemStack stack, Identifier enchantment) {
+        //? if <1.20.5 {
+        return stack.getEnchantmentTags().stream()
+                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
+                .anyMatch(tag -> enchantment.toString().equals(tag.getString("id")));
+        //?} else {
         ItemEnchantments enchantments = stack.getEnchantments();
         if (enchantments.isEmpty()) {
             return false;
@@ -383,6 +411,7 @@ public final class ItemFunctions {
             }
         }
         return false;
+        //?}
     }
 
     /**
@@ -394,6 +423,9 @@ public final class ItemFunctions {
      * @return true if the item has the specified enchantment, false otherwise.
      */
     public static boolean containsEnchantment(ItemStack stack, Enchantment enchantment) {
+        //? if <1.20.5 {
+        return getEnchantmentLevel(stack, enchantment) > 0;
+        //?} else {
         if (enchantment == null) {
             return false;
         }
@@ -408,6 +440,7 @@ public final class ItemFunctions {
             }
         }
         return false;
+        //?}
     }
 
     /**
@@ -419,6 +452,9 @@ public final class ItemFunctions {
      * @return The level of the enchantment, or 0 if not present.
      */
     public static int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+        //? if <1.20.5 {
+        return net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
+        //?} else {
         if (enchantment == null) {
             return 0;
         }
@@ -433,6 +469,7 @@ public final class ItemFunctions {
             }
         }
         return 0;
+        //?}
     }
 
     /**
@@ -444,6 +481,14 @@ public final class ItemFunctions {
      * @return The level of the enchantment, or 0 if not present.
      */
     public static int getEnchantmentLevel(ItemStack stack, Identifier enchantment) {
+        //? if <1.20.5 {
+        return stack.getEnchantmentTags().stream()
+                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
+                .filter(tag -> enchantment.toString().equals(tag.getString("id")))
+                .mapToInt(tag -> tag.getInt("lvl"))
+                .findFirst()
+                .orElse(0);
+        //?} else {
         ItemEnchantments enchantments = stack.getEnchantments();
         if (enchantments.isEmpty()) {
             return 0;
@@ -457,6 +502,7 @@ public final class ItemFunctions {
             }
         }
         return 0;
+        //?}
     }
 
     /**
@@ -475,9 +521,11 @@ public final class ItemFunctions {
      * @param stack The ItemStack to get enchantments from.
      * @return The ItemEnchantments component.
      */
+    //? if >=1.20.5 {
     public static ItemEnchantments getEnchantments(ItemStack stack) {
         return stack.getEnchantments();
     }
+    //?}
 
     // ==================== ITEM CLASSIFICATION OPERATIONS ====================
 
@@ -490,6 +538,9 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isTool(ItemStack stack) {
+        //? if <1.20.5
+        /*return stack.getItem() instanceof net.minecraft.world.item.TieredItem;*/
+        //? if >=1.20.5
         return stack.has(DataComponents.TOOL);
     }
 
@@ -502,6 +553,9 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isTool(Item item) {
+        //? if <1.20.5
+        /*return item instanceof net.minecraft.world.item.TieredItem;*/
+        //? if >=1.20.5
         return item.getDefaultInstance().has(DataComponents.TOOL);
     }
 
@@ -514,6 +568,9 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(ItemStack stack) {
+        //? if <1.20.5
+        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(Attributes.ATTACK_DAMAGE);*/
+        //? if >=1.20.5 {
         //? if >=1.21.5
         return stack.has(DataComponents.WEAPON);
         //? if <1.21.5
@@ -522,6 +579,7 @@ public final class ItemFunctions {
                 .stream()
                 .anyMatch(modifier -> modifier.attribute().equals(Attributes.ATTACK_DAMAGE)
                         && modifier.modifier().amount() > 0.0D);*/
+        //?}
     }
 
     /**
@@ -533,10 +591,14 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(Item item) {
+        //? if <1.20.5
+        /*return isWeapon(item.getDefaultInstance());*/
+        //? if >=1.20.5 {
         //? if >=1.21.5
         return item.getDefaultInstance().has(DataComponents.WEAPON);
         //? if <1.21.5
         /*return isWeapon(item.getDefaultInstance());*/
+        //?}
     }
 
     /**

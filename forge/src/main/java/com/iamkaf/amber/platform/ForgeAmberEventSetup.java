@@ -6,9 +6,11 @@ import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
+//? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPatch;
+//? if >=1.20.5
 import net.minecraft.core.component.DataComponentType;
+//? if >=1.20.5
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -33,6 +35,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;
+//? if >=1.20.5
 import net.minecraftforge.event.GatherComponentsEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 //? if <1.21.6
@@ -46,6 +49,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     /**
      * Forge-specific wrapper for GatherComponentsEvent.Item.
      */
+    //? if >=1.20.5 {
     private static class ForgeComponentModificationContext implements ItemEvents.ComponentModificationContext {
         private final GatherComponentsEvent.Item event;
 
@@ -68,6 +72,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
         }
     }
+    //?}
     @Override
     public void registerCommon() {
         //? if >=1.21.6 {
@@ -139,7 +144,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         // Default item components event
         //? if >=1.21.6
         GatherComponentsEvent.Item.BUS.addListener(EventHandlerCommon::onGatherComponents);
-        //? if <1.21.6
+        //? if >=1.20.5 && <1.21.6
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onGatherComponents);*/
     }
 
@@ -419,11 +424,14 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /**
          * Handles GatherComponentsEvent.Item from Forge.
          */
+        //? if >=1.20.5
         public static void onGatherComponents(GatherComponentsEvent.Item event) {
+        //? if >=1.20.5 {
             ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
                 new ForgeComponentModificationContext(event)
             );
         }
+        //?}
     }
 
     static public class EventHandlerClient {

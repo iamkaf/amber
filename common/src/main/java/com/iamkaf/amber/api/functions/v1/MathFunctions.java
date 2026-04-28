@@ -67,7 +67,7 @@ public final class MathFunctions {
      * @return A clamped probability value from 0 to 1.
      */
     public static float clampProbability(float percent) {
-        return Math.clamp(percent, 0f, 1f);
+        return Math.max(0f, Math.min(1f, percent));
     }
 
     // ==================== RANDOM NUMBER OPERATIONS ====================
@@ -235,7 +235,7 @@ public final class MathFunctions {
      * @return The interpolated value.
      */
     public static double lerp(double a, double b, double t) {
-        return a + (b - a) * Math.clamp(t, 0.0, 1.0);
+        return a + (b - a) * clamp(t, 0.0, 1.0);
     }
 
     /**

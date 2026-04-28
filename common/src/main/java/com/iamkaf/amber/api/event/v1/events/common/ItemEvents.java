@@ -2,15 +2,18 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+//? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+//? if >=1.20.5
 import java.util.function.Consumer;
 
 public class ItemEvents {
+    //? if >=1.20.5 {
     /**
      * An event that is fired when default data components for items are being registered.
      * <p>
@@ -32,6 +35,7 @@ public class ItemEvents {
                 }
             }
     );
+    //?}
 
     /**
      * An event that is fired when a player drops an item.
@@ -96,6 +100,7 @@ public class ItemEvents {
         void onItemPickup(Player player, ItemEntity itemEntity, ItemStack itemStack);
     }
 
+    //? if >=1.20.5 {
     @FunctionalInterface
     public interface ModifyDefaultComponents {
         /**
@@ -130,4 +135,5 @@ public class ItemEvents {
          */
         void modify(Item item, Consumer<DataComponentMap.Builder> builderConsumer);
     }
+    //?}
 }

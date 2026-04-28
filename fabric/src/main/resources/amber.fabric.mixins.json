@@ -8,8 +8,11 @@
     "AnimalMixin",
     "BlockItemMixin",
     "BoneMealItemMixin",
+    "BuiltInRegistriesMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
+    //? if >=1.20.5
+    "ItemAccessor",
     "ItemEntityMixin",
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
