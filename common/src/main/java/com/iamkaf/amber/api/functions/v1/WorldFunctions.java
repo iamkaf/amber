@@ -224,10 +224,7 @@ public final class WorldFunctions {
     }
 
     private static SoundEvent soundEvent(Holder<SoundEvent> sound) {
-        //? if >=1.21
         return sound.value();
-        //? if <1.21
-        /*return sound.value();*/
     }
 
     // ==================== DIMENSION UTILITIES ====================
