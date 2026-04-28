@@ -446,21 +446,33 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             KeybindHelper.forgeEventAlreadyFired = true;
         }
 
+        //? if >=1.20.4
         public static void onClientTickEventPre(TickEvent.ClientTickEvent.Pre pre) {
+        //? if <1.20.4
+        /*public static void onClientTickEventPre(TickEvent.ClientTickEvent event) { if (event.phase != TickEvent.Phase.START) return;*/
             ClientTickEvents.START_CLIENT_TICK.invoker().onStartTick();
         }
 
+        //? if >=1.20.4
         public static void onClientTickEventPost(TickEvent.ClientTickEvent.Post post) {
+        //? if <1.20.4
+        /*public static void onClientTickEventPost(TickEvent.ClientTickEvent event) { if (event.phase != TickEvent.Phase.END) return;*/
             ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
     }
 
     static public class EventHandlerServer {
+        //? if >=1.20.4
         public static void onServerTickEventPre(TickEvent.ServerTickEvent.Pre pre) {
+        //? if <1.20.4
+        /*public static void onServerTickEventPre(TickEvent.ServerTickEvent event) { if (event.phase != TickEvent.Phase.START) return;*/
             ServerTickEvents.START_SERVER_TICK.invoker().onStartTick();
         }
 
+        //? if >=1.20.4
         public static void onServerTickEventPost(TickEvent.ServerTickEvent.Post post) {
+        //? if <1.20.4
+        /*public static void onServerTickEventPost(TickEvent.ServerTickEvent event) { if (event.phase != TickEvent.Phase.END) return;*/
             ServerTickEvents.END_SERVER_TICK.invoker().onEndTick();
         }
     }
