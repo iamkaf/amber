@@ -45,8 +45,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 //? if >=1.19.1
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-//? if <1.19.1
+//? if >=1.18 && <1.19.1
 /*import net.minecraftforge.client.ClientRegistry;*/
+//? if <1.18
+/*import net.minecraftforge.fmlclient.registry.ClientRegistry;*/
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;

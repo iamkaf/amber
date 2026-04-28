@@ -23,7 +23,7 @@ dependencies {
 }
 
 tasks.withType(ProcessResources).configureEach {
-    if (minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
+    if (minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         inputs.property('amberFabricApiModuleDepends', 'fabric')
         filesMatching('fabric.mod.json') {
             filter { line -> line.replace('"fabric-api": "*",', '"fabric": "*",') }

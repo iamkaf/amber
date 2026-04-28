@@ -8,11 +8,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.SimpleChannel;
-//?} else {
+//?} else if >=1.18 {
 /*import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;*/
+//?} else {
+/*import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;*/
 //?}
+//? if >=1.18
 import net.minecraftforge.network.PacketDistributor;
+//? if <1.18
+/*import net.minecraftforge.fmllegacy.network.PacketDistributor;*/
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
