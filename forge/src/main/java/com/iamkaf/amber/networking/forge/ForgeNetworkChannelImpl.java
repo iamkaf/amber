@@ -149,7 +149,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         
         // Send to all players except the specified one
         // We need to iterate through all players and send individually
+        //? if >=1.20
         if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+        //? if <1.20
+        /*if (except.level instanceof net.minecraft.server.level.ServerLevel serverLevel) {*/
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                 if (!player.equals(except)) {
                     //? if >=1.20.2

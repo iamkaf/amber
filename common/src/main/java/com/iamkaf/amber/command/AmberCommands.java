@@ -29,36 +29,39 @@ public class AmberCommands {
                     return Command.SINGLE_SUCCESS;
                 }
 
-                commandContext.getSource().sendSuccess(
-                        () -> {
-                            MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
-                                    .append(" - Version: " + modInfo.version() + "\n")
-                                    .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                                    //? if >=1.21.6
-                                    .append(" - Minecraft: " + SharedConstants.getCurrentVersion().name() + "\n")
-                                    //? if <1.21.6
-                                    /*.append(" - Minecraft: " + SharedConstants.getCurrentVersion().getName() + "\n")*/
-                                    .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
-                                            "Not " + "Initialized") + "\n")
-                                    .append("Mixins: \n");
-                            for (String mixin : AmberMod.AMBER_MIXINS) {
-                                message.append(Component.literal(mixin + "\n")
-                                        .withStyle(style -> style.withColor(0xFFAA00)));
-                            }
-                            message.append("\n").append("Amber Mods: \n");
-                            for (AmberModInfo amberMod : AmberMod.AMBER_MODS) {
-                                message.append(Component.literal(String.format(
-                                                "%s - %s\n",
-                                                amberMod.name(),
-                                                amberMod.version()
-                                        ))
-                                        .withStyle(style -> style.withColor(0x00AAFF)));
-                            }
-                            return message;
-                        }, true
-                );
+                //? if >=1.20
+                commandContext.getSource().sendSuccess(() -> doctorMessage(modInfo), true);
+                //? if <1.20
+                /*commandContext.getSource().sendSuccess(doctorMessage(modInfo), true);*/
                 return Command.SINGLE_SUCCESS;
             });
+
+    private static MutableComponent doctorMessage(ModInfo modInfo) {
+        MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
+                .append(" - Version: " + modInfo.version() + "\n")
+                .append(" - Platform: " + Platform.getPlatformName() + "\n")
+                //? if >=1.21.6
+                .append(" - Minecraft: " + SharedConstants.getCurrentVersion().name() + "\n")
+                //? if <1.21.6
+                /*.append(" - Minecraft: " + SharedConstants.getCurrentVersion().getName() + "\n")*/
+                .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
+                        "Not " + "Initialized") + "\n")
+                .append("Mixins: \n");
+        for (String mixin : AmberMod.AMBER_MIXINS) {
+            message.append(Component.literal(mixin + "\n")
+                    .withStyle(style -> style.withColor(0xFFAA00)));
+        }
+        message.append("\n").append("Amber Mods: \n");
+        for (AmberModInfo amberMod : AmberMod.AMBER_MODS) {
+            message.append(Component.literal(String.format(
+                            "%s - %s\n",
+                            amberMod.name(),
+                            amberMod.version()
+                    ))
+                    .withStyle(style -> style.withColor(0x00AAFF)));
+        }
+        return message;
+    }
 
     public static void initialize() {
         CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {

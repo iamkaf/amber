@@ -610,7 +610,10 @@ public final class PlayerFunctions {
                     player.getZ(),
                     volume,
                     pitch,
+                    //? if >=1.20
                     player.level().getRandom().nextLong()
+                    //? if <1.20
+                    /*player.level.getRandom().nextLong()*/
             ));
         }
     }

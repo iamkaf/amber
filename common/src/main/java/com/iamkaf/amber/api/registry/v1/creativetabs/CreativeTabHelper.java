@@ -2,6 +2,8 @@ package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+//? if >=1.20
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -35,6 +37,13 @@ import java.util.function.Supplier;
  */
 public final class CreativeTabHelper {
     private CreativeTabHelper() {}
+
+    private static ResourceKey<Registry<CreativeModeTab>> creativeModeTabRegistryKey() {
+        //? if >=1.20
+        return Registries.CREATIVE_MODE_TAB;
+        //? if <1.20
+        /*return ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab"));*/
+    }
 
     /**
      * Adds an item to an existing creative mode tab.
@@ -112,7 +121,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, Supplier<ItemLike>... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, tabId);
+        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (Supplier<ItemLike> item : items) {
@@ -132,7 +141,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, ItemLike... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, tabId);
+        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (ItemLike item : items) {

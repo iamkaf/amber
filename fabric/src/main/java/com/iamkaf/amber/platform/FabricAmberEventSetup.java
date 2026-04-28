@@ -148,6 +148,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Creative mode tab events
         // Register for all existing vanilla tabs
+        //? if >=1.20 {
         for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
             //? if >=26.1 {
             net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
@@ -173,13 +174,21 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             });
             *///?}
         }
+        //?}
 
         // Register for our custom tabs
         for (var builder : CreativeModeTabRegistry.getTabBuilders().values()) {
-            var tabKey = net.minecraft.resources.ResourceKey.create(
+            //? if >=1.20 {
+            net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey = net.minecraft.resources.ResourceKey.create(
                 net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
                 builder.getId()
             );
+            //?} else {
+            /*net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey = net.minecraft.resources.ResourceKey.create(
+                net.minecraft.resources.ResourceKey.createRegistryKey(new net.minecraft.resources.ResourceLocation("minecraft", "creative_mode_tab")),
+                builder.getId()
+            );*/
+            //?}
             //? if >=26.1 {
             net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
                 // Add items from the TabBuilder
@@ -197,8 +206,21 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                     }
                 });
             });
-            //?} else {
+            //?} else if >=1.20 {
             /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
+                for (var itemSupplier : builder.getItems()) {
+                    tab.accept(itemSupplier.get());
+                }
+
+                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                    @Override
+                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                        tab.accept(stack);
+                    }
+                });
+            });
+            *///?} else {
+            /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(builder.getId()).register((tab) -> {
                 for (var itemSupplier : builder.getItems()) {
                     tab.accept(itemSupplier.get());
                 }

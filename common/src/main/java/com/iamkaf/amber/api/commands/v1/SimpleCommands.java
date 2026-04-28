@@ -19,11 +19,11 @@ public class SimpleCommands {
                 return Command.SINGLE_SUCCESS;
             }
 
-            commandContext.getSource()
-                    .sendSuccess(
-                            () -> Component.literal(modInfo.name()).append(" - Version: " + modInfo.version()),
-                            false
-                    );
+            Component message = Component.literal(modInfo.name()).append(" - Version: " + modInfo.version());
+            //? if >=1.20
+            commandContext.getSource().sendSuccess(() -> message, false);
+            //? if <1.20
+            /*commandContext.getSource().sendSuccess(message, false);*/
             return Command.SINGLE_SUCCESS;
         });
     }
