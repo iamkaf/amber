@@ -7,11 +7,16 @@ def isModernLine = !minecraftVersion.startsWith('1.')
 def libs = catalogFor(project, minecraftVersion)
 
 dependencies {
+    compileOnly 'org.slf4j:slf4j-api:1.7.36'
     if (isModernLine) {
         implementation library(libs, 'fabric-api')
     } else {
         modImplementation library(libs, 'fabric-api')
         modLocalRuntime library(libs, 'fabric-api')
+        if (minecraftVersion == '1.16.5') {
+            modLocalRuntime 'org.slf4j:slf4j-api:1.7.36'
+            modLocalRuntime 'org.slf4j:slf4j-simple:1.7.36'
+        }
     }
     if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
         if (isModernLine) {
@@ -23,7 +28,7 @@ dependencies {
 }
 
 tasks.withType(ProcessResources).configureEach {
-    if (minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
+    if (minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         inputs.property('amberFabricApiModuleDepends', 'fabric')
         filesMatching('fabric.mod.json') {
             filter { line -> line.replace('"fabric-api": "*",', '"fabric": "*",') }

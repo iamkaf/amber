@@ -334,10 +334,16 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
         // Player lifecycle events
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            //? if >=1.17
             PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(handler.getPlayer());
+            //? if <1.17
+            /*PlayerEvents.PLAYER_JOIN.invoker().onPlayerJoin(handler.player);*/
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            //? if >=1.17
             PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(handler.getPlayer());
+            //? if <1.17
+            /*PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(handler.player);*/
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(oldPlayer, newPlayer, alive);

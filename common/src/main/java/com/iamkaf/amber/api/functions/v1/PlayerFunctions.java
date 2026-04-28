@@ -7,9 +7,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
+//? if >=1.17 {
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
+//?} else
+/*import net.minecraft.network.protocol.game.ClientboundSetTitlesPacket;*/
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
@@ -122,7 +125,10 @@ public final class PlayerFunctions {
      * @return The player's abilities.
      */
     public static Abilities getAbilities(Player player) {
+        //? if >=1.17
         return player.getAbilities();
+        //? if <1.17
+        /*return player.abilities;*/
     }
 
     /**
@@ -132,7 +138,7 @@ public final class PlayerFunctions {
      * @param flying true if the player should be flying, false otherwise.
      */
     public static void setFlying(Player player, boolean flying) {
-        Abilities abilities = player.getAbilities();
+        Abilities abilities = getAbilities(player);
         abilities.flying = flying;
         player.onUpdateAbilities();
     }
@@ -144,7 +150,7 @@ public final class PlayerFunctions {
      * @return true if the player is flying, false otherwise.
      */
     public static boolean isFlying(Player player) {
-        return player.getAbilities().flying;
+        return getAbilities(player).flying;
     }
 
     /**
@@ -154,7 +160,7 @@ public final class PlayerFunctions {
      * @param allowFlight true if the player should be allowed to fly, false otherwise.
      */
     public static void setAllowFlight(Player player, boolean allowFlight) {
-        Abilities abilities = player.getAbilities();
+        Abilities abilities = getAbilities(player);
         abilities.mayfly = allowFlight;
         player.onUpdateAbilities();
     }
@@ -166,7 +172,7 @@ public final class PlayerFunctions {
      * @return true if the player can fly, false otherwise.
      */
     public static boolean canFly(Player player) {
-        return player.getAbilities().mayfly;
+        return getAbilities(player).mayfly;
     }
 
     /**
@@ -176,7 +182,7 @@ public final class PlayerFunctions {
      * @param invulnerable true if the player should be invulnerable, false otherwise.
      */
     public static void setInvulnerable(Player player, boolean invulnerable) {
-        Abilities abilities = player.getAbilities();
+        Abilities abilities = getAbilities(player);
         abilities.invulnerable = invulnerable;
         player.onUpdateAbilities();
     }
@@ -188,7 +194,7 @@ public final class PlayerFunctions {
      * @return true if the player is invulnerable, false otherwise.
      */
     public static boolean isInvulnerable(Player player) {
-        return player.getAbilities().invulnerable;
+        return getAbilities(player).invulnerable;
     }
 
     /**
@@ -198,7 +204,7 @@ public final class PlayerFunctions {
      * @param instaBuild true if the player should have insta-build, false otherwise.
      */
     public static void setInstaBuild(Player player, boolean instaBuild) {
-        Abilities abilities = player.getAbilities();
+        Abilities abilities = getAbilities(player);
         abilities.instabuild = instaBuild;
         player.onUpdateAbilities();
     }
@@ -210,7 +216,7 @@ public final class PlayerFunctions {
      * @return true if the player has insta-build, false otherwise.
      */
     public static boolean hasInstaBuild(Player player) {
-        return player.getAbilities().instabuild;
+        return getAbilities(player).instabuild;
     }
 
     /**
@@ -220,7 +226,7 @@ public final class PlayerFunctions {
      * @param mayBuild true if the player may build, false otherwise.
      */
     public static void setMayBuild(Player player, boolean mayBuild) {
-        Abilities abilities = player.getAbilities();
+        Abilities abilities = getAbilities(player);
         abilities.mayBuild = mayBuild;
         player.onUpdateAbilities();
     }
@@ -232,7 +238,7 @@ public final class PlayerFunctions {
      * @return true if the player may build, false otherwise.
      */
     public static boolean mayBuild(Player player) {
-        return player.getAbilities().mayBuild;
+        return getAbilities(player).mayBuild;
     }
 
     /**
@@ -367,7 +373,10 @@ public final class PlayerFunctions {
      * @param stack The item stack to set.
      */
     public static void setOffhandItem(Player player, ItemStack stack) {
+        //? if >=1.17
         player.getInventory().setItem(Inventory.SLOT_OFFHAND, stack);
+        //? if <1.17
+        /*player.inventory.offhand.set(0, stack);*/
     }
 
     /**
@@ -379,8 +388,10 @@ public final class PlayerFunctions {
     public static int getSelectedSlot(Player player) {
         //? if >=1.21.5
         return player.getInventory().getSelectedSlot();
-        //? if <1.21.5
+        //? if <1.21.5 && >=1.17
         /*return player.getInventory().selected;*/
+        //? if <1.17
+        /*return player.inventory.selected;*/
     }
 
     /**
@@ -395,8 +406,10 @@ public final class PlayerFunctions {
             player.getInventory().setSelectedSlot(slot);
             //? if <1.21.5 && >=1.21.2
             /*player.getInventory().setSelectedHotbarSlot(slot);*/
-            //? if <1.21.2
+            //? if <1.21.2 && >=1.17
             /*player.getInventory().selected = slot;*/
+            //? if <1.17
+            /*player.inventory.selected = slot;*/
         }
     }
 
@@ -409,7 +422,10 @@ public final class PlayerFunctions {
      */
     public static ItemStack getHotbarItem(Player player, int slot) {
         if (slot >= 0 && slot <= 8) {
+            //? if >=1.17
             return player.getInventory().getItem(slot);
+            //? if <1.17
+            /*return player.inventory.getItem(slot);*/
         }
         return ItemStack.EMPTY;
     }
@@ -423,7 +439,10 @@ public final class PlayerFunctions {
      */
     public static void setHotbarItem(Player player, int slot, ItemStack stack) {
         if (slot >= 0 && slot <= 8) {
+            //? if >=1.17
             player.getInventory().setItem(slot, stack);
+            //? if <1.17
+            /*player.inventory.setItem(slot, stack);*/
         }
     }
 
@@ -520,6 +539,7 @@ public final class PlayerFunctions {
     public static void sendTitle(Player player, @Nullable Component title, @Nullable Component subtitle,
                                  int fadeIn, int stay, int fadeOut) {
         if (player instanceof ServerPlayer serverPlayer) {
+            //? if >=1.17 {
             ClientboundSetTitlesAnimationPacket timesPacket = new ClientboundSetTitlesAnimationPacket(fadeIn, stay, fadeOut);
             serverPlayer.connection.send(timesPacket);
 
@@ -532,6 +552,17 @@ public final class PlayerFunctions {
                 ClientboundSetSubtitleTextPacket subtitlePacket = new ClientboundSetSubtitleTextPacket(subtitle);
                 serverPlayer.connection.send(subtitlePacket);
             }
+            //?} else {
+            /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(fadeIn, stay, fadeOut));
+
+            if (title != null) {
+                serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.TITLE, title));
+            }
+
+            if (subtitle != null) {
+                serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.SUBTITLE, subtitle));
+            }*/
+            //?}
         }
     }
 
@@ -554,9 +585,15 @@ public final class PlayerFunctions {
     public static void clearTitle(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             // Send empty title packets to clear the title
+            //? if >=1.17 {
             serverPlayer.connection.send(new ClientboundSetTitleTextPacket(emptyComponent()));
             serverPlayer.connection.send(new ClientboundSetSubtitleTextPacket(emptyComponent()));
             serverPlayer.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, 0));
+            //?} else {
+            /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.TITLE, emptyComponent()));
+            serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.SUBTITLE, emptyComponent()));
+            serverPlayer.connection.send(new ClientboundSetTitlesPacket(0, 0, 0));*/
+            //?}
         }
     }
 
