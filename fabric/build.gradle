@@ -5,6 +5,27 @@ plugins {
 def minecraftVersion = requiredProp(project, 'project.minecraft')
 def isModernLine = !minecraftVersion.startsWith('1.')
 def libs = catalogFor(project, minecraftVersion)
+def minecraftVersionAtLeast = { String targetVersion ->
+    if (isModernLine) {
+        return true
+    }
+    def currentParts = minecraftVersion.tokenize('.').collect { it as int }
+    def targetParts = targetVersion.tokenize('.').collect { it as int }
+    for (int i = 0; i < Math.max(currentParts.size(), targetParts.size()); i++) {
+        def currentPart = i < currentParts.size() ? currentParts[i] : 0
+        def targetPart = i < targetParts.size() ? targetParts[i] : 0
+        if (currentPart != targetPart) {
+            return currentPart > targetPart
+        }
+    }
+    return true
+}
+
+tasks.named('stageMergedJavaSources').configure {
+    if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion.startsWith('1.15.')) {
+        from rootProject.file('common/src/legacy-pre116/java')
+    }
+}
 
 if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
     configurations.configureEach {
@@ -30,7 +51,7 @@ dependencies {
         modImplementation library(libs, 'fabric-api')
         modLocalRuntime library(libs, 'fabric-api')
     }
-    if (minecraftVersion.startsWith('1.16')) {
+    if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion.startsWith('1.15.') || minecraftVersion.startsWith('1.16')) {
         modLocalRuntime 'org.slf4j:slf4j-api:1.7.36'
         modLocalRuntime 'org.slf4j:slf4j-simple:1.7.36'
     }
@@ -44,6 +65,22 @@ dependencies {
 }
 
 tasks.withType(ProcessResources).configureEach {
+    inputs.property('amberLegacyFabricMixinFilter', minecraftVersion)
+    filesMatching('amber.fabric.mixins.json') {
+        if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion == '1.15.1' || minecraftVersion == '1.15.2') {
+            filter { line -> line.contains('"AnimalMixin",') ? '' : line }
+        } else {
+            filter { line -> line.contains('"BreedGoalMixin",') ? '' : line }
+        }
+        if (!minecraftVersionAtLeast('1.20.5')) {
+            filter { line -> line.contains('"BuiltInRegistriesMixin",') ? '' : line }
+            filter { line -> line.contains('"ItemAccessor",') ? '' : line }
+        }
+        if (minecraftVersion == '1.14.4') {
+            filter { line -> line.contains('"LevelRendererMixin",') ? '' : line }
+        }
+    }
+
     if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
         def fabricApiModuleDepends = '''"fabric-api-base": "*",
         "fabric-command-api-v1": "*",
@@ -59,7 +96,7 @@ tasks.withType(ProcessResources).configureEach {
             filter { line -> line.replace('"fabric-api": "*",', fabricApiModuleDepends) }
         }
     }
-    if (minecraftVersion == '1.16.2' || minecraftVersion == '1.16.3' || minecraftVersion == '1.16.4' || minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
+    if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion == '1.15.1' || minecraftVersion == '1.15.2' || minecraftVersion == '1.16.2' || minecraftVersion == '1.16.3' || minecraftVersion == '1.16.4' || minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         inputs.property('amberFabricApiModuleDepends', 'fabric')
         filesMatching('fabric.mod.json') {
             filter { line -> line.replace('"fabric-api": "*",', '"fabric": "*",') }

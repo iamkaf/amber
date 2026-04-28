@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+//? if >=1.19
 import net.minecraft.network.chat.MutableComponent;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
@@ -22,7 +23,8 @@ public class SimpleCommands {
                 return Command.SINGLE_SUCCESS;
             }
 
-            Component message = literal(modInfo.name()).append(" - Version: " + modInfo.version());
+            var message = literal(modInfo.name());
+            message.append(" - Version: " + modInfo.version());
             //? if >=1.20
             commandContext.getSource().sendSuccess(() -> message, false);
             //? if <1.20
@@ -31,7 +33,10 @@ public class SimpleCommands {
         });
     }
 
+    //? if >=1.19
     private static MutableComponent literal(String value) {
+    //? if <1.19
+    /*private static TextComponent literal(String value) {*/
         //? if >=1.19
         return Component.literal(value);
         //? if <1.19

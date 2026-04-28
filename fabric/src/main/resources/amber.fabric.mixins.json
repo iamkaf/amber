@@ -5,7 +5,10 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "${mixin_compat_fabric}",
   "mixins": [
+    //? if >=1.16
     "AnimalMixin",
+    //? if <1.16
+    "BreedGoalMixin",
     "BlockItemMixin",
     "BoneMealItemMixin",
     //? if >=1.20.5

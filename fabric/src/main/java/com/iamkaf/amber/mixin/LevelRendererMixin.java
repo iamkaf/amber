@@ -2,13 +2,15 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
-//? if <1.21.2
+//? if <1.21.2 && >=1.15
 /*import com.mojang.blaze3d.vertex.VertexConsumer;*/
+//? if >=1.15
 import com.mojang.blaze3d.vertex.PoseStack;
 //? if <1.21.9
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+//? if >=1.15
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
@@ -44,7 +46,16 @@ public class LevelRendererMixin {
         cancellable = true
     )
     private void onRenderBlockOutline(
-            //? if <1.21.2 {
+            //? if <1.15 {
+            /*Object poseStack,
+            Object vertexConsumer,
+            Entity entity,
+            double cameraX,
+            double cameraY,
+            double cameraZ,
+            BlockPos outlinePos,
+            BlockState outlineState,
+            *///?} else if <1.21.2 {
             /*PoseStack poseStack,
             VertexConsumer vertexConsumer,
             Entity entity,
@@ -65,7 +76,8 @@ public class LevelRendererMixin {
             CallbackInfo ci
     ) {
         //? if <1.21.2 {
-        /*if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        /*//? if >=1.15 {
+        if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
@@ -76,7 +88,7 @@ public class LevelRendererMixin {
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
                 this.minecraft.gameRenderer.getMainCamera(),
                 this.minecraft.renderBuffers().bufferSource(),
-                poseStack,
+                (PoseStack) poseStack,
                 blockHitResult,
                 outlinePos,
                 outlineState
@@ -85,6 +97,7 @@ public class LevelRendererMixin {
         if (result != InteractionResult.PASS) {
             ci.cancel();
         }
+        //?}
         *///?} else {
         //? if >=1.21.9 {
         if (levelRenderState.blockOutlineRenderState == null) {

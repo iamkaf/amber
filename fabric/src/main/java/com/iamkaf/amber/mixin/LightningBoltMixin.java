@@ -4,7 +4,10 @@ import com.iamkaf.amber.api.event.v1.events.common.WeatherEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+//? if >=1.16
 import net.minecraft.world.entity.LightningBolt;
+//? if <1.16
+/*import net.minecraft.world.entity.global.LightningBolt;*/
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -22,8 +25,10 @@ public abstract class LightningBoltMixin {
                     value = "INVOKE",
                     //? if >=1.16.2
                     target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LightningBolt;)V"
-                    //? if <1.16.2
+                    //? if <1.16.2 && >=1.16
                     /*target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/world/entity/LightningBolt;)V"*/
+                    //? if <1.16
+                    /*target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/world/entity/global/LightningBolt;)V"*/
             )
     )
     //? if >=1.16.2

@@ -16,6 +16,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+//? if >=1.19
 import net.minecraft.network.chat.MutableComponent;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
@@ -39,34 +40,41 @@ public class AmberCommands {
                 return Command.SINGLE_SUCCESS;
             });
 
+    //? if >=1.19
     private static MutableComponent doctorMessage(ModInfo modInfo) {
-        MutableComponent message = literal(modInfo.name() + " Doctor\n")
-                .append(" - Version: " + modInfo.version() + "\n")
-                .append(" - Platform: " + Platform.getPlatformName() + "\n")
-                //? if >=1.21.6
-                .append(" - Minecraft: " + SharedConstants.getCurrentVersion().name() + "\n")
-                //? if <1.21.6
-                /*.append(" - Minecraft: " + SharedConstants.getCurrentVersion().getName() + "\n")*/
-                .append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
-                        "Not " + "Initialized") + "\n")
-                .append("Mixins: \n");
+    //? if <1.19
+    /*private static TextComponent doctorMessage(ModInfo modInfo) {*/
+        var message = literal(modInfo.name() + " Doctor\n");
+        message.append(" - Version: " + modInfo.version() + "\n");
+        message.append(" - Platform: " + Platform.getPlatformName() + "\n");
+        //? if >=1.21.6
+        message.append(" - Minecraft: " + SharedConstants.getCurrentVersion().name() + "\n");
+        //? if <1.21.6
+        /*message.append(" - Minecraft: " + SharedConstants.getCurrentVersion().getName() + "\n");*/
+        message.append(" - Networking: " + (AmberNetworking.isInitialized() ? "Initialized" :
+                "Not " + "Initialized") + "\n");
+        message.append("Mixins: \n");
         for (String mixin : AmberMod.AMBER_MIXINS) {
             message.append(literal(mixin + "\n")
-                    .withStyle(style -> style.withColor(ChatFormatting.GOLD)));
+                    .withStyle(ChatFormatting.GOLD));
         }
-        message.append("\n").append("Amber Mods: \n");
+        message.append("\n");
+        message.append("Amber Mods: \n");
         for (AmberModInfo amberMod : AmberMod.AMBER_MODS) {
             message.append(literal(String.format(
                             "%s - %s\n",
                             amberMod.name(),
                             amberMod.version()
                     ))
-                    .withStyle(style -> style.withColor(ChatFormatting.AQUA)));
+                    .withStyle(ChatFormatting.AQUA));
         }
         return message;
     }
 
+    //? if >=1.19
     private static MutableComponent literal(String value) {
+    //? if <1.19
+    /*private static TextComponent literal(String value) {*/
         //? if >=1.19
         return Component.literal(value);
         //? if <1.19

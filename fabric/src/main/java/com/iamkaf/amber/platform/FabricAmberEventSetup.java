@@ -18,7 +18,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if >=26.1
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-//? if <26.1
+//? if <26.1 && >=1.15
 /*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;*/
 //? if >=1.19
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -69,7 +69,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         return net.minecraft.core.RegistryAccess.BUILTIN.get();
     }*/
     //?}
-    //? if <1.18.2 {
+    //? if <1.18.2 && >=1.16 {
     /*private static net.minecraft.core.RegistryAccess commandRegistryAccess() {
         return net.minecraft.core.RegistryAccess.builtin();
     }*/
@@ -115,9 +115,13 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         /*LootTableEvents.MODIFY.register((resourceManager, lootManager, id, builder, lootTableSource) -> {
             LootEvents.MODIFY.invoker().modify(id, lootPool -> builder.withPool(lootPool));
         });*/
-        //?} else {
+        //?} else if >=1.16 {
         /*LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {
             LootEvents.MODIFY.invoker().modify(id, supplier::pool);
+        });*/
+        //?} else {
+        /*LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {
+            LootEvents.MODIFY.invoker().modify(id, supplier::withPool);
         });*/
         //?}
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
@@ -127,13 +131,17 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
             CommandEvents.EVENT.invoker().register(commandDispatcher, commandBuildContext, commandSelection);
         });
-        //?} else {
+        //?} else if >=1.16 {
         /*CommandRegistrationCallback.EVENT.register((commandDispatcher, dedicated) -> {
             CommandEvents.EVENT.invoker().register(
                     commandDispatcher,
                     commandRegistryAccess(),
                     dedicated ? net.minecraft.commands.Commands.CommandSelection.DEDICATED : net.minecraft.commands.Commands.CommandSelection.ALL
             );
+        });*/
+        //?} else {
+        /*CommandRegistrationCallback.EVENT.register((commandDispatcher, dedicated) -> {
+            CommandEvents.EVENT.invoker().register(commandDispatcher, net.minecraft.core.RegistryAccess.builtin(), dedicated);
         });*/
         //?}
 
@@ -291,9 +299,13 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "render_hud"),
                 (guiGraphics, tickDelta) -> HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta)
         );
-        //?} else {
+        //?} else if >=1.16 {
         /*HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, tickDelta);
+        });
+        *///?} else if >=1.15 {
+        /*HudRenderCallback.EVENT.register((tickDelta) -> {
+            HudEvents.RENDER_HUD.invoker().onHudRender(new com.mojang.blaze3d.vertex.PoseStack(), tickDelta);
         });
         *///?}
         ClientTickEvents.START_CLIENT_TICK.register(minecraft -> {

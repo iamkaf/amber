@@ -5,6 +5,12 @@ plugins {
 def minecraftVersion = requiredProp(project, 'project.minecraft')
 def libs = catalogFor(project, minecraftVersion)
 
+tasks.named('stageMergedJavaSources').configure {
+    if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion.startsWith('1.15.')) {
+        from rootProject.file('common/src/legacy-pre116/java')
+    }
+}
+
 dependencies {
     compileOnly 'org.slf4j:slf4j-api:1.7.36'
     compileOnly library(libs, 'mixin')

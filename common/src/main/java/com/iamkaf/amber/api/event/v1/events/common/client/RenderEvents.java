@@ -3,11 +3,13 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.client.Camera;
+//? if >=1.15
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+//? if >=1.15
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class RenderEvents {
@@ -50,7 +52,15 @@ public class RenderEvents {
          * @param state        the state of the block being outlined
          * @return an {@link InteractionResult} indicating whether the outline should be rendered or cancelled
          */
-        InteractionResult onBlockOutlineRender(Camera camera, MultiBufferSource bufferSource, PoseStack poseStack, 
+        InteractionResult onBlockOutlineRender(Camera camera,
+                                             //? if >=1.15
+                                             MultiBufferSource bufferSource,
+                                             //? if <1.15
+                                             /*Object bufferSource,*/
+                                             //? if >=1.15
+                                             PoseStack poseStack,
+                                             //? if <1.15
+                                             /*Object poseStack,*/
                                              BlockHitResult hitResult, BlockPos pos, BlockState state);
     }
 }
