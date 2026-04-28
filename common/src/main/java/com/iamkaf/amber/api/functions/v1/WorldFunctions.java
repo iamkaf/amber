@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -157,7 +158,12 @@ public final class WorldFunctions {
      * @param position The position to play the sound at.
      * @param sound The sound event to play.
      */
-    public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound) {
+    public static void playSoundAt(Level level, Vec3 position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound
+            //? if <1.18.2
+            /*SoundEvent sound*/
+    ) {
         level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
@@ -169,7 +175,12 @@ public final class WorldFunctions {
      * @param sound The sound event to play.
      * @param source The sound source category.
      */
-    public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source) {
+    public static void playSoundAt(Level level, Vec3 position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+            SoundSource source) {
         level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, 1.0f, 1.0f);
     }
 
@@ -182,7 +193,12 @@ public final class WorldFunctions {
      * @param source The sound source category.
      * @param volume The volume level (1.0 = normal volume).
      */
-    public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source, float volume) {
+    public static void playSoundAt(Level level, Vec3 position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+            SoundSource source, float volume) {
         level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, 1.0f);
     }
 
@@ -196,7 +212,12 @@ public final class WorldFunctions {
      * @param volume The volume level (1.0 = normal volume).
      * @param pitch The pitch multiplier (1.0 = normal pitch).
      */
-    public static void playSoundAt(Level level, Vec3 position, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
+    public static void playSoundAt(Level level, Vec3 position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+            SoundSource source, float volume, float pitch) {
         level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, pitch);
     }
 
@@ -208,7 +229,12 @@ public final class WorldFunctions {
      * @param sound The sound event to play.
      * @param source The sound source category.
      */
-    public static void playSoundAt(Level level, BlockPos position, Holder<SoundEvent> sound, SoundSource source) {
+    public static void playSoundAt(Level level, BlockPos position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+            SoundSource source) {
         level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, 1.0f, 1.0f);
     }
 
@@ -222,12 +248,25 @@ public final class WorldFunctions {
      * @param volume The volume level (1.0 = normal volume).
      * @param pitch The pitch multiplier (1.0 = normal pitch).
      */
-    public static void playSoundAt(Level level, BlockPos position, Holder<SoundEvent> sound, SoundSource source, float volume, float pitch) {
+    public static void playSoundAt(Level level, BlockPos position,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+            SoundSource source, float volume, float pitch) {
         level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, volume, pitch);
     }
 
-    private static SoundEvent soundEvent(Holder<SoundEvent> sound) {
+    private static SoundEvent soundEvent(
+            //? if >=1.18.2
+            Holder<SoundEvent> sound
+            //? if <1.18.2
+            /*SoundEvent sound*/
+    ) {
+        //? if >=1.18.2
         return sound.value();
+        //? if <1.18.2
+        /*return sound;*/
     }
 
     // ==================== DIMENSION UTILITIES ====================
@@ -582,7 +621,10 @@ public final class WorldFunctions {
      * @param position The position to get the biome at.
      * @return The biome at the position.
      */
+    //? if >=1.18.2
     public static Holder<Biome> getBiomeAtPosition(Level level, BlockPos position) {
+    //? if <1.18.2
+    /*public static Biome getBiomeAtPosition(Level level, BlockPos position) {*/
         return level.getBiome(position);
     }
 
@@ -593,10 +635,15 @@ public final class WorldFunctions {
      * @param position The position to get the biome at.
      * @return The biome at the position.
      */
+    //? if >=1.18.2
     public static Holder<Biome> getBiomeAtPosition(Level level, Vec3 position) {
+    //? if <1.18.2
+    /*public static Biome getBiomeAtPosition(Level level, Vec3 position) {*/
         //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position));
-        //? if <1.19.4
+        //? if <1.19.4 && >=1.18.2
+        /*return level.getBiome(new BlockPos(position));*/
+        //? if <1.18.2
         /*return level.getBiome(new BlockPos(position));*/
     }
 
@@ -608,7 +655,10 @@ public final class WorldFunctions {
      * @return The biome value at the position.
      */
     public static Biome getBiomeValueAtPosition(Level level, BlockPos position) {
+        //? if >=1.18.2
         return level.getBiome(position).value();
+        //? if <1.18.2
+        /*return level.getBiome(position);*/
     }
 
     /**
@@ -621,8 +671,10 @@ public final class WorldFunctions {
     public static Biome getBiomeValueAtPosition(Level level, Vec3 position) {
         //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position)).value();
-        //? if <1.19.4
+        //? if <1.19.4 && >=1.18.2
         /*return level.getBiome(new BlockPos(position)).value();*/
+        //? if <1.18.2
+        /*return level.getBiome(new BlockPos(position));*/
     }
 
     /**
@@ -638,8 +690,10 @@ public final class WorldFunctions {
         return level.getBiome(position).value().getPrecipitationAt(position, level.getSeaLevel()) == precipitation;
         //? if <1.21.2 && >=1.19.4
         /*return level.getBiome(position).value().getPrecipitationAt(position) == precipitation;*/
-        //? if <1.19.4
+        //? if <1.19.4 && >=1.18.2
         /*return level.getBiome(position).value().getPrecipitation() == precipitation;*/
+        //? if <1.18.2
+        /*return level.getBiome(position).getPrecipitation() == precipitation;*/
     }
 
     /**

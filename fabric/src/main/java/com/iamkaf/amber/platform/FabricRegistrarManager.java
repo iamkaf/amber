@@ -3,6 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.registry.v1.Registrar;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
 import com.iamkaf.amber.platform.services.IRegistrarManager;
+//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 //? if >=1.19.3
@@ -55,14 +56,20 @@ public class FabricRegistrarManager implements IRegistrarManager {
         }
 
         @Override
+        //? if >=1.18.2 {
         public Optional<Holder.Reference<T>> get(Identifier id) {
             //? if >=1.21.2
             return registry().get(id);
             //? if <1.21.2 && >=1.19.3
             /*return registry().getHolder(ResourceKey.create(key, id));*/
-            //? if <1.19.3
+            //? if <1.19.3 && >=1.18.2
             /*return Optional.empty();*/
         }
+        //?}
+        //? if <1.18.2
+        /*public Optional<T> get(Identifier id) {
+            return Optional.ofNullable(registry().get(id));
+        }*/
     }
 
     private static class FabricRegistrySupplier<R> implements RegistrySupplier<R> {

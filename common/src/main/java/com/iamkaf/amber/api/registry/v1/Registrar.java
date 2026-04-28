@@ -1,5 +1,6 @@
 package com.iamkaf.amber.api.registry.v1;
 
+//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -25,5 +26,8 @@ public interface Registrar<T> {
     /**
      * Retrieves an already registered value.
      */
+    //? if >=1.18.2
     Optional<Holder.Reference<T>> get(Identifier id);
+    //? if <1.18.2
+    /*Optional<T> get(Identifier id);*/
 }

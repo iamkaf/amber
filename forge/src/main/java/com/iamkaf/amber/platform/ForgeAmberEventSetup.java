@@ -32,6 +32,7 @@ import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+//? if >=1.18.1
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 //? if >=1.19.1
 import net.minecraftforge.event.level.LevelEvent;
@@ -40,6 +41,7 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+//? if >=1.18.1
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 //? if >=1.19.1
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -115,6 +117,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         BabyEntitySpawnEvent.BUS.addListener(EventHandlerCommon::onAnimalBreed);
 
         // Shield block events
+        //? if >=1.18.1
         ShieldBlockEvent.BUS.addListener(EventHandlerCommon::onShieldBlock);
         //?} else {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLootTableEvent);
@@ -143,6 +146,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onAnimalBreed);
 
         // Shield block events
+        //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onShieldBlock);*/
         //?}
 
@@ -165,7 +169,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     public void registerClient() {
         //? if >=1.21.6
         RegisterClientCommandsEvent.BUS.addListener(EventHandlerClient::onCommandRegistration);
-        //? if <1.21.6
+        //? if <1.21.6 && >=1.18.1
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onCommandRegistration);*/
         // mod bus events
         //? if >=1.21.10
@@ -282,10 +286,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     .register(event.getDispatcher(),
                             //? if >=1.19.1
                             event.getBuildContext(), event.getCommandSelection()
-                            //? if >=1.19 && <1.19.1
-                            /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
-                            //? if <1.19
+        //? if >=1.19 && <1.19.1
+        /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
+                            //? if <1.19 && >=1.18.2
                             /*net.minecraft.core.RegistryAccess.BUILTIN.get(), net.minecraft.commands.Commands.CommandSelection.ALL*/
+                            //? if <1.18.2
+                            /*net.minecraft.core.RegistryAccess.builtin(), net.minecraft.commands.Commands.CommandSelection.ALL*/
                     );
         }
 
@@ -462,6 +468,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
         }
 
+        //? if >=1.18.1 {
         public static void onShieldBlock(ShieldBlockEvent event) {
             if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player) {
                 //? if >=1.21.5
@@ -475,6 +482,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 }
             }
         }
+        //?}
 
         public static void onWorldLoad(
                 //? if >=1.19.1
@@ -575,16 +583,20 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerClient {
+        //? if >=1.18.1 {
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(),
                     //? if >=1.19.1
                     event.getBuildContext()
                     //? if >=1.19 && <1.19.1
                     /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get())*/
-                    //? if <1.19
+                    //? if <1.19 && >=1.18.2
                     /*net.minecraft.core.RegistryAccess.BUILTIN.get()*/
+                    //? if <1.18.2
+                    /*net.minecraft.core.RegistryAccess.builtin()*/
             );
         }
+        //?}
 
         public static void onKeybindRegistration(
                 //? if >=1.19.1

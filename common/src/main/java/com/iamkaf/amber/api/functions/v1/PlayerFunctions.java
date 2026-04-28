@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.functions.v1;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 //? if <1.19
