@@ -3,7 +3,10 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import com.mojang.brigadier.CommandDispatcher;
+//? if >=1.19
 import net.minecraft.commands.CommandBuildContext;
+//? if <1.19
+/*import net.minecraft.core.RegistryAccess;*/
 import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -32,6 +35,10 @@ public interface ClientCommandEvents {
      * May not work on Fabric.
      */
     @ApiStatus.Experimental
-    void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess);
+    void register(CommandDispatcher<CommandSourceStack> dispatcher,
+            //? if >=1.19
+            CommandBuildContext registryAccess
+            //? if <1.19
+            /*RegistryAccess registryAccess*/
+    );
 }
-

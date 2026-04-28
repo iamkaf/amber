@@ -7,6 +7,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+//? if <1.19
+/*import net.minecraft.network.chat.TextComponent;*/
 
 public class SimpleCommands {
     public static LiteralArgumentBuilder<CommandSourceStack> createBaseCommand(String modId) {
@@ -15,16 +18,23 @@ public class SimpleCommands {
 
             // wat??
             if (modInfo == null) {
-                commandContext.getSource().sendFailure(Component.literal("Mod info not found!"));
+                commandContext.getSource().sendFailure(literal("Mod info not found!"));
                 return Command.SINGLE_SUCCESS;
             }
 
-            Component message = Component.literal(modInfo.name()).append(" - Version: " + modInfo.version());
+            Component message = literal(modInfo.name()).append(" - Version: " + modInfo.version());
             //? if >=1.20
             commandContext.getSource().sendSuccess(() -> message, false);
             //? if <1.20
             /*commandContext.getSource().sendSuccess(message, false);*/
             return Command.SINGLE_SUCCESS;
         });
+    }
+
+    private static MutableComponent literal(String value) {
+        //? if >=1.19
+        return Component.literal(value);
+        //? if <1.19
+        /*return new TextComponent(value);*/
     }
 }

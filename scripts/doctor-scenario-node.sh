@@ -63,7 +63,7 @@ log_detail "result JSON: $result"
 
 log_step "Starting Minecraft client with TeaKit"
 ./gradlew --configure-on-demand "$gradle_task" --console=plain \
-  -Damber.withTeaKit=true \
+  -Pamber.withTeaKit=true \
   -Dteakit.autoWorld=true \
   -Dteakit.repoRoot="$PWD" \
   -Dteakit.scenarioRoot="$PWD" \

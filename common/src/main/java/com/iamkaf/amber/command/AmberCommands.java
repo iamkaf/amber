@@ -16,6 +16,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+//? if <1.19
+/*import net.minecraft.network.chat.TextComponent;*/
 
 public class AmberCommands {
 
@@ -25,7 +27,7 @@ public class AmberCommands {
 
                 // wat??
                 if (modInfo == null) {
-                    commandContext.getSource().sendFailure(Component.literal("Mod info not found!"));
+                    commandContext.getSource().sendFailure(literal("Mod info not found!"));
                     return Command.SINGLE_SUCCESS;
                 }
 
@@ -37,7 +39,7 @@ public class AmberCommands {
             });
 
     private static MutableComponent doctorMessage(ModInfo modInfo) {
-        MutableComponent message = Component.literal(modInfo.name() + " Doctor\n")
+        MutableComponent message = literal(modInfo.name() + " Doctor\n")
                 .append(" - Version: " + modInfo.version() + "\n")
                 .append(" - Platform: " + Platform.getPlatformName() + "\n")
                 //? if >=1.21.6
@@ -48,12 +50,12 @@ public class AmberCommands {
                         "Not " + "Initialized") + "\n")
                 .append("Mixins: \n");
         for (String mixin : AmberMod.AMBER_MIXINS) {
-            message.append(Component.literal(mixin + "\n")
+            message.append(literal(mixin + "\n")
                     .withStyle(style -> style.withColor(0xFFAA00)));
         }
         message.append("\n").append("Amber Mods: \n");
         for (AmberModInfo amberMod : AmberMod.AMBER_MODS) {
-            message.append(Component.literal(String.format(
+            message.append(literal(String.format(
                             "%s - %s\n",
                             amberMod.name(),
                             amberMod.version()
@@ -61,6 +63,13 @@ public class AmberCommands {
                     .withStyle(style -> style.withColor(0x00AAFF)));
         }
         return message;
+    }
+
+    private static MutableComponent literal(String value) {
+        //? if >=1.19
+        return Component.literal(value);
+        //? if <1.19
+        /*return new TextComponent(value);*/
     }
 
     public static void initialize() {
