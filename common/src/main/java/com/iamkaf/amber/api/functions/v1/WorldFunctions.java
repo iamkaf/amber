@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+//? if >=1.16
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.Entity;
@@ -23,6 +24,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 //? if <1.16.2
 /*import net.minecraft.world.level.LevelAccessor;*/
+//? if <1.16
+/*import net.minecraft.world.level.dimension.DimensionType;*/
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -290,7 +293,10 @@ public final class WorldFunctions {
      * @return true if the level is the Overworld, false otherwise.
      */
     public static boolean isOverworld(Level level) {
+        //? if >=1.16
         return level.dimension() == Level.OVERWORLD;
+        //? if <1.16
+        /*return level.dimension.getType() == DimensionType.OVERWORLD;*/
     }
 
     /**
@@ -300,7 +306,10 @@ public final class WorldFunctions {
      * @return true if the level is the Nether, false otherwise.
      */
     public static boolean isNether(Level level) {
+        //? if >=1.16
         return level.dimension() == Level.NETHER;
+        //? if <1.16
+        /*return level.dimension.getType() == DimensionType.NETHER;*/
     }
 
     /**
@@ -310,7 +319,10 @@ public final class WorldFunctions {
      * @return true if the level is the End, false otherwise.
      */
     public static boolean isEnd(Level level) {
+        //? if >=1.16
         return level.dimension() == Level.END;
+        //? if <1.16
+        /*return level.dimension.getType() == DimensionType.THE_END;*/
     }
 
     // ==================== DISTANCE UTILITIES ====================
@@ -551,7 +563,10 @@ public final class WorldFunctions {
     public static List<Player> getPlayers(Level level) {
         if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             return new ArrayList<>(serverLevel.players());
+        //? if >=1.15
         } else if (level instanceof net.minecraft.client.multiplayer.ClientLevel clientLevel) {
+        //? if <1.15
+        /*} else if (level instanceof net.minecraft.client.multiplayer.MultiPlayerLevel clientLevel) {*/
             return new ArrayList<>(clientLevel.players());
         }
         return new ArrayList<>();
@@ -588,7 +603,10 @@ public final class WorldFunctions {
                 center.x() - radius, center.y() - radius, center.z() - radius,
                 center.x() + radius, center.y() + radius, center.z() + radius
         );
+        //? if >=1.15
         return level.getEntities(entityType, boundingBox, entity -> true);
+        //? if <1.15
+        /*return (List<T>) (List<?>) level.getEntities(entityType, boundingBox, entity -> true);*/
     }
 
     /**
@@ -617,7 +635,10 @@ public final class WorldFunctions {
      * @return A list of entities within the radius.
      */
     public static List<Entity> getEntitiesInRadius(Level level, BlockPos center, double radius) {
+        //? if >=1.16
         return getEntitiesInRadius(level, Vec3.atCenterOf(center), radius);
+        //? if <1.16
+        /*return getEntitiesInRadius(level, new Vec3(center.getX() + 0.5D, center.getY() + 0.5D, center.getZ() + 0.5D), radius);*/
     }
 
     /**
@@ -631,7 +652,10 @@ public final class WorldFunctions {
      * @return A list of entities of the specified type within the radius.
      */
     public static <T extends Entity> List<T> getEntitiesInRadius(Level level, BlockPos center, double radius, EntityType<T> entityType) {
+        //? if >=1.16
         return getEntitiesInRadius(level, Vec3.atCenterOf(center), radius, entityType);
+        //? if <1.16
+        /*return getEntitiesInRadius(level, new Vec3(center.getX() + 0.5D, center.getY() + 0.5D, center.getZ() + 0.5D), radius, entityType);*/
     }
 
     /**
@@ -872,8 +896,10 @@ public final class WorldFunctions {
             for (Direction direction : Direction.values()) {
                 //? if >=1.21.2
                 Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getUnitVec3i()));
-                //? if <1.21.2
+                //? if <1.21.2 && >=1.16
                 /*Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getNormal()));*/
+                //? if <1.16
+                /*Vec3 adjacentCenter = center.add(new Vec3(direction.getNormal().getX(), direction.getNormal().getY(), direction.getNormal().getZ()));*/
                 AABB adjacentBox = positionToBox.get(adjacentCenter);
 
                 if (adjacentBox != null && isAligned(box, adjacentBox, direction)) {

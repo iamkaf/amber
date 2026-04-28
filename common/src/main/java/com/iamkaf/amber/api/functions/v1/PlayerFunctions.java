@@ -659,13 +659,23 @@ public final class PlayerFunctions {
                     //? if >=1.19 && <1.20
                     /*player.level.getRandom().nextLong()*/
             ));
-            //?} else {
+            //?} else if >=1.15 {
             /*serverPlayer.connection.send(new ClientboundSoundPacket(
                     sound,
                     source,
                     player.getX(),
                     player.getY(),
                     player.getZ(),
+                    volume,
+                    pitch
+            ));*/
+            //?} else {
+            /*serverPlayer.connection.send(new ClientboundSoundPacket(
+                    sound,
+                    source,
+                    player.x,
+                    player.y,
+                    player.z,
                     volume,
                     pitch
             ));*/

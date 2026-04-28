@@ -16,13 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(ServerPlayer.class)
 public class ServerPlayerDeathMixin {
     //? if <1.19.2 {
-    /*@Inject(
-            method = "die",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;broadcastEntityEvent(Lnet/minecraft/world/entity/Entity;B)V"
-            )
-    )
+    /*@Inject(method = "die", at = @At("HEAD"))
     private void amber$firePlayerDeath(DamageSource source, CallbackInfo ci) {
         EntityEvent.ENTITY_DEATH.invoker().onEntityDeath((ServerPlayer) (Object) this, source);
     }

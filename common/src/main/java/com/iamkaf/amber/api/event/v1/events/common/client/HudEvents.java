@@ -2,7 +2,7 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
-//? if <1.20
+//? if <1.20 && >=1.15
 /*import com.mojang.blaze3d.vertex.PoseStack;*/
 //? if >=1.21
 import net.minecraft.client.DeltaTracker;
@@ -43,7 +43,9 @@ public class HudEvents {
         /*void onHudRender(GuiGraphics guiGraphics, DeltaTracker tickCounter);*/
         //? if <1.21 && >=1.20
         /*void onHudRender(GuiGraphics guiGraphics, float tickCounter);*/
-        //? if <1.20
+        //? if <1.20 && >=1.15
         /*void onHudRender(PoseStack guiGraphics, float tickCounter);*/
+        //? if <1.15
+        /*void onHudRender(Object guiGraphics, float tickCounter);*/
     }
 }

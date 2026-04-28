@@ -45,5 +45,9 @@ public interface CommandEvents {
             CommandBuildContext registryAccess,
             //? if <1.19
             /*RegistryAccess registryAccess,*/
-            Commands.CommandSelection environment);
+            //? if >=1.16
+            Commands.CommandSelection environment
+            //? if <1.16
+            /*boolean dedicated*/
+    );
 }
