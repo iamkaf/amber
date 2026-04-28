@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 //? if <26.1
 /*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;*/
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//? if >=1.19.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -102,6 +103,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         });
 
         // Entity lifecycle events
+        //? if >=1.19.2 {
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(entity, source);
         });
@@ -109,6 +111,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker().onEntityDamage(entity, source, amount);
             return result == InteractionResult.PASS; // Only allow damage if PASS is returned
         });
+        //?}
 
         // After-damage and shield block events are implemented by LivingEntityAfterDamageMixin.
 

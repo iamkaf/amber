@@ -18,6 +18,7 @@
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
     "PlayerMixin",
+    "ServerPlayerDeathMixin",
     "ServerLevelMixin",
     "TamableAnimalMixin"
   ],
