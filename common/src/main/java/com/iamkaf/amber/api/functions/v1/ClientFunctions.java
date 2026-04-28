@@ -53,7 +53,10 @@ public final class ClientFunctions {
             return false;
         }
         try {
+            //? if >=1.20.2
             return !(mc.getDebugOverlay().showDebugScreen() || mc.options.hideGui || mc.level == null || mc.player == null);
+            //? if <1.20.2
+            /*return !(mc.options.renderDebug || mc.options.hideGui || mc.level == null || mc.player == null);*/
         } catch (Exception e) {
             // Handle any exceptions that may occur
             Constants.LOG.error("An error occurred while checking if the HUD should be rendered: {}", e.getMessage());

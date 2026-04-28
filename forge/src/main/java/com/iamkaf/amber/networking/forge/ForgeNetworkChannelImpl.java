@@ -4,10 +4,15 @@ import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.networking.v1.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=1.20.2 {
 import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
+//?} else {
+/*import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;*/
+//?}
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -27,11 +32,20 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     public ForgeNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
+        //? if >=1.20.2 {
         this.channel = ChannelBuilder.named(channelId)
             .networkProtocolVersion(PROTOCOL_VERSION)
             .clientAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
             .serverAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
             .simpleChannel();
+        //?} else {
+        /*String protocolVersion = Integer.toString(PROTOCOL_VERSION);
+        this.channel = NetworkRegistry.ChannelBuilder.named(channelId)
+            .networkProtocolVersion(() -> protocolVersion)
+            .clientAcceptedVersions(protocolVersion::equals)
+            .serverAcceptedVersions(protocolVersion::equals)
+            .simpleChannel();*/
+        //?}
     }
     
     @Override
@@ -42,15 +56,19 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
             PacketHandler<T> handler
     ) {
         PacketRegistration<T> registration = new PacketRegistration<>(encoder, decoder, handler);
+        int discriminator = registrations.size();
         registrations.put(packetClass, registration);
         
         // Register bidirectional packet handling using the deprecated MessageBuilder API
         // This is needed for compatibility with the current Forge version
-        channel.messageBuilder(packetClass)
+        channel.messageBuilder(packetClass, discriminator)
             .decoder(buffer -> decoder.decode(buffer))
             .encoder((packet, buffer) -> encoder.encode(packet, buffer))
             .consumerMainThread((packet, context) -> {
+                //? if >=1.20.2
                 ServerPlayer sender = context.getSender();
+                //? if <1.20.2
+                /*ServerPlayer sender = context.get().getSender();*/
                 ForgePacketContext packetContext = new ForgePacketContext(sender == null, sender);
                 
                 try {
@@ -79,7 +97,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         Constants.LOG.debug("Forge: Sending {} to server", packet.getClass().getSimpleName());
         
         // Send the packet through the SimpleChannel
+        //? if >=1.20.2
         channel.send(packet, PacketDistributor.SERVER.noArg());
+        //? if <1.20.2
+        /*channel.send(PacketDistributor.SERVER.noArg(), packet);*/
     }
     
     @Override
@@ -93,7 +114,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         Constants.LOG.debug("Forge: Sending {} to player {}", packet.getClass().getSimpleName(), player.getName().getString());
         
         // Send the packet to the specific player using PacketDistributor
+        //? if >=1.20.2
         channel.send(packet, PacketDistributor.PLAYER.with(player));
+        //? if <1.20.2
+        /*channel.send(PacketDistributor.PLAYER.with(() -> player), packet);*/
     }
     
     @Override
@@ -107,7 +131,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         Constants.LOG.debug("Forge: Sending {} to all players", packet.getClass().getSimpleName());
         
         // Send the packet to all connected players
+        //? if >=1.20.2
         channel.send(packet, PacketDistributor.ALL.noArg());
+        //? if <1.20.2
+        /*channel.send(PacketDistributor.ALL.noArg(), packet);*/
     }
     
     @Override
@@ -125,7 +152,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                 if (!player.equals(except)) {
+                    //? if >=1.20.2
                     channel.send(packet, PacketDistributor.PLAYER.with(player));
+                    //? if <1.20.2
+                    /*channel.send(PacketDistributor.PLAYER.with(() -> player), packet);*/
                 }
             }
         }
