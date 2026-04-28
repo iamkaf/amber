@@ -6,6 +6,7 @@ def minecraftVersion = requiredProp(project, 'project.minecraft')
 def libs = catalogFor(project, minecraftVersion)
 
 dependencies {
+    compileOnly 'org.slf4j:slf4j-api:1.7.36'
     compileOnly library(libs, 'mixin')
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly library(libs, 'mixin-extras')

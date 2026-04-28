@@ -5,8 +5,180 @@ plugins {
 def minecraftVersion = requiredProp(project, 'project.minecraft')
 def libs = catalogFor(project, minecraftVersion)
 def useTeaKit = providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()
+def useLegacy1165ForgeRunHack = minecraftVersion == '1.16.5'
 def useLegacy1171ForgeRunHack = minecraftVersion == '1.17.1'
 def teaKitVersion = versionOrNull(libs, 'teakit')
+
+if (minecraftVersion == '1.16.5') {
+    tasks.named('stageMergedJavaSources').configure {
+        filesMatching('**/*.java') {
+            filter { String line ->
+                [
+                    'net.minecraft.ChatFormatting'                         : 'net.minecraft.util.text.TextFormatting',
+                    'net.minecraft.SharedConstants'                         : 'net.minecraft.util.SharedConstants',
+                    'net.minecraft.commands.CommandSourceStack'             : 'net.minecraft.command.CommandSource',
+                    'net.minecraft.commands.Commands'                       : 'net.minecraft.command.Commands',
+                    'net.minecraft.network.chat.MutableComponent'           : 'net.minecraft.util.text.IFormattableTextComponent',
+                    'net.minecraft.network.chat.TextComponent'              : 'net.minecraft.util.text.StringTextComponent',
+                    'net.minecraft.network.chat.Component'                  : 'net.minecraft.util.text.ITextComponent',
+                    'net.minecraft.core.BlockPos'                           : 'net.minecraft.util.math.BlockPos',
+                    'net.minecraft.core.Direction'                          : 'net.minecraft.util.Direction',
+                    'net.minecraft.core.NonNullList'                        : 'net.minecraft.util.NonNullList',
+                    'net.minecraft.core.Registry'                           : 'net.minecraft.util.registry.Registry',
+                    'net.minecraft.core.RegistryAccess'                     : 'net.minecraft.util.registry.DynamicRegistries',
+                    'net.minecraft.resources.ResourceKey'                   : 'net.minecraft.util.RegistryKey',
+                    'net.minecraft.resources.ResourceLocation'              : 'net.minecraft.util.ResourceLocation',
+                    'net.minecraft.network.FriendlyByteBuf'                 : 'net.minecraft.network.PacketBuffer',
+                    'net.minecraft.server.level.ServerLevel'                : 'net.minecraft.world.server.ServerWorld',
+                    'net.minecraft.server.level.ServerPlayer'               : 'net.minecraft.entity.player.ServerPlayerEntity',
+                    'net.minecraft.world.entity.player.Player'              : 'net.minecraft.entity.player.PlayerEntity',
+                    'net.minecraft.world.entity.LivingEntity'               : 'net.minecraft.entity.LivingEntity',
+                    'net.minecraft.world.entity.AgableMob'                  : 'net.minecraft.entity.AgeableEntity',
+                    'net.minecraft.world.entity.AgeableMob'                 : 'net.minecraft.entity.AgeableEntity',
+                    'net.minecraft.world.entity.Entity'                     : 'net.minecraft.entity.Entity',
+                    'net.minecraft.world.entity.EquipmentSlot'              : 'net.minecraft.inventory.EquipmentSlotType',
+                    'net.minecraft.world.entity.item.ItemEntity'            : 'net.minecraft.entity.item.ItemEntity',
+                    'net.minecraft.world.entity.animal.Animal'              : 'net.minecraft.entity.passive.AnimalEntity',
+                    'net.minecraft.world.item.context.UseOnContext'         : 'net.minecraft.item.ItemUseContext',
+                    'net.minecraft.world.item.CreativeModeTab'              : 'net.minecraft.item.ItemGroup',
+                    'net.minecraft.world.item.ItemStack'                    : 'net.minecraft.item.ItemStack',
+                    'net.minecraft.world.item.Item'                         : 'net.minecraft.item.Item',
+                    'net.minecraft.world.item.BoneMealItem'                 : 'net.minecraft.item.BoneMealItem',
+                    'net.minecraft.world.item.TooltipFlag'                  : 'net.minecraft.client.util.ITooltipFlag',
+                    'net.minecraft.world.level.block.state.BlockState'      : 'net.minecraft.block.BlockState',
+                    'net.minecraft.world.level.block.FarmBlock'             : 'net.minecraft.block.FarmlandBlock',
+                    'net.minecraft.world.level.block.FarmlandBlock'         : 'net.minecraft.block.FarmlandBlock',
+                    'net.minecraft.world.level.block.CropBlock'             : 'net.minecraft.block.CropsBlock',
+                    'net.minecraft.world.level.ItemLike'                    : 'net.minecraft.item.IItemProvider',
+                    'net.minecraft.world.level.ClipContext'                 : 'net.minecraft.util.math.RayTraceContext',
+                    'net.minecraft.world.level.Level'                       : 'net.minecraft.world.World',
+                    'net.minecraft.world.level.ServerLevelAccessor'         : 'net.minecraft.world.IServerWorld',
+                    'net.minecraft.world.level.biome.Biome'                 : 'net.minecraft.world.biome.Biome',
+                    'net.minecraft.world.level.storage.loot.LootTable'      : 'net.minecraft.loot.LootTable',
+                    'net.minecraft.world.level.storage.loot.LootPool'       : 'net.minecraft.loot.LootPool',
+                    'net.minecraft.world.damagesource.DamageSource'         : 'net.minecraft.util.DamageSource',
+                    'net.minecraft.world.InteractionHand'                   : 'net.minecraft.util.Hand',
+                    'net.minecraft.world.InteractionResult'                 : 'net.minecraft.util.ActionResultType',
+                    'net.minecraft.world.Container'                         : 'net.minecraft.inventory.IInventory',
+                    'net.minecraft.world.inventory.PlayerEnderChestContainer': 'net.minecraft.inventory.EnderChestInventory',
+                    'net.minecraft.world.food.FoodData'                     : 'net.minecraft.util.FoodStats',
+                    'net.minecraft.world.level.GameType'                    : 'net.minecraft.world.GameType',
+                    'net.minecraft.world.level.LevelAccessor'               : 'net.minecraft.world.IWorld',
+                    'net.minecraft.world.WorldAccessor'                     : 'net.minecraft.world.IWorld',
+                    'net.minecraft.world.DifficultyInstance'                : 'net.minecraft.world.DifficultyInstance',
+                    'net.minecraft.world.Difficulty'                        : 'net.minecraft.world.Difficulty',
+                    'net.minecraft.world.phys.AABB'                         : 'net.minecraft.util.math.AxisAlignedBB',
+                    'net.minecraft.world.phys.BlockHitResult'               : 'net.minecraft.util.math.BlockRayTraceResult',
+                    'net.minecraft.world.phys.Vec3'                         : 'net.minecraft.util.math.vector.Vector3d',
+                    'net.minecraft.world.entity.ai.attributes.AttributeModifier': 'net.minecraft.entity.ai.attributes.AttributeModifier',
+                    'net.minecraft.world.entity.ai.attributes.Attributes'    : 'net.minecraft.entity.ai.attributes.Attributes',
+                    'net.minecraft.world.entity.ai.attributes.Attribute'     : 'net.minecraft.entity.ai.attributes.Attribute',
+                    'net.minecraft.sounds.SoundEvent'                       : 'net.minecraft.util.SoundEvent',
+                    'net.minecraft.sounds.SoundSource'                      : 'net.minecraft.util.SoundCategory',
+                    'net.minecraft.client.KeyMapping'                       : 'net.minecraft.client.settings.KeyBinding',
+                    'net.minecraft.client.Camera'                           : 'net.minecraft.client.renderer.ActiveRenderInfo',
+                    'net.minecraft.client.gui.Font'                         : 'net.minecraft.client.gui.FontRenderer',
+                    'net.minecraft.client.gui.screens.Screen'               : 'net.minecraft.client.gui.screen.Screen',
+                    'net.minecraft.client.player.LocalPlayer'               : 'net.minecraft.client.entity.player.ClientPlayerEntity',
+                    'net.minecraft.client.multiplayer.ClientLevel'          : 'net.minecraft.client.world.ClientWorld',
+                    'net.minecraft.client.renderer.MultiBufferSource'       : 'net.minecraft.client.renderer.IRenderTypeBuffer',
+                    'net.minecraft.client.renderer.LevelRenderer'           : 'net.minecraft.client.renderer.WorldRenderer',
+                    'net.minecraft.client.gui.Gui'                          : 'net.minecraft.client.gui.IngameGui',
+                    'net.minecraft.client.gui.screens.LevelLoadingScreen'   : 'net.minecraft.client.gui.screen.DownloadTerrainScreen',
+                    'net.minecraft.client.MouseHandler'                     : 'net.minecraft.client.MouseHelper',
+                    'net.minecraft.core.GlobalPos'                          : 'net.minecraft.util.math.GlobalPos',
+                    'net.minecraft.world.inventory.CraftingContainer'       : 'net.minecraft.inventory.CraftingInventory',
+                    'net.minecraft.world.inventory.ResultSlot'              : 'net.minecraft.inventory.container.CraftingResultSlot',
+                    'net.minecraft.world.phys.HitResult'                    : 'net.minecraft.util.math.RayTraceResult',
+                    'com.mojang.blaze3d.vertex.VertexConsumer'              : 'com.mojang.blaze3d.vertex.IVertexBuilder',
+                    'net.minecraft.network.protocol.game.ClientboundSetTitlesPacket': 'net.minecraft.network.play.server.STitlePacket',
+                    'net.minecraft.network.protocol.game.ClientboundSoundPacket': 'net.minecraft.network.play.server.SPlaySoundEffectPacket',
+                    'net.minecraft.world.entity.player.Abilities'           : 'net.minecraft.entity.player.PlayerAbilities',
+                    'net.minecraft.world.entity.player.Inventory'           : 'net.minecraft.entity.player.PlayerInventory',
+                    'net.minecraft.world.entity.LightningBolt'              : 'net.minecraft.entity.effect.LightningBoltEntity',
+                    'net.minecraft.world.item.ArmorItem'                    : 'net.minecraft.item.ArmorItem',
+                    'net.minecraft.world.item.enchantment.Enchantment'      : 'net.minecraft.enchantment.Enchantment',
+                    'net.minecraft.world.item.crafting.Ingredient'          : 'net.minecraft.item.crafting.Ingredient',
+                    'net.minecraft.world.level.block.entity.BlockEntity'    : 'net.minecraft.tileentity.TileEntity',
+                    'com.mojang.blaze3d.vertex.PoseStack'                  : 'com.mojang.blaze3d.matrix.MatrixStack',
+                    'net.minecraftforge.fmllegacy.RegistryObject'           : 'net.minecraftforge.fml.RegistryObject',
+                    'net.minecraftforge.fmllegacy.network.NetworkRegistry'  : 'net.minecraftforge.fml.network.NetworkRegistry',
+                    'net.minecraftforge.fmllegacy.network.simple.SimpleChannel': 'net.minecraftforge.fml.network.simple.SimpleChannel',
+                    'net.minecraftforge.fmllegacy.network.PacketDistributor': 'net.minecraftforge.fml.network.PacketDistributor',
+                    'net.minecraftforge.fmlclient.registry.ClientRegistry'  : 'net.minecraftforge.fml.client.registry.ClientRegistry',
+                    'net.minecraftforge.fml.event.IModBusEvent'             : 'net.minecraftforge.fml.event.lifecycle.IModBusEvent'
+                ].inject(line) { String current, entry -> current.replace(entry.key, entry.value) }
+                    .replaceAll('\\bMutableComponent\\b', 'IFormattableTextComponent')
+                    .replaceAll('\\bTextComponent\\b', 'StringTextComponent')
+                    .replaceAll('\\bComponent\\b', 'ITextComponent')
+                    .replaceAll('\\bChatFormatting\\b', 'TextFormatting')
+                    .replaceAll('\\bCommandSourceStack\\b', 'CommandSource')
+                    .replaceAll('\\bFriendlyByteBuf\\b', 'PacketBuffer')
+                    .replaceAll('\\bServerPlayer\\b', 'ServerPlayerEntity')
+                    .replaceAll('\\bPlayer\\b', 'PlayerEntity')
+                    .replaceAll('\\bKeyMapping\\b', 'KeyBinding')
+                    .replaceAll('\\bInteractionResult\\b', 'ActionResultType')
+                    .replaceAll('\\bResourceKey\\b', 'RegistryKey')
+                    .replaceAll('\\bCreativeModeTab\\b', 'ItemGroup')
+                    .replaceAll('\\bItemLike\\b', 'IItemProvider')
+                    .replaceAll('\\bServerLevelAccessor\\b', 'IServerWorld')
+                    .replaceAll('\\bServerLevel\\b', 'ServerWorld')
+                    .replaceAll('\\bLevel\\b', 'World')
+                    .replaceAll('\\bBlockHitResult\\b', 'BlockRayTraceResult')
+                    .replaceAll('\\bClipContext\\b', 'RayTraceContext')
+                    .replaceAll('\\bVec3\\b', 'Vector3d')
+                    .replaceAll('\\bAABB\\b', 'AxisAlignedBB')
+                    .replaceAll('\\bSoundSource\\b', 'SoundCategory')
+                    .replaceAll('\\bEquipmentSlot\\b', 'EquipmentSlotType')
+                    .replaceAll('\\bFoodData\\b', 'FoodStats')
+                    .replaceAll('\\bContainer\\b', 'IInventory')
+                    .replaceAll('\\bPlayerEnderChestContainer\\b', 'EnderChestInventory')
+                    .replaceAll('\\bPoseStack\\b', 'MatrixStack')
+                    .replaceAll('\\bFont\\b', 'FontRenderer')
+                    .replaceAll('\\bInventory\\b', 'PlayerInventory')
+                    .replaceAll('\\bAbilities\\b', 'PlayerAbilities')
+                    .replaceAll('\\bItemLike\\b', 'IItemProvider')
+                    .replace('net.minecraft.item.IItemProvider', 'net.minecraft.util.IItemProvider')
+                    .replaceAll('\\bUseOnContext\\b', 'ItemUseContext')
+                    .replaceAll('\\bAnimal\\b', 'AnimalEntity')
+                    .replaceAll('\\bAgableMob\\b', 'AgeableEntity')
+                    .replaceAll('\\bDamageSource\\b', 'DamageSource')
+                    .replaceAll('\\bInteractionHand\\b', 'Hand')
+                    .replaceAll('\\bBlockEntity\\b', 'TileEntity')
+                    .replaceAll('\\bLightningBolt\\b', 'LightningBoltEntity')
+                    .replaceAll('\\bCamera\\b', 'ActiveRenderInfo')
+                    .replaceAll('\\bMultiBufferSource\\b', 'IRenderTypeBuffer')
+                    .replaceAll('\\bRegistryAccess\\b', 'DynamicRegistries')
+                    .replaceAll('\\bLevelAccessor\\b', 'IWorld')
+                    .replaceAll('\\bWorldAccessor\\b', 'IWorld')
+                    .replaceAll('\\bCropBlock\\b', 'CropsBlock')
+                    .replaceAll('\\bFarmBlock\\b', 'FarmlandBlock')
+                    .replaceAll('\\bLevelRenderer\\b', 'WorldRenderer')
+                    .replaceAll('\\bGui\\b', 'IngameGui')
+                    .replaceAll('\\bMouseHandler\\b', 'MouseHelper')
+                    .replaceAll('\\bCraftingContainer\\b', 'CraftingInventory')
+                    .replaceAll('\\bResultSlot\\b', 'CraftingResultSlot')
+                    .replaceAll('\\bVertexConsumer\\b', 'IVertexBuilder')
+                    .replaceAll('\\bHitResult\\b', 'RayTraceResult')
+                    .replace('Biome.Precipitation', 'Biome.RainType')
+                    .replace('Commands.CommandSelection', 'Commands.EnvironmentType')
+                    .replace('event.getWorld().getServer()', '((net.minecraft.world.World) event.getWorld()).getServer()')
+                    .replace('net.minecraft.nbt.CompoundTag', 'net.minecraft.nbt.CompoundNBT')
+                    .replace('net.minecraft.world.item.TieredItem', 'net.minecraft.item.TieredItem')
+                    .replaceAll('\\bClientboundSetTitlesPacket\\b', 'STitlePacket')
+                    .replaceAll('\\bClientboundSoundPacket\\b', 'SPlaySoundEffectPacket')
+                    .replaceAll('\\bLocalPlayer\\b', 'ClientPlayerEntity')
+                    .replaceAll('\\bClientLevel\\b', 'ClientWorld')
+                    .replaceAll('\\bLevelLoadingScreen\\b', 'DownloadTerrainScreen')
+                    .replace('RayTraceContext.Block.', 'RayTraceContext.BlockMode.')
+                    .replace('RayTraceContext.Fluid.', 'RayTraceContext.FluidMode.')
+                    .replace('Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V', 'Lnet/minecraft/entity/LivingEntity;actuallyHurt(Lnet/minecraft/util/DamageSource;F)V')
+                    .replace('Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/level/World;Lnet/minecraft/world/entity/player/PlayerEntity;I)V', 'Lnet/minecraft/item/ItemStack;onCraftedBy(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;I)V')
+                    .replace('Lnet/minecraft/world/level/block/FarmlandBlock;turnToDirt(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/World;Lnet/minecraft/core/BlockPos;)V', 'Lnet/minecraft/block/FarmlandBlock;turnToDirt(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V')
+            }
+        }
+    }
+}
 
 jar {
     manifest {
@@ -22,6 +194,155 @@ dependencies {
     }
     if (useTeaKit) {
         runtimeOnly library(libs, 'teakit-forge')
+    }
+}
+
+if (useLegacy1165ForgeRunHack) {
+    def forgeRunLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+    def forgeVersion = versionOrNull(libs, 'forge')
+    def legacyForgeArtifactVersion = providers.provider {
+        forgeVersion.startsWith("${minecraftVersion}-") ? forgeVersion : "${minecraftVersion}-${forgeVersion}"
+    }
+    def assetIndex = providers.provider { '1.16' }
+    def assetsDir = providers.provider { new File(gradle.gradleUserHomeDir, 'caches/forge_gradle/assets') }
+    def assetsDirPath = providers.provider { assetsDir.get().absolutePath }
+    def legacyForgeNativesDir = layout.buildDirectory.dir('legacy-forge-natives')
+    def legacyForgeNativesDirPath = providers.provider { legacyForgeNativesDir.get().asFile.absolutePath }
+    def legacyForgeModsDir = layout.projectDirectory.dir('run/mods')
+    def legacyTeaKitForgeJar = providers.provider {
+        configurations.detachedConfiguration(
+            dependencies.create("com.iamkaf.teakit:teakit-forge:${teaKitVersion}")
+        ).resolve().find { it.name.startsWith('teakit-forge-') && it.name.endsWith('.jar') }
+    }
+    def legacyForgeNativeJars = providers.provider {
+        def jars = [] as Set<File>
+        jars.addAll(fileTree(new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/org.lwjgl')) {
+            include '**/3.2.2/**/lwjgl*-natives-linux.jar'
+        }.files)
+        jars.addAll(fileTree(new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/com.mojang/text2speech/1.11.3')) {
+            include '**/**/text2speech-*-natives-linux.jar'
+        }.files)
+        if (jars.empty) {
+            throw new GradleException('Missing legacy Forge LWJGL native jars for 1.16.5 runClient')
+        }
+        jars
+    }
+    def legacyForgeUserdevDir = providers.provider {
+        new File(
+            gradle.gradleUserHomeDir,
+            "caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}_mapped_official_${minecraftVersion}"
+        )
+    }
+    def legacyForgeUserdevJar = providers.provider {
+        def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-recomp.jar' }.files
+        if (matches.size() != 1) {
+            throw new GradleException("Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()}")
+        }
+        matches.first()
+    }
+    def legacyForgeLauncherJar = providers.provider {
+        def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-launcher.jar' }.files
+        if (matches.size() != 1) {
+            throw new GradleException("Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()}")
+        }
+        matches.first()
+    }
+
+    dependencies {
+        compileOnly(files(legacyForgeUserdevJar))
+        compileOnly(files(legacyForgeLauncherJar))
+        runtimeOnly(files(legacyForgeUserdevJar))
+        runtimeOnly(files(legacyForgeLauncherJar))
+        runtimeOnly 'net.jodah:typetools:0.6.3'
+    }
+
+    if (useTeaKit && teaKitVersion != null && teaKitVersion != 'null') {
+        configurations.named('runtimeClasspath').configure {
+            exclude group: 'com.iamkaf.teakit', module: 'teakit-forge'
+        }
+    }
+
+    def stageLegacyForgeNatives = tasks.register('stageLegacyForgeNatives', Sync) {
+        into legacyForgeNativesDir
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        from({
+            legacyForgeNativeJars.get().collect { zipTree(it) }
+        }) {
+            exclude 'META-INF/**', '**/*.sha1', '**/*.git'
+        }
+        eachFile { details -> details.path = details.name }
+        includeEmptyDirs = false
+    }
+    def stageTeaKitLegacyForgeMod = tasks.register('stageTeaKitLegacyForgeMod') {
+        onlyIf { useTeaKit && teaKitVersion != null && teaKitVersion != 'null' }
+        outputs.dir(legacyForgeModsDir)
+        doLast {
+            def source = legacyTeaKitForgeJar.get()
+            if (source == null || !source.isFile()) {
+                throw new GradleException("Missing TeaKit Forge jar for ${minecraftVersion}")
+            }
+
+            def modsDir = legacyForgeModsDir.asFile
+            modsDir.mkdirs()
+            project.delete(fileTree(modsDir) { include 'teakit-forge-*.jar' })
+
+            def jarFile = new java.util.jar.JarFile(source)
+            def manifest = jarFile.manifest ?: new java.util.jar.Manifest()
+            manifest.mainAttributes.remove(new java.util.jar.Attributes.Name('MixinConfigs'))
+
+            def target = new File(modsDir, source.name)
+            def tempFile = new File(modsDir, "${source.name}.temp")
+            def out = new java.util.jar.JarOutputStream(new FileOutputStream(tempFile), manifest)
+            try {
+                jarFile.entries().each { entry ->
+                    if (entry.name == 'META-INF/MANIFEST.MF') {
+                        return
+                    }
+                    def newEntry = new java.util.jar.JarEntry(entry.name)
+                    newEntry.time = entry.time
+                    out.putNextEntry(newEntry)
+                    if (!entry.isDirectory()) {
+                        out << jarFile.getInputStream(entry)
+                    }
+                    out.closeEntry()
+                }
+            } finally {
+                out.close()
+                jarFile.close()
+            }
+
+            java.nio.file.Files.move(
+                tempFile.toPath(),
+                target.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.ATOMIC_MOVE
+            )
+        }
+    }
+
+    if (project.extensions.findByName('minecraft') != null) {
+        minecraft.runs.named('client').configure { run ->
+            run.client.set(true)
+            run.environment 'assetIndex', assetIndex
+            run.environment 'assetDirectory', assetsDirPath
+            run.environment 'nativesDirectory', legacyForgeNativesDirPath
+            run.systemProperty 'java.library.path', legacyForgeNativesDirPath
+            run.systemProperty 'org.lwjgl.librarypath', legacyForgeNativesDirPath
+        }
+    }
+
+    tasks.configureEach { task ->
+        if (task.name in ['runClient', 'runServer'] && task.hasProperty('javaLauncher')) {
+            task.javaLauncher.set(forgeRunLauncher)
+        }
+        if (task.name in ['runClient', 'runData']) {
+            task.dependsOn(stageLegacyForgeNatives)
+        }
+        if (task.name == 'runClient') {
+            task.dependsOn(stageTeaKitLegacyForgeMod)
+        }
     }
 }
 

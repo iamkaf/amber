@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 //? if <26.1 && >=1.20
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.Screen;
+//? if >=1.21.6
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 //? if >=1.19.3
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -118,7 +119,7 @@ public final class ClientFunctions {
             return;
         }
 
-        mc.screen.renderTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), stack.getTooltipImage(), x, y);
+        mc.screen.renderComponentTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);
         *///?}
 
         //? if >=1.21.6 {

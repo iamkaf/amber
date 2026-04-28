@@ -25,6 +25,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -110,7 +111,12 @@ public final class WorldFunctions {
      */
     public static void dropItem(Level level, ItemStack stack, Vec3 pos, Vec3 delta) {
         if (level == null) return;
+        //? if >=1.17
         var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack, delta.x(), delta.y(), delta.z());
+        //? if <1.17 {
+        /*var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack);
+        itemEntity.setDeltaMovement(delta);*/
+        //?}
         level.addFreshEntity(itemEntity);
     }
 
@@ -139,7 +145,10 @@ public final class WorldFunctions {
      * @return The result of the raytrace.
      */
     public static @NotNull BlockHitResult raytrace(Level level, Player player) {
+        //? if >=1.17
         Vec3 eyePosition = player.getEyePosition();
+        //? if <1.17
+        /*Vec3 eyePosition = player.getEyePosition(1.0F);*/
         Vec3 rotation = player.getViewVector(1);
         //? if >=1.20.5
         double reach = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);
@@ -488,7 +497,10 @@ public final class WorldFunctions {
      * @return true if difficulty is hard or harder, false otherwise.
      */
     public static boolean isHardDifficulty(ServerLevelAccessor level, BlockPos position) {
+        //? if >=1.17
         return getCurrentDifficulty(level, position).isHard();
+        //? if <1.17
+        /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
 
     /**
@@ -499,7 +511,10 @@ public final class WorldFunctions {
      * @return true if difficulty is hard or harder, false otherwise.
      */
     public static boolean isHardDifficulty(ServerLevelAccessor level, Vec3 position) {
+        //? if >=1.17
         return getCurrentDifficulty(level, position).isHard();
+        //? if <1.17
+        /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
 
     // ==================== ENTITY UTILITIES ====================

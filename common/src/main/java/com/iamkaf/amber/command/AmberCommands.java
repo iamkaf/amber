@@ -11,6 +11,7 @@ import com.iamkaf.amber.networking.v1.AmberNetworking;
 import com.iamkaf.amber.platform.Services;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -51,7 +52,7 @@ public class AmberCommands {
                 .append("Mixins: \n");
         for (String mixin : AmberMod.AMBER_MIXINS) {
             message.append(literal(mixin + "\n")
-                    .withStyle(style -> style.withColor(0xFFAA00)));
+                    .withStyle(style -> style.withColor(ChatFormatting.GOLD)));
         }
         message.append("\n").append("Amber Mods: \n");
         for (AmberModInfo amberMod : AmberMod.AMBER_MODS) {
@@ -60,7 +61,7 @@ public class AmberCommands {
                             amberMod.name(),
                             amberMod.version()
                     ))
-                    .withStyle(style -> style.withColor(0x00AAFF)));
+                    .withStyle(style -> style.withColor(ChatFormatting.AQUA)));
         }
         return message;
     }
@@ -73,8 +74,8 @@ public class AmberCommands {
     }
 
     public static void initialize() {
+        Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
         CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
-            Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
             dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID)
                     .then(DOCTOR_COMMAND));
         });
