@@ -19,20 +19,32 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+//? if >=1.19.1
 import net.minecraftforge.event.level.BlockEvent;
+//? if <1.19.1
+/*import net.minecraftforge.event.world.BlockEvent;*/
+//? if >=1.19.1
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+//? if <1.19.1
+/*import net.minecraftforge.event.entity.EntityJoinWorldEvent;*/
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
+//? if >=1.19.1
 import net.minecraftforge.event.level.LevelEvent;
+//? if <1.19.1
+/*import net.minecraftforge.event.world.WorldEvent;*/
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+//? if >=1.19.1
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+//? if <1.19.1
+/*import net.minecraftforge.client.ClientRegistry;*/
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;
@@ -160,8 +172,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         RegisterKeyMappingsEvent.BUS.addListener(EventHandlerClient::onKeybindRegistration);
         //? if >=1.21.6 && <1.21.10
         /*RegisterKeyMappingsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerClient::onKeybindRegistration);*/
-        //? if <1.21.6
+        //? if >=1.19.1 && <1.21.6
         /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerClient::onKeybindRegistration);*/
+        //? if <1.19.1
+        /*EventHandlerClient.onKeybindRegistration();*/
         //? if >=1.21.6 {
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
         TickEvent.ClientTickEvent.Post.BUS.addListener(EventHandlerClient::onClientTickEventPost);
@@ -230,7 +244,16 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
-                    .interact(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
+                    .interact(
+                            //? if >=1.19.1
+                            event.getEntity(),
+                            //? if <1.19.1
+                            /*event.getPlayer(),*/
+                            //? if >=1.19.1
+                            event.getLevel(),
+                            //? if <1.19.1
+                            /*event.getWorld(),*/
+                            event.getHand(), event.getTarget());
 
             LogicalSide side = event.getSide();
 
@@ -256,20 +279,45 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
-                    .register(event.getDispatcher(), event.getBuildContext(), event.getCommandSelection());
+                    .register(event.getDispatcher(),
+                            //? if >=1.19.1
+                            event.getBuildContext(), event.getCommandSelection()
+                            //? if <1.19.1
+                            /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
+                    );
         }
 
-        public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
-            EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(event.getEntity(), event.getLevel());
+        public static void onEntityJoinLevel(
+                //? if >=1.19.1
+                EntityJoinLevelEvent event
+                //? if <1.19.1
+                /*EntityJoinWorldEvent event*/
+        ) {
+            EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(event.getEntity(),
+                    //? if >=1.19.1
+                    event.getLevel()
+                    //? if <1.19.1
+                    /*event.getWorld()*/
+            );
         }
 
         public static void onLivingDeath(LivingDeathEvent event) {
-            EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(event.getEntity(), event.getSource());
+            EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(
+                    //? if >=1.19.1
+                    event.getEntity(),
+                    //? if <1.19.1
+                    /*event.getEntityLiving(),*/
+                    event.getSource());
         }
 
         public static boolean onLivingAttack(LivingAttackEvent event) {
             InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker()
-                    .onEntityDamage(event.getEntity(), event.getSource(), event.getAmount());
+                    .onEntityDamage(
+                            //? if >=1.19.1
+                            event.getEntity(),
+                            //? if <1.19.1
+                            /*event.getEntityLiving(),*/
+                            event.getSource(), event.getAmount());
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
 
@@ -282,7 +330,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
+                    //? if >=1.19.1
                     event.getLevel().getBlockEntity(event.getPos())
+                    //? if <1.19.1
+                    /*event.getWorld().getBlockEntity(event.getPos())*/
             );
             if (result != InteractionResult.PASS) {
                 return true; // Cancel break
@@ -297,7 +348,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
+                    //? if >=1.19.1
                     event.getLevel().getBlockEntity(event.getPos())
+                    //? if <1.19.1
+                    /*event.getWorld().getBlockEntity(event.getPos())*/
             );
             return false; // Allow break
         }
@@ -320,19 +374,26 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker()
                     //? if >=1.20
                     .onBlockInteract(event.getEntity(), event.getEntity().level(), event.getHand(), event.getHitVec());
-                    //? if <1.20
+                    //? if <1.20 && >=1.19.1
                     /*.onBlockInteract(event.getEntity(), event.getEntity().level, event.getHand(), event.getHitVec());*/
+                    //? if <1.19.1
+                    /*.onBlockInteract(event.getPlayer(), event.getPlayer().level, event.getHand(), event.getHitVec());*/
             return result != InteractionResult.PASS; // Cancel if not PASS
         }
 
         public static boolean onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker()
                     .onBlockClick(
+                            //? if >=1.19.1
                             event.getEntity(),
+                            //? if <1.19.1
+                            /*event.getPlayer(),*/
                             //? if >=1.20
                             event.getEntity().level(),
-                            //? if <1.20
+                            //? if <1.20 && >=1.19.1
                             /*event.getEntity().level,*/
+                            //? if <1.19.1
+                            /*event.getPlayer().level,*/
                             event.getHand(),
                             event.getPos(),
                             event.getFace()
@@ -362,7 +423,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static void onItemDrop(ItemTossEvent event) {
             // Fire the informational Amber item drop event (fires on both client and server)
-            ItemEvents.ITEM_DROP.invoker().onItemDrop(event.getPlayer(), event.getEntity());
+            ItemEvents.ITEM_DROP.invoker().onItemDrop(event.getPlayer(),
+                    //? if >=1.19.1
+                    event.getEntity()
+                    //? if <1.19.1
+                    /*event.getEntityItem()*/
+            );
         }
 
         public static void onItemPickup(EntityItemPickupEvent event) {
@@ -372,7 +438,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
 
             // Fire the informational Amber item pickup event
-            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(event.getEntity(), event.getItem(), event.getItem().getItem());
+            ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
+                    //? if >=1.19.1
+                    event.getEntity(),
+                    //? if <1.19.1
+                    /*event.getPlayer(),*/
+                    event.getItem(), event.getItem().getItem());
         }
 
         public static boolean onAnimalTame(AnimalTameEvent event) {
@@ -403,16 +474,46 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
         }
 
-        public static void onWorldLoad(LevelEvent.Load event) {
-            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(event.getLevel().getServer(), event.getLevel());
+        public static void onWorldLoad(
+                //? if >=1.19.1
+                LevelEvent.Load event
+                //? if <1.19.1
+                /*WorldEvent.Load event*/
+        ) {
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
+                    //? if >=1.19.1
+                    event.getLevel().getServer(), event.getLevel()
+                    //? if <1.19.1
+                    /*event.getWorld().getServer(), event.getWorld()*/
+            );
         }
 
-        public static void onWorldUnload(LevelEvent.Unload event) {
-            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(event.getLevel().getServer(), event.getLevel());
+        public static void onWorldUnload(
+                //? if >=1.19.1
+                LevelEvent.Unload event
+                //? if <1.19.1
+                /*WorldEvent.Unload event*/
+        ) {
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(
+                    //? if >=1.19.1
+                    event.getLevel().getServer(), event.getLevel()
+                    //? if <1.19.1
+                    /*event.getWorld().getServer(), event.getWorld()*/
+            );
         }
 
-        public static void onWorldSave(LevelEvent.Save event) {
-            WorldEvents.WORLD_SAVE.invoker().onWorldSave(event.getLevel().getServer(), event.getLevel());
+        public static void onWorldSave(
+                //? if >=1.19.1
+                LevelEvent.Save event
+                //? if <1.19.1
+                /*WorldEvent.Save event*/
+        ) {
+            WorldEvents.WORLD_SAVE.invoker().onWorldSave(
+                    //? if >=1.19.1
+                    event.getLevel().getServer(), event.getLevel()
+                    //? if <1.19.1
+                    /*event.getWorld().getServer(), event.getWorld()*/
+            );
         }
 
         public static boolean onLightningStrike(EntityStruckByLightningEvent event) {
@@ -473,12 +574,23 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
     static public class EventHandlerClient {
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
-            ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(), event.getBuildContext());
+            ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(),
+                    //? if >=1.19.1
+                    event.getBuildContext()
+                    //? if <1.19.1
+                    /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get())*/
+            );
         }
 
-        public static void onKeybindRegistration(RegisterKeyMappingsEvent event) {
+        public static void onKeybindRegistration(
+                //? if >=1.19.1
+                RegisterKeyMappingsEvent event
+        ) {
             for (var keyMapping : KeybindHelper.getKeybindings()) {
+                //? if >=1.19.1
                 event.register(keyMapping);
+                //? if <1.19.1
+                /*ClientRegistry.registerKeyBinding(keyMapping);*/
             }
             KeybindHelper.forgeEventAlreadyFired = true;
         }

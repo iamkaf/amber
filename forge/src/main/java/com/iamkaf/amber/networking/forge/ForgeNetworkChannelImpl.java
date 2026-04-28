@@ -61,23 +61,43 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         
         // Register bidirectional packet handling using the deprecated MessageBuilder API
         // This is needed for compatibility with the current Forge version
+        //? if >=1.19.1 {
         channel.messageBuilder(packetClass, discriminator)
-            .decoder(buffer -> decoder.decode(buffer))
-            .encoder((packet, buffer) -> encoder.encode(packet, buffer))
-            .consumerMainThread((packet, context) -> {
-                //? if >=1.20.2
-                ServerPlayer sender = context.getSender();
-                //? if <1.20.2
-                /*ServerPlayer sender = context.get().getSender();*/
-                ForgePacketContext packetContext = new ForgePacketContext(sender == null, sender);
-                
-                try {
-                    handler.handle(packet, packetContext);
-                } catch (Exception e) {
-                    Constants.LOG.error("Error handling packet: {}", e.getMessage(), e);
-                }
-            })
-            .add();
+                .decoder(buffer -> decoder.decode(buffer))
+                .encoder((packet, buffer) -> encoder.encode(packet, buffer))
+                .consumerMainThread((packet, context) -> {
+                    //? if >=1.20.2
+                    ServerPlayer sender = context.getSender();
+                    //? if <1.20.2
+                    /*ServerPlayer sender = context.get().getSender();*/
+                    ForgePacketContext packetContext = new ForgePacketContext(sender == null, sender);
+
+                    try {
+                        handler.handle(packet, packetContext);
+                    } catch (Exception e) {
+                        Constants.LOG.error("Error handling packet: {}", e.getMessage(), e);
+                    }
+                })
+                .add();
+        //?} else {
+        /*channel.messageBuilder(packetClass, discriminator)
+                .decoder(buffer -> decoder.decode(buffer))
+                .encoder((packet, buffer) -> encoder.encode(packet, buffer))
+                .consumer((packet, context) -> {
+                    context.get().enqueueWork(() -> {
+                        ServerPlayer sender = context.get().getSender();
+                        ForgePacketContext packetContext = new ForgePacketContext(sender == null, sender);
+
+                        try {
+                            handler.handle(packet, packetContext);
+                        } catch (Exception e) {
+                            Constants.LOG.error("Error handling packet: {}", e.getMessage(), e);
+                        }
+                    });
+                    context.get().setPacketHandled(true);
+                })
+                .add();*/
+        //?}
         
         Constants.LOG.info("Forge: Registered packet {} for channel {}", packetClass.getSimpleName(), channelId);
     }

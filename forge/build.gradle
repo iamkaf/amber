@@ -18,3 +18,9 @@ dependencies {
         runtimeOnly library(libs, 'teakit-forge')
     }
 }
+
+if (minecraftVersion == '1.19') {
+    tasks.named('runClient').configure {
+        jvmArgs '--add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler'
+    }
+}
