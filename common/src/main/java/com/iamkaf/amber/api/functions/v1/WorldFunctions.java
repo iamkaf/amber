@@ -19,7 +19,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+//? if >=1.16.2
 import net.minecraft.world.level.ServerLevelAccessor;
+//? if <1.16.2
+/*import net.minecraft.world.level.LevelAccessor;*/
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -471,7 +474,12 @@ public final class WorldFunctions {
      * @param position The position to check difficulty at.
      * @return The difficulty instance at the position.
      */
-    public static DifficultyInstance getCurrentDifficulty(ServerLevelAccessor level, BlockPos position) {
+    public static DifficultyInstance getCurrentDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            BlockPos position) {
         return level.getCurrentDifficultyAt(position);
     }
 
@@ -482,7 +490,12 @@ public final class WorldFunctions {
      * @param position The position to check difficulty at.
      * @return The difficulty instance at the position.
      */
-    public static DifficultyInstance getCurrentDifficulty(ServerLevelAccessor level, Vec3 position) {
+    public static DifficultyInstance getCurrentDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            Vec3 position) {
         //? if >=1.19.4
         return level.getCurrentDifficultyAt(BlockPos.containing(position));
         //? if <1.19.4
@@ -496,7 +509,12 @@ public final class WorldFunctions {
      * @param position The position to check difficulty at.
      * @return true if difficulty is hard or harder, false otherwise.
      */
-    public static boolean isHardDifficulty(ServerLevelAccessor level, BlockPos position) {
+    public static boolean isHardDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            BlockPos position) {
         //? if >=1.17
         return getCurrentDifficulty(level, position).isHard();
         //? if <1.17
@@ -510,7 +528,12 @@ public final class WorldFunctions {
      * @param position The position to check difficulty at.
      * @return true if difficulty is hard or harder, false otherwise.
      */
-    public static boolean isHardDifficulty(ServerLevelAccessor level, Vec3 position) {
+    public static boolean isHardDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            Vec3 position) {
         //? if >=1.17
         return getCurrentDifficulty(level, position).isHard();
         //? if <1.17

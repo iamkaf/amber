@@ -6,17 +6,33 @@ def minecraftVersion = requiredProp(project, 'project.minecraft')
 def isModernLine = !minecraftVersion.startsWith('1.')
 def libs = catalogFor(project, minecraftVersion)
 
+if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
+    configurations.configureEach {
+        exclude group: 'net.fabricmc.fabric-api', module: 'fabric-resource-loader-v0'
+        exclude group: 'maven.modrinth', module: 'mOgUt4GM'
+    }
+}
+
 dependencies {
     compileOnly 'org.slf4j:slf4j-api:1.7.36'
     if (isModernLine) {
         implementation library(libs, 'fabric-api')
+    } else if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
+        modImplementation 'net.fabricmc.fabric-api:fabric-api-base:0.2.0+ab87788d3a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-command-api-v1:1.0.9+6a2618f53a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-events-interaction-v0:0.4.1+6a2618f53a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-key-binding-api-v1:1.0.1+730711c63a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-lifecycle-events-v1:1.2.0+ffb68a873a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-loot-tables-v1:1.0.1+6a2618f53a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-networking-api-v1:1.0.0+4358fbc63a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-rendering-v1:1.5.0+c26373133a'
     } else {
         modImplementation library(libs, 'fabric-api')
         modLocalRuntime library(libs, 'fabric-api')
-        if (minecraftVersion == '1.16.5') {
-            modLocalRuntime 'org.slf4j:slf4j-api:1.7.36'
-            modLocalRuntime 'org.slf4j:slf4j-simple:1.7.36'
-        }
+    }
+    if (minecraftVersion.startsWith('1.16')) {
+        modLocalRuntime 'org.slf4j:slf4j-api:1.7.36'
+        modLocalRuntime 'org.slf4j:slf4j-simple:1.7.36'
     }
     if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
         if (isModernLine) {
@@ -28,7 +44,22 @@ dependencies {
 }
 
 tasks.withType(ProcessResources).configureEach {
-    if (minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
+    if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
+        def fabricApiModuleDepends = '''"fabric-api-base": "*",
+        "fabric-command-api-v1": "*",
+        "fabric-events-interaction-v0": "*",
+        "fabric-key-binding-api-v1": "*",
+        "fabric-lifecycle-events-v1": "*",
+        "fabric-loot-tables-v1": "*",
+        "fabric-networking-api-v1": "*",
+        "fabric-rendering-v1": "*",'''
+
+        inputs.property('amberFabricApiModuleDepends', fabricApiModuleDepends)
+        filesMatching('fabric.mod.json') {
+            filter { line -> line.replace('"fabric-api": "*",', fabricApiModuleDepends) }
+        }
+    }
+    if (minecraftVersion == '1.16.2' || minecraftVersion == '1.16.3' || minecraftVersion == '1.16.4' || minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         inputs.property('amberFabricApiModuleDepends', 'fabric')
         filesMatching('fabric.mod.json') {
             filter { line -> line.replace('"fabric-api": "*",', '"fabric": "*",') }
