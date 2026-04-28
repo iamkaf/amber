@@ -82,12 +82,14 @@ public abstract class LivingEntityAfterDamageMixin {
             CallbackInfoReturnable<Boolean> cir
             //? if >=1.21.9 {
             ,
+            float reducedDamage,
             ItemStack itemInUse,
-            float damageBlocked
+            float damageBlocked,
+            boolean blocked
             //?}
     ) {
         //? if >=1.21.9
-        this.amber$armAfterDamage(damage - this.lastHurt, damage, damageBlocked > 0.0F);
+        this.amber$armAfterDamage(damage - this.lastHurt, damage, blocked);
         //? if <1.21.9
         /*this.amber$armAfterDamage(damage - this.lastHurt, damage, false);*/
     }
@@ -117,12 +119,14 @@ public abstract class LivingEntityAfterDamageMixin {
             CallbackInfoReturnable<Boolean> cir
             //? if >=1.21.9 {
             ,
+            float reducedDamage,
             ItemStack itemInUse,
-            float damageBlocked
+            float damageBlocked,
+            boolean blocked
             //?}
     ) {
         //? if >=1.21.9
-        this.amber$armAfterDamage(damage, damage, damageBlocked > 0.0F);
+        this.amber$armAfterDamage(damage, damage, blocked);
         //? if <1.21.9
         /*this.amber$armAfterDamage(damage, damage, false);*/
     }
