@@ -603,7 +603,10 @@ public final class PlayerFunctions {
     public static void playSound(Player player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSoundPacket(
+                    //? if >=1.19.3
                     Holder.direct(sound),
+                    //? if <1.19.3
+                    /*sound,*/
                     source,
                     player.getX(),
                     player.getY(),

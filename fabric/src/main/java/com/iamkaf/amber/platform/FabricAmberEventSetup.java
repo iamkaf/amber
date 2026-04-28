@@ -219,7 +219,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
                     }
                 });
             });
-            *///?} else {
+            *///?} else if >=1.19.3 {
             /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(builder.getId()).register((tab) -> {
                 for (var itemSupplier : builder.getItems()) {
                     tab.accept(itemSupplier.get());
