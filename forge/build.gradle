@@ -15,7 +15,7 @@ jar {
 
 dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-    if (minecraftVersion == '1.18.1') {
+    if (minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
     }
     if (useTeaKit) {
