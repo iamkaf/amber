@@ -282,8 +282,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     .register(event.getDispatcher(),
                             //? if >=1.19.1
                             event.getBuildContext(), event.getCommandSelection()
-                            //? if <1.19.1
+                            //? if >=1.19 && <1.19.1
                             /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
+                            //? if <1.19
+                            /*net.minecraft.core.RegistryAccess.BUILTIN.get(), net.minecraft.commands.Commands.CommandSelection.ALL*/
                     );
         }
 
@@ -577,8 +579,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(),
                     //? if >=1.19.1
                     event.getBuildContext()
-                    //? if <1.19.1
+                    //? if >=1.19 && <1.19.1
                     /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get())*/
+                    //? if <1.19
+                    /*net.minecraft.core.RegistryAccess.BUILTIN.get()*/
             );
         }
 

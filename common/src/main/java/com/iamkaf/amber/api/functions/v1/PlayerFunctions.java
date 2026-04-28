@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+//? if <1.19
+/*import net.minecraft.network.chat.TextComponent;*/
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
@@ -551,8 +553,8 @@ public final class PlayerFunctions {
     public static void clearTitle(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             // Send empty title packets to clear the title
-            serverPlayer.connection.send(new ClientboundSetTitleTextPacket(Component.empty()));
-            serverPlayer.connection.send(new ClientboundSetSubtitleTextPacket(Component.empty()));
+            serverPlayer.connection.send(new ClientboundSetTitleTextPacket(emptyComponent()));
+            serverPlayer.connection.send(new ClientboundSetSubtitleTextPacket(emptyComponent()));
             serverPlayer.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, 0));
         }
     }
@@ -602,6 +604,7 @@ public final class PlayerFunctions {
      */
     public static void playSound(Player player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (player instanceof ServerPlayer serverPlayer) {
+            //? if >=1.19 {
             serverPlayer.connection.send(new ClientboundSoundPacket(
                     //? if >=1.19.3
                     Holder.direct(sound),
@@ -615,10 +618,28 @@ public final class PlayerFunctions {
                     pitch,
                     //? if >=1.20
                     player.level().getRandom().nextLong()
-                    //? if <1.20
+                    //? if >=1.19 && <1.20
                     /*player.level.getRandom().nextLong()*/
             ));
+            //?} else {
+            /*serverPlayer.connection.send(new ClientboundSoundPacket(
+                    sound,
+                    source,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    volume,
+                    pitch
+            ));*/
+            //?}
         }
+    }
+
+    private static Component emptyComponent() {
+        //? if >=1.19
+        return Component.empty();
+        //? if <1.19
+        /*return new TextComponent("");*/
     }
 
     // ==================== WORLD INTERACTION UTILITIES ====================
@@ -630,7 +651,10 @@ public final class PlayerFunctions {
      * @return The player's last death location, or empty if none set.
      */
     public static Optional<GlobalPos> getLastDeathLocation(Player player) {
+        //? if >=1.19
         return player.getLastDeathLocation();
+        //? if <1.19
+        /*return Optional.empty();*/
     }
 
     /**
@@ -640,7 +664,10 @@ public final class PlayerFunctions {
      * @param position The death location to set.
      */
     public static void setLastDeathLocation(Player player, GlobalPos position) {
+        //? if >=1.19
         player.setLastDeathLocation(Optional.of(position));
+        //? if <1.19
+        /*return;*/
     }
 
     /**

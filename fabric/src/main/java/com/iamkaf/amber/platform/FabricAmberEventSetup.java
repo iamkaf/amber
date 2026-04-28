@@ -11,13 +11,19 @@ import com.iamkaf.amber.Constants;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
+//? if >=1.19
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+//? if <1.19
+/*import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;*/
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if >=26.1
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 //? if <26.1
 /*import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;*/
+//? if >=1.19
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//? if <1.19
+/*import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;*/
 //? if >=1.19.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -40,6 +46,7 @@ import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 /*import net.fabricmc.fabric.api.loot.v2.LootTableSource;*/
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
+//? if >=1.19
 import net.minecraft.core.HolderLookup;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
@@ -98,9 +105,19 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
             return PlayerEvents.ENTITY_INTERACT.invoker().interact(player, level, hand, entity);
         });
+        //? if >=1.19 {
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
             CommandEvents.EVENT.invoker().register(commandDispatcher, commandBuildContext, commandSelection);
         });
+        //?} else {
+        /*CommandRegistrationCallback.EVENT.register((commandDispatcher, dedicated) -> {
+            CommandEvents.EVENT.invoker().register(
+                    commandDispatcher,
+                    net.minecraft.core.RegistryAccess.BUILTIN.get(),
+                    dedicated ? net.minecraft.commands.Commands.CommandSelection.DEDICATED : net.minecraft.commands.Commands.CommandSelection.ALL
+            );
+        });*/
+        //?}
 
         // Entity lifecycle events
         //? if >=1.19.2 {
@@ -241,10 +258,16 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
 
     @Override
     public void registerClient() {
+        //? if >=1.19 {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
+        //?} else {
+        /*@SuppressWarnings("unchecked")
+        CommandDispatcher<CommandSourceStack> commandsTemp = (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) ClientCommandManager.DISPATCHER;
+        ClientCommandEvents.EVENT.invoker().register(commandsTemp, net.minecraft.core.RegistryAccess.BUILTIN.get());*/
+        //?}
         //? if >=26.1 {
         HudElementRegistry.addLast(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "render_hud"),

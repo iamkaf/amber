@@ -1,6 +1,8 @@
 package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import net.minecraft.network.chat.Component;
+//? if <1.19
+/*import net.minecraft.network.chat.TextComponent;*/
 //? if <1.19.3
 /*import net.minecraft.core.NonNullList;*/
 import net.minecraft.resources.Identifier;
@@ -31,7 +33,7 @@ import java.util.function.Supplier;
  */
 public class TabBuilder {
     private final Identifier id;
-    private Component title = Component.empty();
+    private Component title = emptyTitle();
     private Supplier<ItemStack> icon = () -> ItemStack.EMPTY;
     private final List<Supplier<ItemLike>> items = new ArrayList<>();
     private Identifier backgroundTexture = defaultId("textures/gui/container/creative_inventory/tab_items.png");
@@ -46,6 +48,13 @@ public class TabBuilder {
 
     TabBuilder(Identifier id) {
         this.id = id;
+    }
+
+    private static Component emptyTitle() {
+        //? if >=1.19
+        return Component.empty();
+        //? if <1.19
+        /*return new TextComponent("");*/
     }
 
     private static Identifier defaultId(String path) {

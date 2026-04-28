@@ -3,7 +3,10 @@ package com.iamkaf.amber.api.event.v1.events.common;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import com.mojang.brigadier.CommandDispatcher;
+//? if >=1.19
 import net.minecraft.commands.CommandBuildContext;
+//? if <1.19
+/*import net.minecraft.core.RegistryAccess;*/
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -37,5 +40,10 @@ public interface CommandEvents {
      * @param registryAccess object exposing access to the game's registries
      * @param environment environment the registrations should be done for, used for commands that are dedicated or integrated server only
      */
-    void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment);
+    void register(CommandDispatcher<CommandSourceStack> dispatcher,
+            //? if >=1.19
+            CommandBuildContext registryAccess,
+            //? if <1.19
+            /*RegistryAccess registryAccess,*/
+            Commands.CommandSelection environment);
 }
