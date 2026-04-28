@@ -40,10 +40,12 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 //? if >=1.21
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
-//? if <1.21
+//? if <1.21 && >=1.18.2
 /*import net.fabricmc.fabric.api.loot.v2.LootTableEvents;*/
-//? if <1.21
+//? if <1.21 && >=1.18.2
 /*import net.fabricmc.fabric.api.loot.v2.LootTableSource;*/
+//? if <1.18.2
+/*import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;*/
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 //? if >=1.19
@@ -60,6 +62,17 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import java.util.function.Consumer;
 
 public class FabricAmberEventSetup implements IAmberEventSetup {
+
+    //? if >=1.18.2 && <1.19 {
+    /*private static net.minecraft.core.RegistryAccess commandRegistryAccess() {
+        return net.minecraft.core.RegistryAccess.BUILTIN.get();
+    }*/
+    //?}
+    //? if <1.18.2 {
+    /*private static net.minecraft.core.RegistryAccess commandRegistryAccess() {
+        return net.minecraft.core.RegistryAccess.builtin();
+    }*/
+    //?}
 
     /**
      * Fabric-specific wrapper for DefaultItemComponentEvents.ModifyContext.
@@ -97,9 +110,13 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             //? if <1.21.11 && >=1.21
             /*LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);*/
         });
-        //?} else {
+        //?} else if >=1.18.2 {
         /*LootTableEvents.MODIFY.register((resourceManager, lootManager, id, builder, lootTableSource) -> {
             LootEvents.MODIFY.invoker().modify(id, lootPool -> builder.withPool(lootPool));
+        });*/
+        //?} else {
+        /*LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {
+            LootEvents.MODIFY.invoker().modify(id, supplier::pool);
         });*/
         //?}
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
@@ -113,7 +130,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         /*CommandRegistrationCallback.EVENT.register((commandDispatcher, dedicated) -> {
             CommandEvents.EVENT.invoker().register(
                     commandDispatcher,
-                    net.minecraft.core.RegistryAccess.BUILTIN.get(),
+                    commandRegistryAccess(),
                     dedicated ? net.minecraft.commands.Commands.CommandSelection.DEDICATED : net.minecraft.commands.Commands.CommandSelection.ALL
             );
         });*/
@@ -266,7 +283,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         //?} else {
         /*@SuppressWarnings("unchecked")
         CommandDispatcher<CommandSourceStack> commandsTemp = (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) ClientCommandManager.DISPATCHER;
-        ClientCommandEvents.EVENT.invoker().register(commandsTemp, net.minecraft.core.RegistryAccess.BUILTIN.get());*/
+        ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());*/
         //?}
         //? if >=26.1 {
         HudElementRegistry.addLast(

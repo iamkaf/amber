@@ -4,6 +4,7 @@ plugins {
 
 def minecraftVersion = requiredProp(project, 'project.minecraft')
 def libs = catalogFor(project, minecraftVersion)
+def useTeaKit = providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()
 
 jar {
     manifest {
@@ -14,12 +15,46 @@ jar {
 
 dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-    if (providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()) {
+    if (minecraftVersion == '1.18.1') {
+        runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
+    }
+    if (useTeaKit) {
         runtimeOnly library(libs, 'teakit-forge')
     }
 }
 
-if (minecraftVersion == '1.19') {
+if (minecraftVersion == '1.18.1' && useTeaKit && project.extensions.findByName('minecraft') != null) {
+    def modId = requiredProp(project, 'mod.id')
+    def teaKitSourceSetDir = providers.provider {
+        def dir = new File(rootProject.projectDir.parentFile, "teakit/forge/versions/${minecraftVersion}/build/sourcesSets/main")
+        if (!dir.isDirectory()) {
+            throw new GradleException("Missing TeaKit Forge source roots for ${minecraftVersion} at ${dir}")
+        }
+        dir
+    }
+    def legacyModClasses = providers.provider {
+        def explodedPath = layout.buildDirectory.dir('sourcesSets/main').get().asFile.absolutePath
+        def teaKitPath = teaKitSourceSetDir.get().absolutePath
+        [
+            "${modId}%%${explodedPath}",
+            "${modId}%%${explodedPath}",
+            "teakit%%${teaKitPath}",
+            "teakit%%${teaKitPath}",
+        ].join(File.pathSeparator)
+    }
+
+    minecraft.runs.named('client').configure { run ->
+        run.environment 'MOD_CLASSES', legacyModClasses.get()
+    }
+    tasks.named('runClient').configure { task ->
+        task.environment 'MOD_CLASSES', legacyModClasses.get()
+        task.doFirst {
+            environment 'MOD_CLASSES', legacyModClasses.get()
+        }
+    }
+}
+
+if (minecraftVersion == '1.18.1' || minecraftVersion == '1.19') {
     tasks.named('runClient').configure {
         jvmArgs '--add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler'
     }

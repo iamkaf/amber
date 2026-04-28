@@ -1,10 +1,12 @@
 package com.iamkaf.amber.api.functions.v1;
 
+//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
+//? if >=1.18.2
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 //? if >=1.20.5
@@ -101,6 +103,7 @@ public final class ItemFunctions {
         return false;
     }
 
+    //? if >=1.18.2 {
     /**
      * Checks if the inventory contains the item and shrinks the stack by one.
      * Returns true if it does.
@@ -130,7 +133,9 @@ public final class ItemFunctions {
         }
         return false;
     }
+    //?}
 
+    //? if >=1.18.2 {
     /**
      * Checks if the inventory contains the item.
      * Returns true if it does.
@@ -200,6 +205,7 @@ public final class ItemFunctions {
         }
         return false;
     }
+    //?}
 
     /**
      * Executes a predicate on each ItemStack in the inventory.
@@ -302,13 +308,21 @@ public final class ItemFunctions {
      * @see AttributeModifier
      * @see EquipmentSlotGroup
      */
-    public static void addModifier(ItemStack stack, Holder<Attribute> attribute, AttributeModifier modifier,
+    public static void addModifier(ItemStack stack,
+            //? if >=1.18.2
+            Holder<Attribute> attribute,
+            //? if <1.18.2
+            /*Attribute attribute,*/
+            AttributeModifier modifier,
             //? if >=1.20.5
             EquipmentSlotGroup slotGroup) {
             //? if <1.20.5
             /*EquipmentSlot slotGroup) {*/
         //? if <1.20.5 {
+        //? if >=1.18.2
         stack.addAttributeModifier(attribute.value(), modifier, slotGroup);
+        //? if <1.18.2
+        /*stack.addAttributeModifier(attribute, modifier, slotGroup);*/
         //?} else {
         ItemAttributeModifiers extraModifiers = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         assert extraModifiers != null;
