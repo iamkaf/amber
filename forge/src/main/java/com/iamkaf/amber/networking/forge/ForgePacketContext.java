@@ -40,7 +40,10 @@ public class ForgePacketContext implements PacketContext {
             }
         } else {
             // Server-side execution
+            //? if >=1.20
             if (player instanceof ServerPlayer serverPlayer && serverPlayer.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            //? if <1.20
+            /*if (player instanceof ServerPlayer serverPlayer && serverPlayer.level instanceof net.minecraft.server.level.ServerLevel serverLevel) {*/
                 serverLevel.getServer().execute(task);
             } else {
                 // Fallback to immediate execution

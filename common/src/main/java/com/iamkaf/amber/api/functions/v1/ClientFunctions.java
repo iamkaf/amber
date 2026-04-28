@@ -1,12 +1,14 @@
 package com.iamkaf.amber.api.functions.v1;
 
 import com.iamkaf.amber.Constants;
+//? if <1.20
+/*import com.mojang.blaze3d.vertex.PoseStack;*/
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 //? if >=26.1
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-//? if <26.1
+//? if <26.1 && >=1.20
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -77,9 +79,12 @@ public final class ClientFunctions {
     //? if >=26.1 {
     public static void renderText(GuiGraphicsExtractor context, Font font, Component message, int x, int y, int color) {
         context.text(font, message, x, y, color);
-    //?} else {
+    //?} else if >=1.20 {
     /*public static void renderText(GuiGraphics context, Font font, Component message, int x, int y, int color) {
         context.drawString(font, message, x, y, color);*/
+    //?} else {
+    /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
+        font.draw(context, message, x, y, color);*/
     //?}
     }
 
@@ -93,8 +98,10 @@ public final class ClientFunctions {
      */
     //? if >=26.1
     public static void renderTooltip(GuiGraphicsExtractor guiGraphics, ItemStack stack, int x, int y) {
-    //? if <26.1
+    //? if <26.1 && >=1.20
     /*public static void renderTooltip(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {*/
+    //? if <1.20
+    /*public static void renderTooltip(PoseStack guiGraphics, ItemStack stack, int x, int y) {*/
         Minecraft mc = Minecraft.getInstance();
 
         if (mc == null) {
@@ -104,6 +111,14 @@ public final class ClientFunctions {
         if (stack == null || stack.isEmpty()) {
             return;
         }
+
+        //? if <1.20 {
+        /*if (mc.screen == null) {
+            return;
+        }
+
+        mc.screen.renderTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), stack.getTooltipImage(), x, y);
+        *///?}
 
         //? if >=1.21.6 {
         // converts a list of components to a list of ClientTooltipComponents
@@ -132,7 +147,7 @@ public final class ClientFunctions {
                 stack.get(DataComponents.TOOLTIP_STYLE)
         );*/
         //?}
-        //?} else
+        //?} else if >=1.20
         /*guiGraphics.renderTooltip(mc.font, stack, x, y);*/
     }
 
@@ -253,8 +268,10 @@ public final class ClientFunctions {
     public static final class TextWriter {
         //? if >=26.1
         private final GuiGraphicsExtractor context;
-        //? if <26.1
+        //? if <26.1 && >=1.20
         /*private final GuiGraphics context;*/
+        //? if <1.20
+        /*private final PoseStack context;*/
         private final Font font;
 
         private int cursorX = 0; // Current cursor X position
@@ -271,8 +288,10 @@ public final class ClientFunctions {
          */
         //? if >=26.1
         public TextWriter(GuiGraphicsExtractor context, Font font) {
-        //? if <26.1
+        //? if <26.1 && >=1.20
         /*public TextWriter(GuiGraphics context, Font font) {*/
+        //? if <1.20
+        /*public TextWriter(PoseStack context, Font font) {*/
             this.context = context;
             this.font = font;
         }
@@ -287,8 +306,10 @@ public final class ClientFunctions {
          */
         //? if >=26.1
         public TextWriter(GuiGraphicsExtractor context, Font font, int x, int y) {
-        //? if <26.1
+        //? if <26.1 && >=1.20
         /*public TextWriter(GuiGraphics context, Font font, int x, int y) {*/
+        //? if <1.20
+        /*public TextWriter(PoseStack context, Font font, int x, int y) {*/
             this(context, font);
             this.cursorX = x;
             this.cursorY = y;

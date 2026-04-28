@@ -13,6 +13,7 @@ import net.minecraft.core.component.DataComponentType;
 //? if >=1.20.5
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.item.Item;
+//? if >=1.20
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -138,7 +139,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         BuildCreativeModeTabContentsEvent.BUS.addListener(EventHandlerCommon::buildContents);
         //? if >=1.21.6 && <1.21.10
         /*BuildCreativeModeTabContentsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerCommon::buildContents);*/
-        //? if <1.21.6
+        //? if >=1.20 && <1.21.6
         /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerCommon::buildContents);*/
 
         // Default item components event
@@ -274,7 +275,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         public static boolean onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
+                    //? if >=1.20
                     event.getPlayer().level(),
+                    //? if <1.20
+                    /*event.getPlayer().level,*/
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
@@ -286,7 +290,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
             // Fire after event (can't cancel)
             BlockEvents.BLOCK_BREAK_AFTER.invoker().afterBlockBreak(
+                    //? if >=1.20
                     event.getPlayer().level(),
+                    //? if <1.20
+                    /*event.getPlayer().level,*/
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
@@ -302,13 +309,19 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
             // Fire the unified BLOCK_PLACE event
             InteractionResult result = BlockEvents.BLOCK_PLACE.invoker()
+                    //? if >=1.20
                     .onBlockPlace(player.level(), player, event.getPos(), event.getPlacedBlock(), player.getMainHandItem());
+                    //? if <1.20
+                    /*.onBlockPlace(player.level, player, event.getPos(), event.getPlacedBlock(), player.getMainHandItem());*/
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
 
         public static boolean onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker()
+                    //? if >=1.20
                     .onBlockInteract(event.getEntity(), event.getEntity().level(), event.getHand(), event.getHitVec());
+                    //? if <1.20
+                    /*.onBlockInteract(event.getEntity(), event.getEntity().level, event.getHand(), event.getHitVec());*/
             return result != InteractionResult.PASS; // Cancel if not PASS
         }
 
@@ -316,7 +329,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker()
                     .onBlockClick(
                             event.getEntity(),
+                            //? if >=1.20
                             event.getEntity().level(),
+                            //? if <1.20
+                            /*event.getEntity().level,*/
                             event.getHand(),
                             event.getPos(),
                             event.getFace()
@@ -405,6 +421,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             return result != InteractionResult.PASS; // Return true to cancel if not PASS
         }
         
+        //? if >=1.20 {
         /**
          * Handles the BuildCreativeModeTabContentsEvent from Forge.
          * <p>
@@ -438,15 +455,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 }
             };
             CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                .modifyEntries(event.getTabKey(), output);
+                    .modifyEntries(event.getTabKey(), output);
         }
+        //?}
 
+        //? if >=1.20.5 {
         /**
          * Handles GatherComponentsEvent.Item from Forge.
          */
-        //? if >=1.20.5
         public static void onGatherComponents(GatherComponentsEvent.Item event) {
-        //? if >=1.20.5 {
             ItemEvents.MODIFY_DEFAULT_COMPONENTS.invoker().modify(
                 new ForgeComponentModificationContext(event)
             );

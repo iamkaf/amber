@@ -2,13 +2,15 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+//? if <1.20
+/*import com.mojang.blaze3d.vertex.PoseStack;*/
 //? if >=1.21
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 //? if >=26.1
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-//? if <26.1
+//? if <26.1 && >=1.20
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import org.spongepowered.asm.mixin.Final;
@@ -43,8 +45,10 @@ public class GuiMixin {
     public void amber$render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
     //? if <26.1 && >=1.21
     /*public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {*/
-    //? if <1.21
+    //? if <1.21 && >=1.20
     /*public void amber$render(GuiGraphics guiGraphics, float deltaTracker, CallbackInfo ci) {*/
+    //? if <1.20
+    /*public void amber$render(PoseStack guiGraphics, float deltaTracker, CallbackInfo ci) {*/
         // this check mirrors the vanilla check
         if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, deltaTracker);

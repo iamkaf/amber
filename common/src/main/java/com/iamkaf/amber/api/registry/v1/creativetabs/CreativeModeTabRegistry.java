@@ -2,6 +2,9 @@ package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+//? if >=1.20
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
@@ -74,9 +77,40 @@ public final class CreativeModeTabRegistry {
      */
     public static RegistrySupplier<CreativeModeTab> register(TabBuilder builder) {
         TAB_BUILDERS.put(builder.getId(), builder);
+        //? if >=1.20 {
         return com.iamkaf.amber.api.registry.v1.RegistrarManager.get(builder.getId().getNamespace())
             .get(Registries.CREATIVE_MODE_TAB)
             .register(builder.getId(), builder::build);
+        //?} else {
+        /*CreativeModeTab tab = builder.build();
+        Identifier registryId = id("minecraft", "creative_mode_tab");
+        return new RegistrySupplier<>() {
+            @Override
+            public boolean isPresent() {
+                return true;
+            }
+
+            @Override
+            public CreativeModeTab get() {
+                return tab;
+            }
+
+            @Override
+            public Identifier getRegistryId() {
+                return registryId;
+            }
+
+            @Override
+            public ResourceKey<Registry<CreativeModeTab>> getRegistryKey() {
+                return ResourceKey.createRegistryKey(registryId);
+            }
+
+            @Override
+            public Identifier getId() {
+                return builder.getId();
+            }
+        };*/
+        //?}
     }
     
     /**
