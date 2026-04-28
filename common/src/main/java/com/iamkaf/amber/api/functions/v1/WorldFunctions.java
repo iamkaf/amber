@@ -435,7 +435,10 @@ public final class WorldFunctions {
      * @return The difficulty instance at the position.
      */
     public static DifficultyInstance getCurrentDifficulty(ServerLevelAccessor level, Vec3 position) {
+        //? if >=1.19.4
         return level.getCurrentDifficultyAt(BlockPos.containing(position));
+        //? if <1.19.4
+        /*return level.getCurrentDifficultyAt(new BlockPos(position));*/
     }
 
     /**
@@ -591,7 +594,10 @@ public final class WorldFunctions {
      * @return The biome at the position.
      */
     public static Holder<Biome> getBiomeAtPosition(Level level, Vec3 position) {
+        //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position));
+        //? if <1.19.4
+        /*return level.getBiome(new BlockPos(position));*/
     }
 
     /**
@@ -613,7 +619,10 @@ public final class WorldFunctions {
      * @return The biome value at the position.
      */
     public static Biome getBiomeValueAtPosition(Level level, Vec3 position) {
+        //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position)).value();
+        //? if <1.19.4
+        /*return level.getBiome(new BlockPos(position)).value();*/
     }
 
     /**
@@ -627,8 +636,10 @@ public final class WorldFunctions {
     public static boolean hasPrecipitation(Level level, BlockPos position, Biome.Precipitation precipitation) {
         //? if >=1.21.2
         return level.getBiome(position).value().getPrecipitationAt(position, level.getSeaLevel()) == precipitation;
-        //? if <1.21.2
+        //? if <1.21.2 && >=1.19.4
         /*return level.getBiome(position).value().getPrecipitationAt(position) == precipitation;*/
+        //? if <1.19.4
+        /*return level.getBiome(position).value().getPrecipitation() == precipitation;*/
     }
 
     /**
@@ -640,7 +651,10 @@ public final class WorldFunctions {
      * @return true if the position has the specified precipitation, false otherwise.
      */
     public static boolean hasPrecipitation(Level level, Vec3 position, Biome.Precipitation precipitation) {
+        //? if >=1.19.4
         return hasPrecipitation(level, BlockPos.containing(position), precipitation);
+        //? if <1.19.4
+        /*return hasPrecipitation(level, new BlockPos(position), precipitation);*/
     }
 
     // ==================== BOUNDING BOX OPERATIONS ====================
