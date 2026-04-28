@@ -204,8 +204,28 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
     static public class EventHandlerCommon {
         public static void onLootTableEvent(LootTableLoadEvent event) {
-            LootEvents.MODIFY.invoker().modify(event.getName(), lootPool -> event.getTable().addPool(lootPool.build()));
+            LootEvents.MODIFY.invoker().modify(event.getName(), lootPool -> {
+                //? if >=1.20.1
+                event.getTable().addPool(lootPool.build());
+                //? if <1.20.1
+                /*addLootPool(event.getTable(), lootPool.build());*/
+            });
         }
+
+        //? if <1.20.1 {
+        /*private static void addLootPool(net.minecraft.world.level.storage.loot.LootTable table, net.minecraft.world.level.storage.loot.LootPool pool) {
+            try {
+                java.lang.reflect.Field poolsField = net.minecraft.world.level.storage.loot.LootTable.class.getDeclaredField("pools");
+                poolsField.setAccessible(true);
+                net.minecraft.world.level.storage.loot.LootPool[] pools = (net.minecraft.world.level.storage.loot.LootPool[]) poolsField.get(table);
+                net.minecraft.world.level.storage.loot.LootPool[] expanded = java.util.Arrays.copyOf(pools, pools.length + 1);
+                expanded[pools.length] = pool;
+                poolsField.set(table, expanded);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("Failed to modify loot table", e);
+            }
+        }*/
+        //?}
 
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
