@@ -20,17 +20,26 @@ public abstract class LightningBoltMixin {
             method = "tick",
             at = @At(
                     value = "INVOKE",
+                    //? if >=1.16.2
                     target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LightningBolt;)V"
+                    //? if <1.16.2
+                    /*target = "Lnet/minecraft/world/entity/Entity;thunderHit(Lnet/minecraft/world/entity/LightningBolt;)V"*/
             )
     )
+    //? if >=1.16.2
     private void onLightningStrike(Entity entity, ServerLevel level, LightningBolt lightning) {
+    //? if <1.16.2
+    /*private void onLightningStrike(Entity entity, LightningBolt lightning) {*/
         // Fire the custom event
         InteractionResult result = WeatherEvents.LIGHTNING_STRIKE.invoker().onLightningStrike(entity, lightning);
 
         // Only call the original thunderHit method if the event was not cancelled.
         // InteractionResult.PASS means the event was not handled and vanilla behavior should continue.
         if (result == InteractionResult.PASS) {
+            //? if >=1.16.2
             entity.thunderHit(level, lightning);
+            //? if <1.16.2
+            /*entity.thunderHit(lightning);*/
         }
     }
 }

@@ -114,13 +114,15 @@ public final class ClientFunctions {
             return;
         }
 
-        //? if <1.20 {
+        //? if <1.20
         /*if (mc.screen == null) {
             return;
-        }
+        }*/
 
-        mc.screen.renderComponentTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);
-        *///?}
+        //? if <1.20 && >=1.16.2
+        /*mc.screen.renderComponentTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
+        //? if <1.16.2
+        /*mc.screen.renderTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
 
         //? if >=1.21.6 {
         // converts a list of components to a list of ClientTooltipComponents

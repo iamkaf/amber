@@ -4,7 +4,10 @@ import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.BlockEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
+//? if >=1.16.2
 import net.minecraft.world.item.context.BlockPlaceContext;
+//? if <1.16.2
+/*import net.minecraft.world.item.BlockPlaceContext;*/
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +20,10 @@ public class BlockItemMixin {
 
     @Inject(method = "place",
             at = @At(value = "INVOKE",
+                    //? if >=1.16.2
                     target = "Lnet/minecraft/world/item/BlockItem;placeBlock(Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z"),
+                    //? if <1.16.2
+                    /*target = "Lnet/minecraft/world/item/BlockItem;placeBlock(Lnet/minecraft/world/item/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z"),*/
             locals = LocalCapture.CAPTURE_FAILHARD,
             cancellable = true)
     private void onPlace(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir,

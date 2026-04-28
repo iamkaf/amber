@@ -13,7 +13,7 @@ import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
 //? if >=1.19
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-//? if <1.19
+//? if <1.19 && >=1.16.2
 /*import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;*/
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 //? if >=26.1
@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 /*import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;*/
 //? if >=1.19.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+//? if >=1.16.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 //? if >=26.1
@@ -280,7 +281,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
-        //?} else {
+        //?} else if >=1.16.2 {
         /*@SuppressWarnings("unchecked")
         CommandDispatcher<CommandSourceStack> commandsTemp = (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) ClientCommandManager.DISPATCHER;
         ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());*/
@@ -345,9 +346,11 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             //? if <1.17
             /*PlayerEvents.PLAYER_LEAVE.invoker().onPlayerLeave(handler.player);*/
         });
+        //? if >=1.16.2 {
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(oldPlayer, newPlayer, alive);
         });
+        //?}
     }
 
 }
