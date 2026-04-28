@@ -4,6 +4,8 @@ import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import net.minecraft.server.level.ServerLevel;
+//? if <1.19.2
+/*import net.minecraft.world.InteractionResult;*/
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +16,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+//? if <1.19.2
+/*import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;*/
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -36,6 +40,32 @@ public abstract class LivingEntityAfterDamageMixin {
 
     @Unique
     private boolean amber$blocked;
+
+    //? if <1.19.2 {
+    /*@Inject(
+            method = "hurt",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"),
+            cancellable = true
+    )
+    private void amber$fireEntityDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker()
+                .onEntityDamage((LivingEntity) (Object) this, source, amount);
+        if (result != InteractionResult.PASS) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(
+            method = "die",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;broadcastEntityEvent(Lnet/minecraft/world/entity/Entity;B)V"
+            )
+    )
+    private void amber$fireEntityDeath(DamageSource source, CallbackInfo ci) {
+        EntityEvent.ENTITY_DEATH.invoker().onEntityDeath((LivingEntity) (Object) this, source);
+    }
+    *///?}
 
     @Inject(
             //? if >=1.21.2
