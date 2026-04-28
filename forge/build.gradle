@@ -5,6 +5,8 @@ plugins {
 def minecraftVersion = requiredProp(project, 'project.minecraft')
 def libs = catalogFor(project, minecraftVersion)
 def useTeaKit = providers.gradleProperty('amber.withTeaKit').orElse('false').map { it.toBoolean() }.get()
+def useLegacy1171ForgeRunHack = minecraftVersion == '1.17.1'
+def teaKitVersion = versionOrNull(libs, 'teakit')
 
 jar {
     manifest {
@@ -15,7 +17,7 @@ jar {
 
 dependencies {
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-    if (minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
+    if (useLegacy1171ForgeRunHack || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         runtimeOnly 'org.slf4j:slf4j-simple:2.0.13'
     }
     if (useTeaKit) {
@@ -54,7 +56,125 @@ if (minecraftVersion == '1.18.1' && useTeaKit && project.extensions.findByName('
     }
 }
 
-if (minecraftVersion == '1.18.1' || minecraftVersion == '1.19') {
+if (useLegacy1171ForgeRunHack) {
+    def forgeRunLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+    def lwjglNativesDir = layout.buildDirectory.dir('lwjgl-natives')
+    def legacyForgeModsDir = layout.projectDirectory.dir('run/mods')
+    def legacyTeaKitForgeJar = providers.provider {
+        configurations.detachedConfiguration(
+            dependencies.create("com.iamkaf.teakit:teakit-forge:${teaKitVersion}")
+        ).resolve().find { it.name.startsWith('teakit-forge-') && it.name.endsWith('.jar') }
+    }
+    def filteredLegacyRuntimeClasspath = providers.provider {
+        layout.buildDirectory.file('moddev/clientLegacyClasspath.txt').get().asFile.readLines()
+            .findAll { it?.trim() }
+            .findAll { path ->
+                def fileName = new File(path).name
+                !fileName.startsWith('securejarhandler-') &&
+                    !fileName.startsWith('bootstraplauncher-') &&
+                    !(useTeaKit && fileName.startsWith('teakit-forge-') && fileName.endsWith('.jar'))
+            }
+            .join(File.pathSeparator)
+    }
+    def patchLegacyModDevRunArgs = tasks.register('patchLegacyModDevRunArgs') {
+        dependsOn 'prepareClientRun'
+        inputs.file(layout.buildDirectory.file('moddev/clientRunVmArgs.txt'))
+        outputs.file(layout.buildDirectory.file('moddev/clientRunVmArgs.txt'))
+        doLast {
+            def runArgsFile = layout.buildDirectory.file('moddev/clientRunVmArgs.txt').get().asFile
+            def patchedArgs = runArgsFile.text
+                .replace('{runtime_classpath}', filteredLegacyRuntimeClasspath.get())
+                .replace('{natives}', lwjglNativesDir.get().asFile.absolutePath)
+                .replace('securejarhandler-0.9.44.jar', 'securejarhandler-0.9.61.jar')
+            runArgsFile.text = patchedArgs
+        }
+    }
+    def lwjglNativeJars = providers.provider {
+        def jars = [] as Set<File>
+        jars.addAll(fileTree(new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/org.lwjgl')) {
+            include '**/*natives-linux.jar'
+        }.files)
+        jars.addAll(fileTree(new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/com.mojang')) {
+            include '**/text2speech-*-natives-linux.jar'
+        }.files)
+        if (jars.empty) {
+            throw new GradleException("Missing LWJGL native jars for ${minecraftVersion} Forge runClient")
+        }
+        jars
+    }
+    def extractLwjglNatives = tasks.register('extractLwjglNatives', Sync) {
+        into lwjglNativesDir
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        from({
+            lwjglNativeJars.get().collect { zipTree(it) }
+        }) {
+            exclude 'META-INF/**', '**/*.sha1', '**/*.git'
+        }
+    }
+    def stageTeaKitLegacyForgeMod = tasks.register('stageTeaKitLegacyForgeMod') {
+        onlyIf { useTeaKit && teaKitVersion != null && teaKitVersion != 'null' }
+        outputs.dir(legacyForgeModsDir)
+        doLast {
+            def source = legacyTeaKitForgeJar.get()
+            if (source == null || !source.isFile()) {
+                throw new GradleException("Missing TeaKit Forge jar for ${minecraftVersion}")
+            }
+
+            def modsDir = legacyForgeModsDir.asFile
+            modsDir.mkdirs()
+            project.delete(fileTree(modsDir) { include 'teakit-forge-*.jar' })
+
+            def jarFile = new java.util.jar.JarFile(source)
+            def manifest = jarFile.manifest ?: new java.util.jar.Manifest()
+            manifest.mainAttributes.remove(new java.util.jar.Attributes.Name('MixinConfigs'))
+
+            def target = new File(modsDir, source.name)
+            def tempFile = new File(modsDir, "${source.name}.temp")
+            def out = new java.util.jar.JarOutputStream(new FileOutputStream(tempFile), manifest)
+            try {
+                jarFile.entries().each { entry ->
+                    if (entry.name == 'META-INF/MANIFEST.MF') {
+                        return
+                    }
+                    def newEntry = new java.util.jar.JarEntry(entry.name)
+                    newEntry.time = entry.time
+                    out.putNextEntry(newEntry)
+                    if (!entry.isDirectory()) {
+                        out << jarFile.getInputStream(entry)
+                    }
+                    out.closeEntry()
+                }
+            } finally {
+                out.close()
+                jarFile.close()
+            }
+
+            java.nio.file.Files.move(
+                tempFile.toPath(),
+                target.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.ATOMIC_MOVE
+            )
+        }
+    }
+
+    tasks.configureEach { task ->
+        if (task.name in ['runClient', 'runServer'] && task.hasProperty('javaLauncher')) {
+            task.dependsOn(patchLegacyModDevRunArgs)
+            task.javaLauncher.set(forgeRunLauncher)
+        }
+        if (task.name == 'runClient' && task.hasProperty('javaLauncher')) {
+            task.dependsOn(extractLwjglNatives)
+            task.dependsOn(stageTeaKitLegacyForgeMod)
+            task.systemProperty 'java.library.path', lwjglNativesDir.get().asFile.absolutePath
+            task.systemProperty 'org.lwjgl.librarypath', lwjglNativesDir.get().asFile.absolutePath
+        }
+    }
+}
+
+if (useLegacy1171ForgeRunHack || minecraftVersion == '1.18.1' || minecraftVersion == '1.19') {
     tasks.named('runClient').configure {
         jvmArgs '--add-opens=java.base/java.lang.invoke=cpw.mods.securejarhandler'
     }

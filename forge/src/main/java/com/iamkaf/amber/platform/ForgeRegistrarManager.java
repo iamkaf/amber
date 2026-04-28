@@ -16,7 +16,10 @@ import net.minecraftforge.registries.DeferredRegister;
 /*import net.minecraftforge.registries.IForgeRegistry;*/
 //? if <1.18.2
 /*import net.minecraftforge.registries.RegistryManager;*/
+//? if >=1.18
 import net.minecraftforge.registries.RegistryObject;
+//? if <1.18
+/*import net.minecraftforge.fmllegacy.RegistryObject;*/
 
 import java.util.HashMap;
 import java.util.Map;
