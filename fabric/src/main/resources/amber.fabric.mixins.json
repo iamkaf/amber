@@ -8,6 +8,7 @@
     "AnimalMixin",
     "BlockItemMixin",
     "BoneMealItemMixin",
+    //? if >=1.20.5
     "BuiltInRegistriesMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",

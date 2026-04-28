@@ -1,14 +1,12 @@
 package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Registry;
 //? if >=1.20
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Supplier;

@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import com.iamkaf.amber.mixin.ItemAccessor;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
+//? if >=1.20.5
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public final class FabricDefaultItemComponentBridge {

@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+//? if >=1.19.3
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponents;

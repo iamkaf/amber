@@ -1,9 +1,8 @@
 package com.iamkaf.amber.api.registry.v1.creativetabs;
 
-import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
+//? if <1.19.3
+/*import net.minecraft.core.NonNullList;*/
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -39,8 +38,10 @@ public class TabBuilder {
     private boolean canScroll = true;
     private boolean showTitle = true;
     private boolean alignedRight = false;
+    //? if >=1.19.3
     private CreativeModeTab.Row row = CreativeModeTab.Row.TOP;
     private int column = 0;
+    //? if >=1.19.3
     private CreativeModeTab.Type type = CreativeModeTab.Type.CATEGORY;
 
     TabBuilder(Identifier id) {
@@ -193,7 +194,11 @@ public class TabBuilder {
      * @param row The row position
      * @return This builder for chaining
      */
+    //? if >=1.19.3
     public TabBuilder row(CreativeModeTab.Row row) {
+    //? if <1.19.3
+    /*public TabBuilder row(Object row) {*/
+        //? if >=1.19.3
         this.row = row;
         return this;
     }
@@ -219,7 +224,11 @@ public class TabBuilder {
      * @param type The tab type
      * @return This builder for chaining
      */
+    //? if >=1.19.3
     public TabBuilder type(CreativeModeTab.Type type) {
+    //? if <1.19.3
+    /*public TabBuilder type(Object type) {*/
+        //? if >=1.19.3
         this.type = type;
         return this;
     }
@@ -232,6 +241,7 @@ public class TabBuilder {
      * @return The built creative mode tab
      */
     CreativeModeTab build() {
+        //? if >=1.19.3 {
         CreativeModeTab.Builder builder = CreativeModeTab.builder(row, column);
 
         builder.title(title);
@@ -252,6 +262,21 @@ public class TabBuilder {
         // but they can be accessed through reflection in platform-specific implementations if needed
 
         return builder.build();
+        //?} else {
+        /*return new CreativeModeTab(CreativeModeTab.TABS.length, id.getNamespace() + "." + id.getPath()) {
+            @Override
+            public ItemStack makeIcon() {
+                return icon.get();
+            }
+
+            @Override
+            public void fillItemList(NonNullList<ItemStack> stacks) {
+                for (Supplier<ItemLike> item : items) {
+                    stacks.add(new ItemStack(item.get()));
+                }
+            }
+        };*/
+        //?}
     }
 
     /**
