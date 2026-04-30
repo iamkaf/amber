@@ -46,15 +46,15 @@ features:
 
 ## Documentation Versions
 
-::: tip Choose Your Amber Version
-Select the Amber version that matches your Minecraft version:
+::: tip Current Support Policy
+Amber follows a Perfect Parity policy for supported Minecraft lines. The `+<mc-version>` suffix identifies the target Minecraft line only, not a reduced feature set.
 
-- **Amber 10.x** → Minecraft 26.1
-- **Amber 9.x** → Minecraft 1.21.11
-- **Amber 8.x** → Minecraft 1.21.10
-- **Amber 3.x** → Minecraft 1.21.1
-- **Amber 1.x** → Minecraft 1.20.1
+- **Modern Supported** → Minecraft `1.20+`
+- **Legacy Supported** → Minecraft `1.17-1.19.4`
+- **EOL** → Minecraft `1.14.4-1.16.5`
 :::
+
+See the [Support Policy](/support-policy), [Support Matrix](/support-matrix), and [Parity Checks](/parity-checks) for current compatibility expectations.
 
 ## Quick Start
 
@@ -66,11 +66,11 @@ repositories {
 }
 
 dependencies {
-    implementation "com.iamkaf:amber-common:9.0.2+1.21.11"
+    implementation "com.iamkaf.amber:amber-common:<amber-version>+<mc-version>"
     // Platform-specific dependencies
-    implementation "com.iamkaf:amber-fabric:9.0.2+1.21.11"
-    // OR implementation "com.iamkaf:amber-forge:9.0.2+1.21.11"
-    // OR implementation "com.iamkaf:amber-neoforge:9.0.2+1.21.11"
+    implementation "com.iamkaf.amber:amber-fabric:<amber-version>+<mc-version>"
+    // OR implementation "com.iamkaf.amber:amber-forge:<amber-version>+<mc-version>"
+    // OR implementation "com.iamkaf.amber:amber-neoforge:<amber-version>+<mc-version>"
 }
 ```
 
