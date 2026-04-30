@@ -16,10 +16,10 @@ import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.api.registry.v1.DeferredRegister;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
 import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.@ID_TYPE@;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 
@@ -34,10 +34,11 @@ import java.util.Objects;
 public final class AmberApiTestmod {
     private static final String MOD_ID = "amber_testmod";
 
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registries.ITEM);
+    private static final ResourceKey<Registry<Item>> ITEM_REGISTRY = ResourceKey.createRegistryKey(id("item"));
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, ITEM_REGISTRY);
     private static final RegistrySupplier<Item> TEST_ITEM = ITEMS.register(
             "test_item",
-            key -> new Item(new Item.Properties().setId(key))
+            () -> new Item(new Item.Properties())
     );
     private static final NetworkChannel CHANNEL = NetworkChannel.create(id("main"));
 
@@ -90,11 +91,11 @@ public final class AmberApiTestmod {
         MathFunctions.chance(0.5f);
         MathFunctions.nextIntInclusive(1, 3);
         WorldFunctions.isOverworld(null);
-        PlayerFunctions.sendMessage(null, Component.literal("parity"));
+        PlayerFunctions.getExperienceLevel(null);
     }
 
-    private static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    private static @ID_TYPE@ id(String path) {
+        return @ID_FACTORY@;
     }
 
     private record TestmodPacket(int value) implements Packet<TestmodPacket> {

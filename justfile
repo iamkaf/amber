@@ -38,6 +38,9 @@ compile-all:
 testmod-compile version="26.1.2":
   @./gradlew ":testmod:compileTestmodApi" -Pamber.testmod.version="{{version}}" --console=plain
 
+testmod-compile-all:
+  @failures=(); for version in $(just list-versions); do log="/tmp/amber-testmod-$version.log"; if just testmod-compile "$version" > "$log" 2>&1; then echo "PASS $version"; else echo "FAIL $version log=$log"; failures+=("$version"); fi; done; if [ "${#failures[@]}" -ne 0 ]; then echo "FAILED versions: ${failures[*]}"; exit 1; fi
+
 run-client node:
   @if ! just list-nodes | grep -Fxq "{{node}}"; then echo "Unknown node: {{node}}"; exit 1; fi
   @version="{{node}}"; loader="${version##*-}"; version="${version%-*}"; ./gradlew --configure-on-demand ":$loader:$version:runClient" --console=plain

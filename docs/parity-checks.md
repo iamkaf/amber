@@ -4,7 +4,8 @@ Amber's parity contract should be enforced by checks that run, not by a second h
 
 ## Current Checks
 
-- `just testmod-compile` compiles a development-only consumer mod against Amber's public API.
+- `just testmod-compile <version>` compiles a development-only consumer mod against one Amber common API target.
+- `just testmod-compile-all` compiles that consumer mod against every supported Minecraft line.
 - `just scenario-check <node>` boots the existing TeaKit doctor scenario for one loader/version node.
 - `just scenario-check-all` runs the doctor scenario across the enabled matrix.
 

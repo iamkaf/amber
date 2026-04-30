@@ -2,8 +2,11 @@ plugins {
     id 'java-library'
 }
 
+import org.apache.tools.ant.filters.ReplaceTokens
+
 def targetVersion = providers.gradleProperty('amber.testmod.version').orElse('26.1.2').get()
 def commonApi = project(":common:${targetVersion}")
+def generatedSources = layout.buildDirectory.dir("generated/sources/testmod/${targetVersion}/java".toString())
 
 group = 'com.iamkaf.amber'
 version = 'NOT_PUBLISHABLE'
@@ -14,7 +17,52 @@ java {
     }
 }
 
+static def versionParts(String version) {
+    version.tokenize('.').collect { it as int }
+}
+
+static def isAtLeast(String version, String floor) {
+    def left = versionParts(version)
+    def right = versionParts(floor)
+    def size = Math.max(left.size(), right.size())
+
+    for (int i = 0; i < size; i++) {
+        def a = i < left.size() ? left[i] : 0
+        def b = i < right.size() ? right[i] : 0
+        if (a != b) {
+            return a > b
+        }
+    }
+
+    return true
+}
+
+def idType = isAtLeast(targetVersion, '1.21.11') ? 'Identifier' : 'ResourceLocation'
+def idFactory = isAtLeast(targetVersion, '1.21')
+    ? "${idType}.fromNamespaceAndPath(MOD_ID, path)"
+    : "new ${idType}(MOD_ID, path)"
+
+def generateTestmodSources = tasks.register('generateTestmodSources', Copy) {
+    inputs.property('targetVersion', targetVersion)
+    inputs.property('idType', idType)
+    inputs.property('idFactory', idFactory)
+    from('src/main/templates')
+    into(generatedSources)
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: [
+        ID_TYPE: idType.toString(),
+        ID_FACTORY: idFactory.toString(),
+    ])
+}
+
+sourceSets {
+    main {
+        java.srcDirs = [generatedSources]
+    }
+}
+
 tasks.named('compileJava').configure {
+    dependsOn generateTestmodSources
     dependsOn commonApi.tasks.named('compileJava')
     classpath += commonApi.sourceSets.main.output
     classpath += commonApi.sourceSets.main.compileClasspath
