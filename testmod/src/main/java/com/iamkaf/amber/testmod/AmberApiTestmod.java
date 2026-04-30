@@ -19,7 +19,6 @@ import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.@ID_TYPE@;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 
@@ -34,13 +33,13 @@ import java.util.Objects;
 public final class AmberApiTestmod {
     private static final String MOD_ID = "amber_testmod";
 
-    private static final ResourceKey<Registry<Item>> ITEM_REGISTRY = ResourceKey.createRegistryKey(id("item"));
+    private static final ResourceKey<Registry<Item>> ITEM_REGISTRY = null;
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, ITEM_REGISTRY);
     private static final RegistrySupplier<Item> TEST_ITEM = ITEMS.register(
             "test_item",
             () -> new Item(new Item.Properties())
     );
-    private static final NetworkChannel CHANNEL = NetworkChannel.create(id("main"));
+    private static final NetworkChannel CHANNEL = NetworkChannel.create(null);
 
     private AmberApiTestmod() {
     }
@@ -84,7 +83,7 @@ public final class AmberApiTestmod {
     private static void registerRegistries() {
         ITEMS.register();
         Objects.requireNonNull(TEST_ITEM.getId());
-        CreativeModeTabRegistry.builder(id("tab"));
+        CreativeModeTabRegistry.builder("tab");
     }
 
     private static void callFunctions() {
@@ -92,10 +91,6 @@ public final class AmberApiTestmod {
         MathFunctions.nextIntInclusive(1, 3);
         WorldFunctions.isOverworld(null);
         PlayerFunctions.getExperienceLevel(null);
-    }
-
-    private static @ID_TYPE@ id(String path) {
-        return @ID_FACTORY@;
     }
 
     private record TestmodPacket(int value) implements Packet<TestmodPacket> {
