@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.0.0
+
+### Changed
+
+- Ported the mod to Stonecutter
+
+### Fixed
+
+- Fixed Fabric `ItemEvents.ITEM_PICKUP` firing repeatedly before vanilla completed the pickup
+- Fixed Fabric `EntityEvent.SHEAR` not firing for player-sheared sheep on modern Minecraft versions
+- Fixed Fabric `EntityEvent.SHEAR` reporting an empty drops list for player-sheared sheep on modern Minecraft versions
+- Fixed Fabric `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
+- Fixed Fabric `PlayerEvents.SHIELD_BLOCK` not firing for fully blocked shield damage
+- Fixed Fabric `FarmingEvents.BONEMEAL_USE` firing once on the client and once on the server for a single use
+- Fixed Fabric `FarmingEvents.FARMLAND_TRAMPLE` not firing or supporting cancellation on modern Minecraft versions
+- Fixed Fabric `LootEvents.MODIFY` not forwarding loot table callbacks on 1.20.5 and 1.20.6
+- Fixed Fabric `NetworkChannel.sendToAllPlayers` not having an active server for `PlayerLookup.all`
+- Fixed Fabric custom creative tabs registered by consumer mods not receiving Amber creative tab content callbacks on 26.1, 1.21.x, 1.20.6, and 1.20.5
+- Fixed NeoForge `NetworkChannel.sendToAllPlayers` not broadcasting clientbound packets
+- Fixed NeoForge `BlockEvents.BLOCK_BREAK_BEFORE` firing twice from client and server break events
+- Fixed NeoForge `FarmingEvents.FARMLAND_TRAMPLE` not firing on modern Minecraft versions
+- Fixed NeoForge `EntityEvent.SHEAR` not firing for player-sheared sheep on modern and legacy 1.21 Minecraft versions
+- Fixed NeoForge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
+- Fixed Forge `EntityEvent.SHEAR` not firing for player-sheared sheep on modern Minecraft versions
+- Fixed Forge `RenderEvents.BLOCK_OUTLINE_RENDER` not firing because the client render mixin was not loaded
+- Fixed Forge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
+- Fixed Forge `ItemEvents.MODIFY_DEFAULT_COMPONENTS` missing late consumer registrations after default item component caches were initialized
+- Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
+
 ## 10.0.2
 
 ### Fixed

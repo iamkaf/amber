@@ -42,6 +42,12 @@ public abstract class LivingEntityAfterDamageMixin {
     @Unique
     private boolean amber$blocked;
 
+    @Unique
+    private boolean amber$shieldBlockPending;
+
+    @Unique
+    private float amber$shieldBlockedDamage;
+
     //? if <1.19.2 {
     /*@Inject(
             method = "hurt",
@@ -86,7 +92,67 @@ public abstract class LivingEntityAfterDamageMixin {
         this.amber$baseDamageTaken = 0.0F;
         this.amber$damageTaken = 0.0F;
         this.amber$blocked = false;
+        this.amber$shieldBlockPending = false;
+        this.amber$shieldBlockedDamage = 0.0F;
     }
+
+    //? if >=1.21.5 {
+    @Inject(
+            method = "applyItemBlocking",
+            at = @At("RETURN")
+    )
+    private void amber$captureShieldBlock(
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Float> cir
+    ) {
+        float damageBlocked = cir.getReturnValueF();
+        this.amber$shieldBlockPending = damageBlocked > 0.0F;
+        this.amber$shieldBlockedDamage = damage;
+    }
+    //?}
+
+    //? if <1.21.5 && >=1.21.2 {
+    /*@Inject(
+            method = "hurtServer",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
+            )
+    )
+    private void amber$captureLegacyShieldBlock(
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        this.amber$shieldBlockPending = true;
+        this.amber$shieldBlockedDamage = damage;
+    }
+    *///?}
+
+    //? if <1.21.2 {
+    /*@Inject(
+            method = "hurt",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
+            )
+    )
+    private void amber$captureLegacyShieldBlock(
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if ((LivingEntity) (Object) this instanceof Player player) {
+            ItemStack shield = amber$findCarriedShield(player);
+            if (!shield.isEmpty()) {
+                PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, damage, source);
+            }
+        }
+    }
+    *///?}
 
     @Inject(
             //? if >=1.21.2
@@ -176,23 +242,25 @@ public abstract class LivingEntityAfterDamageMixin {
             float damage,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        if (!this.amber$afterDamagePending || !cir.getReturnValueZ() || this.amber$isDeadOrDying()) {
+        if (this.amber$isDeadOrDying()) {
             return;
         }
 
         LivingEntity entity = (LivingEntity) (Object) this;
-        EntityEvent.AFTER_DAMAGE.invoker().afterDamage(
-                entity,
-                source,
-                this.amber$baseDamageTaken,
-                this.amber$damageTaken,
-                this.amber$blocked
-        );
+        if (this.amber$afterDamagePending && cir.getReturnValueZ()) {
+            EntityEvent.AFTER_DAMAGE.invoker().afterDamage(
+                    entity,
+                    source,
+                    this.amber$baseDamageTaken,
+                    this.amber$damageTaken,
+                    this.amber$blocked
+            );
+        }
 
-        if (entity instanceof Player player && this.amber$blocked) {
+        if (entity instanceof Player player && this.amber$shieldBlockPending) {
             ItemStack shield = amber$findBlockingShield(player);
             if (!shield.isEmpty()) {
-                PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, this.amber$baseDamageTaken, source);
+                PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, this.amber$shieldBlockedDamage, source);
             }
         }
     }
@@ -219,6 +287,11 @@ public abstract class LivingEntityAfterDamageMixin {
             return ItemStack.EMPTY;
         }
 
+        return amber$findCarriedShield(player);
+    }
+
+    @Unique
+    private static ItemStack amber$findCarriedShield(Player player) {
         ItemStack mainHand = player.getMainHandItem();
         if (mainHand.getItem() instanceof ShieldItem) {
             return mainHand;

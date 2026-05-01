@@ -23,6 +23,10 @@ public abstract class BoneMealItemMixin {
     @Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
     private void onBonemealUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Level level = context.getLevel();
+        if (level.isClientSide()) {
+            return;
+        }
+
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
         ItemStack stack = context.getItemInHand();

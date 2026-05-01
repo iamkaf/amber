@@ -110,6 +110,8 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             LootEvents.MODIFY.invoker().modify(resourceKey.identifier(), builder::withPool);
             //? if <1.21.11 && >=1.21
             /*LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);*/
+            //? if <1.21 && >=1.20.5
+            /*LootEvents.MODIFY.invoker().modify(resourceKey.location(), builder::withPool);*/
         });
         //?} else if >=1.18.2 {
         /*LootTableEvents.MODIFY.register((resourceManager, lootManager, id, builder, lootTableSource) -> {
@@ -177,7 +179,7 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         // Item events - implemented via Mixins (PlayerMixin, ItemEntityMixin)
         // Fabric doesn't have native item drop/pickup events: https://github.com/FabricMC/fabric/issues/1130
 
-        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmBlockMixin, CropBlockMixin)
+        // Farming events - implemented via Mixins (BoneMealItemMixin, FarmlandBlockMixin, CropBlockMixin)
         // Fabric doesn't have native farming events for bonemeal, farmland trampling, or crop growth
 
         // Animal events - implemented via Mixins (TamableAnimalMixin, AnimalMixin, VillagerMixin)

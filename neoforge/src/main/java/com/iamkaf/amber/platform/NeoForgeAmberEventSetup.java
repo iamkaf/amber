@@ -184,6 +184,10 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         public static void onBlockBreak(BreakBlockEvent event) {
         //? if <26.1.2
         /*public static void onBlockBreak(BlockEvent.BreakEvent event) {*/
+            if (event.getPlayer().level().isClientSide()) {
+                return;
+            }
+
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
                     event.getPlayer().level(),
                     event.getPlayer(),
@@ -193,6 +197,8 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
             );
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true); // Cancel break
+                //? if >=26.1.2
+                event.setNotifyClient(true);
                 return;
             }
 

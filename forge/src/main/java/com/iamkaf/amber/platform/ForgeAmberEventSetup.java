@@ -3,9 +3,11 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
+import java.lang.reflect.Field;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
 //? if >=1.20.5
@@ -43,6 +45,8 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 //? if >=1.18.1
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+//? if >=1.20 && <1.20.5
+import net.minecraftforge.client.event.RenderGuiEvent;
 //? if >=1.19.1
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 //? if >=1.18 && <1.19.1
@@ -62,6 +66,10 @@ import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
 
 public class ForgeAmberEventSetup implements IAmberEventSetup {
+    //? if >=1.20.5
+    private static final Field ITEM_BUILT_COMPONENTS_FIELD = findItemBuiltComponentsField();
+    //? if >=1.20.5
+    private static volatile boolean itemComponentCacheDirty;
 
     /**
      * Forge-specific wrapper for GatherComponentsEvent.Item.
@@ -165,6 +173,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         GatherComponentsEvent.Item.BUS.addListener(EventHandlerCommon::onGatherComponents);
         //? if >=1.20.5 && <1.21.6
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onGatherComponents);*/
+        //? if >=1.20.5
+        ItemEvents.setDefaultComponentListenerRegisteredHook(ForgeAmberEventSetup::invalidateItemComponentCache);
     }
 
     @Override
@@ -189,6 +199,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPre);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPost);*/
         //?}
+        //? if >=1.20 && <1.20.5
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onRenderGuiPost);*/
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
@@ -321,6 +333,17 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         public static boolean onLivingAttack(LivingAttackEvent event) {
+            if (
+                    //? if >=1.20
+                    event.getEntity().level().isClientSide()
+                    //? if <1.20 && >=1.19.1
+                    /*event.getEntity().level.isClientSide*/
+                    //? if <1.19.1
+                    /*event.getEntityLiving().level.isClientSide*/
+            ) {
+                return false;
+            }
+
             InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker()
                     .onEntityDamage(
                             //? if >=1.19.1
@@ -492,6 +515,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 //? if <1.19.1
                 /*WorldEvent.Load event*/
         ) {
+            //? if >=1.20.5
+            rebuildItemComponentCacheIfReady();
             WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
                     //? if >=1.19.1
                     event.getLevel().getServer(), event.getLevel()
@@ -544,6 +569,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
          * @param event The Forge event
          */
         public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+            //? if >=1.20.5
+            rebuildItemComponentCacheIfReady();
             // Add items from TabBuilder if this is a custom tab
             com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder =
                 //? if >=1.21.11
@@ -585,6 +612,13 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerClient {
+        //? if >=1.20 && <1.20.5 {
+        public static void onRenderGuiPost(RenderGuiEvent.Post event) {
+            HudEvents.RENDER_HUD.invoker().onHudRender(event.getGuiGraphics(), event.getPartialTick());
+        }
+
+        //?}
+
         //? if >=1.18.1 {
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(),
@@ -643,4 +677,46 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             ServerTickEvents.END_SERVER_TICK.invoker().onEndTick();
         }
     }
+
+    //? if >=1.20.5 {
+    private static Field findItemBuiltComponentsField() {
+        try {
+            Field field = Item.class.getDeclaredField("builtComponents");
+            field.setAccessible(true);
+            return field;
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Unable to access Forge item component cache", e);
+        }
+    }
+
+    private static void invalidateItemComponentCache() {
+        itemComponentCacheDirty = true;
+        rebuildItemComponentCacheIfReady();
+    }
+
+    private static void rebuildItemComponentCacheIfReady() {
+        if (!itemComponentCacheDirty) {
+            return;
+        }
+        //? if >=26.1 {
+        if (!net.minecraft.world.item.Items.STICK.builtInRegistryHolder().areComponentsBound()) {
+            return;
+        }
+        //?}
+
+        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+            try {
+                ITEM_BUILT_COMPONENTS_FIELD.set(item, null);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Unable to invalidate Forge item component cache", e);
+            }
+        }
+        //? if >=26.1 {
+        for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
+            item.builtInRegistryHolder().bindComponents(item.components());
+        }
+        //?}
+        itemComponentCacheDirty = false;
+    }
+    //?}
 }

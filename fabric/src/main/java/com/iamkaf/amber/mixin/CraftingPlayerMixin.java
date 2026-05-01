@@ -1,8 +1,8 @@
 package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
-import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultSlot;
@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,16 +26,34 @@ public abstract class CraftingPlayerMixin {
     @Final
     private CraftingContainer craftSlots;
 
-    @Inject(method = "checkTakeAchievements", at = @At(value = "INVOKE",
-            //? if >=1.21.5
-            target = "Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/entity/player/Player;I)V",
-            //? if <1.21.5
-            /*target = "Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;I)V",*/
+    @Shadow
+    private int removeCount;
+
+    @Unique
+    private int amber$removeCountBeforeCheck;
+
+    @Inject(method = "checkTakeAchievements", at = @At("HEAD"))
+    private void amber$captureRemoveCount(ItemStack craftedItem, CallbackInfo ci) {
+        amber$removeCountBeforeCheck = removeCount;
+    }
+
+    @Inject(method = "onTake", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/inventory/ResultSlot;checkTakeAchievements(Lnet/minecraft/world/item/ItemStack;)V",
             shift = At.Shift.AFTER))
-    private void amber$onItemCrafted(ItemStack craftedItem, CallbackInfo ci) {
-        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-            PlayerEvents.CRAFT_ITEM.invoker().onCraftItem(serverPlayer, java.util.List.of(craftedItem));
+    private void amber$onResultTaken(Player player, ItemStack carried, CallbackInfo ci) {
+        if (amber$removeCountBeforeCheck <= 0) {
+            amber$fireCraftEvent(carried);
         }
+        amber$removeCountBeforeCheck = 0;
+    }
+
+    @Unique
+    private void amber$fireCraftEvent(ItemStack craftedItem) {
+        if (craftedItem.isEmpty() || !(player instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
+
+        PlayerEvents.CRAFT_ITEM.invoker().onCraftItem(serverPlayer, java.util.List.of(craftedItem));
     }
 
     static {
