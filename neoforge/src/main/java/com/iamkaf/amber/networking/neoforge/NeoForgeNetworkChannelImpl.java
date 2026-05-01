@@ -193,9 +193,7 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         // Use the server-to-client payload type
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
         
-        // Send to all players by iterating through player list
-        // We need a server reference for this
-        throw new UnsupportedOperationException("sendToAllPlayers requires server access - not yet implemented");
+        PacketDistributor.sendToAllPlayers(wrapper);
     }
     
     @Override

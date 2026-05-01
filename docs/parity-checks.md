@@ -4,32 +4,30 @@ Amber's parity contract should be enforced by checks that run, not by a second h
 
 ## Current Checks
 
-- `just testmod-compile <version>` compiles a development-only consumer mod against one Amber common API target.
-- `just testmod-compile-all` compiles that consumer mod against every supported Minecraft line.
 - `just scenario-check <node>` boots the existing TeaKit doctor scenario for one loader/version node.
 - `just scenario-check-all` runs the doctor scenario across the enabled matrix.
 
-## Test Mod
+## Runtime Conformance
 
-The `testmod` project is intentionally development-only. It imports Amber APIs like a consumer would, without depending on Amber internals.
+Amber runtime conformance checks should live in an external consumer testmod. The testmod should depend on Amber as a normal consumer, register callbacks through Amber's public APIs, and record observed behavior through TeaKit spies.
 
-Phase 1 covers compile-time API shape. Later phases should turn `testmod` into a runtime probe mod that TeaKit can drive in-game.
+TeaKit should drive real gameplay and assert spy calls, counts, order, and arguments. Amber production code should not contain test-only probe commands, counters, or TeaKit dependencies.
 
 ## Feature Slices
 
-The compile fixture currently exercises these coarse API slices:
+Runtime conformance scenarios should grow to cover these behavior slices:
 
 - commands
 - block events
 - entity and player events
 - client events
-- deferred registry
+- registry behavior
 - creative tabs
 - networking channels
-- common functions
+- common functions with observable game effects
 - platform info
 
-Later phases should split these into smaller runtime probes with concrete pass/fail assertions.
+Later phases should split these into smaller consumer-owned runtime checks with concrete pass/fail assertions.
 
 ## Exception Policy
 

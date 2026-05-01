@@ -1,6 +1,7 @@
 package com.iamkaf.amber.networking.fabric;
 
 import com.iamkaf.amber.api.networking.v1.*;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -9,10 +10,12 @@ import net.minecraft.network.codec.StreamCodec;
 //? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,12 +24,15 @@ import java.util.concurrent.ConcurrentMap;
  * Uses Fabric's networking API to handle cross-platform packet sending.
  */
 public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
+    private static final AtomicBoolean SERVER_TRACKING_REGISTERED = new AtomicBoolean();
+    private static volatile MinecraftServer currentServer;
     
     private final Identifier channelId;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     
     public FabricNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
+        registerServerTracking();
     }
     
     @Override
@@ -154,7 +160,8 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
             new CustomPacketPayload.Type<>(packetId);
         FabricPacketWrapper<T> wrapper = new FabricPacketWrapper<>(packet, payloadType);
         
-        for (ServerPlayer player : PlayerLookup.all(null)) {
+        MinecraftServer server = requireCurrentServer();
+        for (ServerPlayer player : PlayerLookup.all(server)) {
             ServerPlayNetworking.send(player, wrapper);
         }
         //?}
@@ -194,6 +201,21 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static void registerServerTracking() {
+        if (SERVER_TRACKING_REGISTERED.compareAndSet(false, true)) {
+            ServerLifecycleEvents.SERVER_STARTED.register(server -> currentServer = server);
+            ServerLifecycleEvents.SERVER_STOPPED.register(server -> currentServer = null);
+        }
+    }
+
+    private static MinecraftServer requireCurrentServer() {
+        MinecraftServer server = currentServer;
+        if (server == null) {
+            throw new IllegalStateException("No active Minecraft server is available for broadcast networking");
+        }
+        return server;
     }
 
     private static Identifier id(String namespace, String path) {

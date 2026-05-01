@@ -2,12 +2,15 @@ package com.iamkaf.amber.api.event.v1.events.common;
 
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
+import com.iamkaf.amber.api.event.v1.ArrayBackedEvent;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
 //? if >=1.20.5
 import java.util.function.Consumer;
@@ -28,13 +31,39 @@ public class ItemEvents {
      * <b>This event is informational only and cannot be cancelled.</b>
      * </p>
      */
-    public static final Event<ModifyDefaultComponents> MODIFY_DEFAULT_COMPONENTS = EventFactory.createArrayBacked(
-            ModifyDefaultComponents.class, callbacks -> (context) -> {
+    public static final Event<ModifyDefaultComponents> MODIFY_DEFAULT_COMPONENTS = new DefaultComponentModificationEvent(
+            callbacks -> (context) -> {
                 for (ModifyDefaultComponents callback : callbacks) {
                     callback.modify(context);
                 }
             }
     );
+
+    private static volatile Runnable defaultComponentListenerRegisteredHook = () -> {};
+
+    @ApiStatus.Internal
+    public static void setDefaultComponentListenerRegisteredHook(Runnable hook) {
+        defaultComponentListenerRegisteredHook = hook == null ? () -> {} : hook;
+    }
+
+    private static final class DefaultComponentModificationEvent extends ArrayBackedEvent<ModifyDefaultComponents> {
+        private DefaultComponentModificationEvent(
+                java.util.function.Function<ModifyDefaultComponents[], ModifyDefaultComponents> invokerFactory
+        ) {
+            super(ModifyDefaultComponents.class, invokerFactory);
+        }
+
+        @Override
+        public void register(ModifyDefaultComponents listener) {
+            super.register(listener);
+        }
+
+        @Override
+        public void register(Identifier phaseIdentifier, ModifyDefaultComponents listener) {
+            super.register(phaseIdentifier, listener);
+            defaultComponentListenerRegisteredHook.run();
+        }
+    }
     //?}
 
     /**

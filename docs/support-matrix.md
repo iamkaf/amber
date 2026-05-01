@@ -64,4 +64,4 @@ Use only the loader artifacts enabled for the target Minecraft line.
 
 ## Verification Status
 
-Phase 1 establishes the support contract and compile-only test mod. Runtime feature parity probes are planned but not yet implemented.
+Phase 1 establishes the support contract. Broader feature parity checks should be implemented as TeaKit-driven consumer testmod scenarios, not Amber-internal probes.

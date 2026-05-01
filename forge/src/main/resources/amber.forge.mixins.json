@@ -5,13 +5,16 @@
   "compatibilityLevel": "${mixin_compat_forge}",
   "mixins": [
     "BoneMealItemMixin",
+    "CraftedItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
     "FarmBlockMixin",
+    "ForgeSheepMixin",
     "LivingEntityAfterDamageMixin"
   ],
   "client": [
     "GuiMixin",
+    "LevelRendererMixin",
     "MouseHandlerMixin"
   ],
   "server": [],

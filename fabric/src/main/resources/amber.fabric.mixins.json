@@ -13,8 +13,10 @@
     "BoneMealItemMixin",
     //? if >=1.20.5
     "BuiltInRegistriesMixin",
+    "CraftedItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
+    "FarmlandBlockMixin",
     //? if >=1.20.5
     "ItemAccessor",
     "ItemEntityMixin",
@@ -23,6 +25,7 @@
     "PlayerMixin",
     "ServerPlayerDeathMixin",
     "ServerLevelMixin",
+    "SheepMixin",
     "TamableAnimalMixin"
   ],
   "client": [

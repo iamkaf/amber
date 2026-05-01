@@ -685,7 +685,7 @@ public final class PlayerFunctions {
 
     private static Component emptyComponent() {
         //? if >=1.19
-        return Component.empty();
+        return Component.literal("");
         //? if <1.19
         /*return new TextComponent("");*/
     }

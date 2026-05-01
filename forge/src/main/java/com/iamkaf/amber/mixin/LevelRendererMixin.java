@@ -70,6 +70,8 @@ public class LevelRendererMixin {
             MultiBufferSource.BufferSource bufferSource,
             PoseStack poseStack,
             boolean translucentPass,
+            //? if <1.21.9
+            float partialTick,
             //? if >=1.21.9
             LevelRenderState levelRenderState,
             //?}
