@@ -93,10 +93,11 @@ public class ForgeRegistrarManager implements IRegistrarManager {
             /*return Optional.empty();*/
         }
         //?}
-        //? if <1.18.2
+        //? if <1.18.2 {
         /*public Optional<T> get(Identifier id) {
             return Optional.ofNullable(registry().get(id));
         }*/
+        //?}
 
         @SuppressWarnings("unchecked")
         private Registry<T> registry() {
@@ -118,22 +119,7 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         }
 
         private static Identifier legacyKeyLocation(ResourceKey<?> key) {
-            try {
-                Object value = key.getClass().getMethod("location").invoke(key);
-                if (value instanceof Identifier identifier) {
-                    return identifier;
-                }
-            } catch (ReflectiveOperationException ignored) {
-                // Forge 1.18 userdev exposes MCP names at runtime while common sources compile against official names.
-            }
-
-            String value = key.toString();
-            int separator = value.lastIndexOf(" / ");
-            int end = value.lastIndexOf(']');
-            if (separator >= 0 && end > separator) {
-                return new Identifier(value.substring(separator + 3, end));
-            }
-            throw new IllegalStateException("Unable to determine legacy registry key location: " + value);
+            return key.location();
         }*/
         //?}
     }

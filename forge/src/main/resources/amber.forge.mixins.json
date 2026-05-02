@@ -14,6 +14,12 @@
     "CreativeModeTabMixin",
     "FarmBlockMixin",
     "ForgeSheepMixin",
+    //? if <1.20.1
+    "LootTableAccessor",
+    //? if >=1.20.5
+    "ItemAccessor",
+    //? if <1.17
+    "LivingEntityAccessor",
     "LivingEntityAfterDamageMixin"
   ],
   "client": [

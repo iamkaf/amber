@@ -72,6 +72,8 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Fabric 1.14.4 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the legacy hit-outline renderer
 - Fixed pre-1.16 `ItemFunctions` weapon classification and attack-damage lookup against legacy attribute APIs
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
+- Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods
+- Replaced Forge creative-tab, loot-table, item-component, render, registrar, and legacy event reflection with typed calls, mixin accessors, and version overlays
 
 ## 10.0.2
 
