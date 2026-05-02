@@ -15,19 +15,23 @@ import net.minecraft.core.component.DataComponentType;
 //? if >=1.20.5
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.item.ItemEntity;
 //? if >=1.20
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+//? if >=1.19.3 && <1.20
+/*import net.minecraftforge.event.CreativeModeTabEvent;*/
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-//? if >=1.19.1
+//? if >=1.19
 import net.minecraftforge.event.level.BlockEvent;
-//? if <1.19.1
+//? if <1.19
 /*import net.minecraftforge.event.world.BlockEvent;*/
-//? if >=1.19.1
+//? if >=1.19
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-//? if <1.19.1
+//? if <1.19
 /*import net.minecraftforge.event.entity.EntityJoinWorldEvent;*/
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
@@ -36,20 +40,22 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 //? if >=1.18.1
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
-//? if >=1.19.1
+//? if >=1.19
 import net.minecraftforge.event.level.LevelEvent;
-//? if <1.19.1
+//? if <1.19
 /*import net.minecraftforge.event.world.WorldEvent;*/
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 //? if >=1.18.1
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-//? if >=1.20 && <1.20.5
+//? if >=1.19 && <1.20.5
 import net.minecraftforge.client.event.RenderGuiEvent;
-//? if >=1.19.1
+//? if <1.19
+/*import net.minecraftforge.client.event.RenderGameOverlayEvent;*/
+//? if >=1.19
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-//? if >=1.18 && <1.19.1
+//? if >=1.18 && <1.19
 /*import net.minecraftforge.client.ClientRegistry;*/
 //? if <1.18
 /*import net.minecraftforge.fmlclient.registry.ClientRegistry;*/
@@ -175,6 +181,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onGatherComponents);*/
         //? if >=1.20.5
         ItemEvents.setDefaultComponentListenerRegisteredHook(ForgeAmberEventSetup::invalidateItemComponentCache);
+        //? if >=1.19.3 && <1.20
+        /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerCommon::registerCreativeTabsLegacy);*/
+        //? if >=1.19.3 && <1.20
+        /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerCommon::buildContentsLegacy);*/
     }
 
     @Override
@@ -188,9 +198,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         RegisterKeyMappingsEvent.BUS.addListener(EventHandlerClient::onKeybindRegistration);
         //? if >=1.21.6 && <1.21.10
         /*RegisterKeyMappingsEvent.getBus(FMLJavaModLoadingContext.get().getModBusGroup()).addListener(EventHandlerClient::onKeybindRegistration);*/
-        //? if >=1.19.1 && <1.21.6
+        //? if >=1.19 && <1.21.6
         /*FMLJavaModLoadingContext.get().getModEventBus().addListener(EventHandlerClient::onKeybindRegistration);*/
-        //? if <1.19.1
+        //? if <1.19
         /*EventHandlerClient.onKeybindRegistration();*/
         //? if >=1.21.6 {
         TickEvent.ClientTickEvent.Pre.BUS.addListener(EventHandlerClient::onClientTickEventPre);
@@ -199,8 +209,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPre);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onClientTickEventPost);*/
         //?}
-        //? if >=1.20 && <1.20.5
+        //? if >=1.19 && <1.20.5
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onRenderGuiPost);*/
+        //? if <1.19
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onRenderGameOverlayPost);*/
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
@@ -263,13 +275,13 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
                     .interact(
-                            //? if >=1.19.1
+                            //? if >=1.19
                             event.getEntity(),
-                            //? if <1.19.1
+                            //? if <1.19
                             /*event.getPlayer(),*/
-                            //? if >=1.19.1
+                            //? if >=1.19
                             event.getLevel(),
-                            //? if <1.19.1
+                            //? if <1.19
                             /*event.getWorld(),*/
                             event.getHand(), event.getTarget());
 
@@ -298,36 +310,60 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
                     .register(event.getDispatcher(),
-                            //? if >=1.19.1
+                            //? if >=1.19
                             event.getBuildContext(), event.getCommandSelection()
-        //? if >=1.19 && <1.19.1
-        /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
-                            //? if <1.19 && >=1.18.2
-                            /*net.minecraft.core.RegistryAccess.BUILTIN.get(), net.minecraft.commands.Commands.CommandSelection.ALL*/
-                            //? if <1.18.2
-                            /*net.minecraft.core.RegistryAccess.builtin(), net.minecraft.commands.Commands.CommandSelection.ALL*/
-                    );
-        }
+	        //? if >=1.19 && <1.19
+	        /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get()), net.minecraft.commands.Commands.CommandSelection.ALL*/
+	                            //? if <1.19 && >=1.18.2
+	                            /*legacyBuiltinRegistryAccess(), commandSelectionAll()*/
+	                            //? if <1.18.2
+	                            /*legacyBuiltinRegistryAccess(), commandSelectionAll()*/
+	                    );
+	        }
+
+	        //? if <1.19 {
+	        /*private static net.minecraft.core.RegistryAccess legacyBuiltinRegistryAccess() {
+	            try {
+	                Object supplier = net.minecraft.core.RegistryAccess.class.getField("BUILTIN").get(null);
+	                if (supplier instanceof java.util.function.Supplier<?> registrySupplier) {
+	                    return (net.minecraft.core.RegistryAccess) registrySupplier.get();
+	                }
+	            } catch (ReflectiveOperationException ignored) {
+	            }
+
+	            try {
+	                return (net.minecraft.core.RegistryAccess) net.minecraft.core.RegistryAccess.class
+	                        .getMethod("builtin")
+	                        .invoke(null);
+	            } catch (ReflectiveOperationException exception) {
+	                throw new IllegalStateException("Unable to resolve builtin registry access", exception);
+	            }
+	        }
+
+	        private static net.minecraft.commands.Commands.CommandSelection commandSelectionAll() {
+	            return java.lang.Enum.valueOf(net.minecraft.commands.Commands.CommandSelection.class, "ALL");
+	        }*/
+	        //?}
 
         public static void onEntityJoinLevel(
-                //? if >=1.19.1
+                //? if >=1.19
                 EntityJoinLevelEvent event
-                //? if <1.19.1
+                //? if <1.19
                 /*EntityJoinWorldEvent event*/
         ) {
             EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(event.getEntity(),
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getLevel()
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getWorld()*/
             );
         }
 
         public static void onLivingDeath(LivingDeathEvent event) {
             EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getEntity(),
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getEntityLiving(),*/
                     event.getSource());
         }
@@ -336,23 +372,49 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             if (
                     //? if >=1.20
                     event.getEntity().level().isClientSide()
-                    //? if <1.20 && >=1.19.1
+                    //? if <1.20 && >=1.19
                     /*event.getEntity().level.isClientSide*/
-                    //? if <1.19.1
-                    /*event.getEntityLiving().level.isClientSide*/
+                    //? if <1.19
+                    /*legacyIsClientSide(event.getEntityLiving())*/
             ) {
                 return false;
             }
 
             InteractionResult result = EntityEvent.ENTITY_DAMAGE.invoker()
                     .onEntityDamage(
-                            //? if >=1.19.1
+                            //? if >=1.19
                             event.getEntity(),
-                            //? if <1.19.1
+                            //? if <1.19
                             /*event.getEntityLiving(),*/
                             event.getSource(), event.getAmount());
-            return result != InteractionResult.PASS; // Return true to cancel if not PASS
+            if (result != InteractionResult.PASS) {
+                return true;
+            }
+
+            //? if <1.18.1
+            /*fireLegacyShieldBlock(event);*/
+
+            return false;
         }
+
+        //? if <1.18.1 {
+        /*private static void fireLegacyShieldBlock(LivingAttackEvent event) {
+            if (!(event.getEntityLiving() instanceof net.minecraft.world.entity.player.Player player)) {
+                return;
+            }
+
+            if (!player.isDamageSourceBlocked(event.getSource())) {
+                return;
+            }
+
+            ItemStack shield = player.getUseItem();
+            if (shield.isEmpty() || !(shield.getItem() instanceof net.minecraft.world.item.ShieldItem)) {
+                return;
+            }
+
+            PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, event.getAmount(), event.getSource());
+        }
+        *///?}
 
         public static boolean onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
@@ -363,9 +425,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getLevel().getBlockEntity(event.getPos())
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getWorld().getBlockEntity(event.getPos())*/
             );
             if (result != InteractionResult.PASS) {
@@ -381,9 +443,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                     event.getPlayer(),
                     event.getPos(),
                     event.getState(),
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getLevel().getBlockEntity(event.getPos())
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getWorld().getBlockEntity(event.getPos())*/
             );
             return false; // Allow break
@@ -407,9 +469,9 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             InteractionResult result = BlockEvents.BLOCK_INTERACT.invoker()
                     //? if >=1.20
                     .onBlockInteract(event.getEntity(), event.getEntity().level(), event.getHand(), event.getHitVec());
-                    //? if <1.20 && >=1.19.1
+                    //? if <1.20 && >=1.19
                     /*.onBlockInteract(event.getEntity(), event.getEntity().level, event.getHand(), event.getHitVec());*/
-                    //? if <1.19.1
+                    //? if <1.19
                     /*.onBlockInteract(event.getPlayer(), event.getPlayer().level, event.getHand(), event.getHitVec());*/
             return result != InteractionResult.PASS; // Cancel if not PASS
         }
@@ -417,15 +479,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static boolean onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
             InteractionResult result = BlockEvents.BLOCK_CLICK.invoker()
                     .onBlockClick(
-                            //? if >=1.19.1
+                            //? if >=1.19
                             event.getEntity(),
-                            //? if <1.19.1
+                            //? if <1.19
                             /*event.getPlayer(),*/
                             //? if >=1.20
                             event.getEntity().level(),
-                            //? if <1.20 && >=1.19.1
+                            //? if <1.20 && >=1.19
                             /*event.getEntity().level,*/
-                            //? if <1.19.1
+                            //? if <1.19
                             /*event.getPlayer().level,*/
                             event.getHand(),
                             event.getPos(),
@@ -457,26 +519,43 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         public static void onItemDrop(ItemTossEvent event) {
             // Fire the informational Amber item drop event (fires on both client and server)
             ItemEvents.ITEM_DROP.invoker().onItemDrop(event.getPlayer(),
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getEntity()
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getEntityItem()*/
             );
         }
 
         public static void onItemPickup(EntityItemPickupEvent event) {
             // Don't fire if the item has pickup delay (e.g., just dropped)
-            if (event.getItem().hasPickUpDelay()) {
+            if (hasPickUpDelay(event.getItem())) {
                 return;
             }
 
             // Fire the informational Amber item pickup event
             ItemEvents.ITEM_PICKUP.invoker().onItemPickup(
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getEntity(),
-                    //? if <1.19.1
+                    //? if <1.19
                     /*event.getPlayer(),*/
-                    event.getItem(), event.getItem().getItem());
+                    event.getItem(), itemStack(event.getItem()));
+        }
+
+        private static boolean hasPickUpDelay(ItemEntity item) {
+            try {
+                Object value = item.getClass().getMethod("hasPickUpDelay").invoke(item);
+                return value instanceof Boolean delayed && delayed;
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException("Unable to resolve item pickup delay", exception);
+            }
+        }
+
+        private static ItemStack itemStack(ItemEntity item) {
+            try {
+                return (ItemStack) item.getClass().getMethod("getItem").invoke(item);
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException("Unable to resolve item entity stack", exception);
+            }
         }
 
         public static boolean onAnimalTame(AnimalTameEvent event) {
@@ -510,48 +589,68 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //?}
 
         public static void onWorldLoad(
-                //? if >=1.19.1
+                //? if >=1.19
                 LevelEvent.Load event
-                //? if <1.19.1
+                //? if <1.19
                 /*WorldEvent.Load event*/
         ) {
             //? if >=1.20.5
             rebuildItemComponentCacheIfReady();
-            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
-                    //? if >=1.19.1
-                    event.getLevel().getServer(), event.getLevel()
-                    //? if <1.19.1
-                    /*event.getWorld().getServer(), event.getWorld()*/
-            );
-        }
+	            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
+	                    //? if >=1.19
+	                    event.getLevel().getServer(), event.getLevel()
+	                    //? if <1.19
+	                    /*legacyServer(event.getWorld()), event.getWorld()*/
+	            );
+	        }
 
         public static void onWorldUnload(
-                //? if >=1.19.1
+                //? if >=1.19
                 LevelEvent.Unload event
-                //? if <1.19.1
+                //? if <1.19
                 /*WorldEvent.Unload event*/
         ) {
-            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(
-                    //? if >=1.19.1
-                    event.getLevel().getServer(), event.getLevel()
-                    //? if <1.19.1
-                    /*event.getWorld().getServer(), event.getWorld()*/
-            );
-        }
+	            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(
+	                    //? if >=1.19
+	                    event.getLevel().getServer(), event.getLevel()
+	                    //? if <1.19
+	                    /*legacyServer(event.getWorld()), event.getWorld()*/
+	            );
+	        }
 
         public static void onWorldSave(
-                //? if >=1.19.1
+                //? if >=1.19
                 LevelEvent.Save event
-                //? if <1.19.1
+                //? if <1.19
                 /*WorldEvent.Save event*/
         ) {
-            WorldEvents.WORLD_SAVE.invoker().onWorldSave(
-                    //? if >=1.19.1
-                    event.getLevel().getServer(), event.getLevel()
-                    //? if <1.19.1
-                    /*event.getWorld().getServer(), event.getWorld()*/
-            );
-        }
+	            WorldEvents.WORLD_SAVE.invoker().onWorldSave(
+	                    //? if >=1.19
+	                    event.getLevel().getServer(), event.getLevel()
+	                    //? if <1.19
+	                    /*legacyServer(event.getWorld()), event.getWorld()*/
+	            );
+	        }
+
+	        //? if <1.19 {
+	        /*private static net.minecraft.server.MinecraftServer legacyServer(Object level) {
+	            try {
+	                return (net.minecraft.server.MinecraftServer) level.getClass().getMethod("getServer").invoke(level);
+	            } catch (ReflectiveOperationException exception) {
+	                throw new IllegalStateException("Unable to resolve server for Forge world event", exception);
+	            }
+	        }*/
+
+	        /*private static boolean legacyIsClientSide(net.minecraft.world.entity.Entity entity) {
+	            try {
+	                Object level = net.minecraft.world.entity.Entity.class.getField("level").get(entity);
+	                Object value = level.getClass().getField("isClientSide").get(level);
+	                return value instanceof Boolean clientSide && clientSide;
+	            } catch (ReflectiveOperationException exception) {
+	                throw new IllegalStateException("Unable to resolve entity level side", exception);
+	            }
+	        }*/
+	        //?}
 
         public static boolean onLightningStrike(EntityStruckByLightningEvent event) {
             InteractionResult result =
@@ -599,6 +698,63 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         }
         //?}
 
+        //? if >=1.19.3 && <1.20 {
+        /*public static void registerCreativeTabsLegacy(CreativeModeTabEvent.Register event) {
+            for (var builder : com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilders().values()) {
+                event.registerCreativeModeTab(builder.getId(), tabBuilder -> {
+                    tabBuilder.title(builder.getTitle());
+                    tabBuilder.icon(builder.getIcon());
+                    if (!builder.shouldShowTitle()) {
+                        tabBuilder.hideTitle();
+                    }
+                    if (!builder.canScroll()) {
+                        tabBuilder.noScrollBar();
+                    }
+                });
+            }
+        }*/
+
+        //?}
+
+        //? if >=1.19.3 && <1.20 {
+        /*public static void buildContentsLegacy(CreativeModeTabEvent.BuildContents event) {
+            net.minecraft.resources.ResourceLocation tabId = net.minecraftforge.common.CreativeModeTabRegistry.getName(event.getTab());
+            if (tabId == null) {
+                return;
+            }
+            net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<net.minecraft.world.item.CreativeModeTab>> registryKey =
+                    net.minecraft.resources.ResourceKey.createRegistryKey(new net.minecraft.resources.ResourceLocation("minecraft", "creative_mode_tab"));
+            net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey =
+                    net.minecraft.resources.ResourceKey.create(registryKey, tabId);
+
+            com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder =
+                    com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(tabId);
+            //? if >=1.19.3 {
+            if (tabBuilder != null) {
+                for (var itemSupplier : tabBuilder.getItems()) {
+                    event.getEntries().put(
+                            new net.minecraft.world.item.ItemStack(itemSupplier.get()),
+                            net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS
+                    );
+                }
+            }
+
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
+                    .modifyEntries(tabKey, new CreativeModeTabOutput() {
+                        @Override
+                        public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                            net.minecraft.world.item.CreativeModeTab.TabVisibility mcVisibility = switch (visibility) {
+                                case PARENT_AND_SEARCH_TABS -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
+                                case PARENT_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.PARENT_TAB_ONLY;
+                                case SEARCH_TAB_ONLY -> net.minecraft.world.item.CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY;
+                            };
+                            event.getEntries().put(stack, mcVisibility);
+                        }
+                    });
+            //?}
+        }*/
+        //?}
+
         //? if >=1.20.5 {
         /**
          * Handles GatherComponentsEvent.Item from Forge.
@@ -612,36 +768,49 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     static public class EventHandlerClient {
-        //? if >=1.20 && <1.20.5 {
+        //? if >=1.19 && <1.20.5 {
         public static void onRenderGuiPost(RenderGuiEvent.Post event) {
+            //? if >=1.20 {
             HudEvents.RENDER_HUD.invoker().onHudRender(event.getGuiGraphics(), event.getPartialTick());
+            //?} else {
+            /*HudEvents.RENDER_HUD.invoker().onHudRender(event.getPoseStack(), event.getPartialTick());*/
+            //?}
         }
 
         //?}
+
+        //? if <1.19 {
+        /*public static void onRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
+            if (event.getType() == RenderGameOverlayEvent.ElementType.ALL) {
+                HudEvents.RENDER_HUD.invoker().onHudRender(event.getMatrixStack(), event.getPartialTicks());
+            }
+        }
+
+        *///?}
 
         //? if >=1.18.1 {
         public static void onCommandRegistration(RegisterClientCommandsEvent event) {
             ClientCommandEvents.EVENT.invoker().register(event.getDispatcher(),
-                    //? if >=1.19.1
+                    //? if >=1.19
                     event.getBuildContext()
-                    //? if >=1.19 && <1.19.1
-                    /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get())*/
-                    //? if <1.19 && >=1.18.2
-                    /*net.minecraft.core.RegistryAccess.BUILTIN.get()*/
-                    //? if <1.18.2
-                    /*net.minecraft.core.RegistryAccess.builtin()*/
-            );
-        }
+	                    //? if >=1.19 && <1.19
+	                    /*new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get())*/
+	                    //? if <1.19 && >=1.18.2
+	                    /*EventHandlerCommon.legacyBuiltinRegistryAccess()*/
+	                    //? if <1.18.2
+	                    /*EventHandlerCommon.legacyBuiltinRegistryAccess()*/
+	            );
+	        }
         //?}
 
         public static void onKeybindRegistration(
-                //? if >=1.19.1
+                //? if >=1.19
                 RegisterKeyMappingsEvent event
         ) {
             for (var keyMapping : KeybindHelper.getKeybindings()) {
-                //? if >=1.19.1
+                //? if >=1.19
                 event.register(keyMapping);
-                //? if <1.19.1
+                //? if <1.19
                 /*ClientRegistry.registerKeyBinding(keyMapping);*/
             }
             KeybindHelper.forgeEventAlreadyFired = true;

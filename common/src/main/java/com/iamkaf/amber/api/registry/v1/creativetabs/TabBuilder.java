@@ -249,7 +249,7 @@ public class TabBuilder {
      *
      * @return The built creative mode tab
      */
-    CreativeModeTab build() {
+    public CreativeModeTab build() {
         //? if >=1.19.3 {
         CreativeModeTab.Builder builder = CreativeModeTab.builder(row, column);
 
@@ -277,7 +277,7 @@ public class TabBuilder {
 
         return builder.build();
         //?} else {
-        /*return new CreativeModeTab(CreativeModeTab.TABS.length, id.getNamespace() + "." + id.getPath()) {
+        /*return new CreativeModeTab(nextLegacyTabIndex(), legacyTabName(id)) {
             @Override
             public ItemStack makeIcon() {
                 return icon.get();
@@ -288,10 +288,44 @@ public class TabBuilder {
                 for (Supplier<ItemLike> item : items) {
                     stacks.add(new ItemStack(item.get()));
                 }
+                com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
+                        .modifyEntries(
+                                CreativeTabHelper.creativeModeTabKey(id),
+                                new com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput() {
+                                    @Override
+                                    public void accept(ItemStack stack, com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput.TabVisibility visibility) {
+                                        stacks.add(stack);
+                                    }
+                                }
+                        );
             }
         };*/
         //?}
     }
+
+    //? if <1.19.3 {
+    private static int nextLegacyTabIndex() {
+        try {
+            Object count = CreativeModeTab.class.getMethod("getGroupCountSafe").invoke(null);
+            if (count instanceof Integer value) {
+                return value;
+            }
+        } catch (ReflectiveOperationException ignored) {
+            // Vanilla and Fabric do not expose Forge's dynamically-sized group counter.
+        }
+
+        try {
+            Object tabs = CreativeModeTab.class.getField("TABS").get(null);
+            return java.lang.reflect.Array.getLength(tabs);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to determine legacy creative tab index", exception);
+        }
+    }
+
+    private static String legacyTabName(Identifier id) {
+        return id.toString().replace(':', '.');
+    }
+    //?}
 
     /**
      * Gets the ID of this tab.
@@ -300,6 +334,26 @@ public class TabBuilder {
      */
     public Identifier getId() {
         return id;
+    }
+
+    public Component getTitle() {
+        return title;
+    }
+
+    public Supplier<ItemStack> getIcon() {
+        return icon;
+    }
+
+    public boolean canScroll() {
+        return canScroll;
+    }
+
+    public boolean shouldShowTitle() {
+        return showTitle;
+    }
+
+    public boolean isAlignedRight() {
+        return alignedRight;
     }
 
     /**

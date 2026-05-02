@@ -82,7 +82,7 @@ public final class CreativeModeTabRegistry {
             .get(Registries.CREATIVE_MODE_TAB)
             .register(builder.getId(), builder::build);
         //?} else {
-        /*CreativeModeTab tab = builder.build();
+        /*CreativeModeTab tab = com.iamkaf.amber.platform.Services.CREATIVE_MODE_TABS.build(builder);
         Identifier registryId = id("minecraft", "creative_mode_tab");
         return new RegistrySupplier<>() {
             @Override

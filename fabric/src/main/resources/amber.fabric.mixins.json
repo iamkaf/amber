@@ -15,6 +15,8 @@
     "BuiltInRegistriesMixin",
     "CraftedItemMixin",
     "CraftingPlayerMixin",
+    //? if <1.19.3
+    "CreativeModeTabMixin",
     "CropBlockMixin",
     "FarmlandBlockMixin",
     //? if >=1.20.5

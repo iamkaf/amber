@@ -36,11 +36,20 @@ import java.util.function.Supplier;
 public final class CreativeTabHelper {
     private CreativeTabHelper() {}
 
-    private static ResourceKey<Registry<CreativeModeTab>> creativeModeTabRegistryKey() {
+    static ResourceKey<Registry<CreativeModeTab>> creativeModeTabRegistryKey() {
         //? if >=1.20
         return Registries.CREATIVE_MODE_TAB;
-        //? if <1.20
+        //? if <1.20 && >=1.19.3
         /*return ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab"));*/
+        //? if <1.19.3
+        /*return legacyCreateRegistryKey(new Identifier("minecraft", "creative_mode_tab"));*/
+    }
+
+    static ResourceKey<CreativeModeTab> creativeModeTabKey(Identifier tabId) {
+        //? if >=1.19.3
+        return ResourceKey.create(creativeModeTabRegistryKey(), tabId);
+        //? if <1.19.3
+        /*return legacyCreate(creativeModeTabRegistryKey(), tabId);*/
     }
 
     /**
@@ -119,7 +128,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, Supplier<ItemLike>... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
+        ResourceKey<CreativeModeTab> tabKey = creativeModeTabKey(tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (Supplier<ItemLike> item : items) {
@@ -139,7 +148,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, ItemLike... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
+        ResourceKey<CreativeModeTab> tabKey = creativeModeTabKey(tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (ItemLike item : items) {
@@ -148,4 +157,24 @@ public final class CreativeTabHelper {
             }
         });
     }
+
+    //? if <1.19.3 {
+    /*@SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> legacyCreateRegistryKey(Identifier id) {
+        try {
+            return (ResourceKey<T>) ResourceKey.class.getMethod("createRegistryKey", Identifier.class).invoke(null, id);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to create legacy registry key for " + id, exception);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> legacyCreate(ResourceKey<?> registryKey, Identifier id) {
+        try {
+            return (ResourceKey<T>) ResourceKey.class.getMethod("create", ResourceKey.class, Identifier.class).invoke(null, registryKey, id);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to create legacy resource key for " + id, exception);
+        }
+    }*/
+    //?}
 }

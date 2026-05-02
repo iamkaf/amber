@@ -65,11 +65,16 @@ public class ForgeRegistrarManager implements IRegistrarManager {
         @Override
         @SuppressWarnings("unchecked")
         public <R extends T> RegistrySupplier<R> register(Identifier id, Supplier<? extends R> supplier) {
+            //? if >=1.19.3
             RegistryObject obj = register.register(id.getPath(), supplier);
+            //? if <1.19.3
+            /*RegistryObject obj = register.register(legacyPath(id), supplier);*/
             //? if >=1.21.11
             return new ForgeRegistrySupplier<>(key.identifier(), id, obj);
-            //? if <1.21.11
+            //? if <1.21.11 && >=1.19.3
             /*return new ForgeRegistrySupplier<>(key.location(), id, obj);*/
+            //? if <1.19.3
+            /*return new ForgeRegistrySupplier<>(legacyKeyLocation(key), id, obj);*/
         }
 
         @Override
@@ -102,8 +107,35 @@ public class ForgeRegistrarManager implements IRegistrarManager {
             //? if <1.21.2 && >=1.19.3
             /*return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());*/
             //? if <1.19.3
-            /*return (Registry<T>) Registry.REGISTRY.get(key.location());*/
+            /*return (Registry<T>) Registry.REGISTRY.get(legacyKeyLocation(key));*/
         }
+
+        //? if <1.19.3 {
+        /*private static String legacyPath(Identifier id) {
+            String value = id.toString();
+            int separator = value.indexOf(':');
+            return separator >= 0 ? value.substring(separator + 1) : value;
+        }
+
+        private static Identifier legacyKeyLocation(ResourceKey<?> key) {
+            try {
+                Object value = key.getClass().getMethod("location").invoke(key);
+                if (value instanceof Identifier identifier) {
+                    return identifier;
+                }
+            } catch (ReflectiveOperationException ignored) {
+                // Forge 1.18 userdev exposes MCP names at runtime while common sources compile against official names.
+            }
+
+            String value = key.toString();
+            int separator = value.lastIndexOf(" / ");
+            int end = value.lastIndexOf(']');
+            if (separator >= 0 && end > separator) {
+                return new Identifier(value.substring(separator + 3, end));
+            }
+            throw new IllegalStateException("Unable to determine legacy registry key location: " + value);
+        }*/
+        //?}
     }
 
     private static class ForgeRegistrySupplier<R> implements RegistrySupplier<R> {

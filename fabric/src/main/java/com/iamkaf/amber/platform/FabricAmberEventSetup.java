@@ -24,6 +24,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //? if <1.19
 /*import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;*/
+//? if <1.20 && >=1.19.3
+/*import net.fabricmc.fabric.api.itemgroup.v1.IdentifiableItemGroup;*/
+//? if <1.20 && >=1.19.3
+/*import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;*/
 //? if >=1.19.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 //? if >=1.16.2
@@ -222,6 +226,19 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
             });
             *///?}
         }
+        //?} else if >=1.19.3 {
+        /*ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
+            net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<net.minecraft.world.item.CreativeModeTab>> registryKey =
+                    net.minecraft.resources.ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab"));
+            net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey =
+                    net.minecraft.resources.ResourceKey.create(registryKey, ((IdentifiableItemGroup) tab).getId());
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
+                @Override
+                public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
+                    entries.accept(stack);
+                }
+            });
+        });*/
         //?}
 
         // Register for our custom tabs
@@ -294,7 +311,15 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         //?} else if >=1.16.2 {
         /*@SuppressWarnings("unchecked")
         CommandDispatcher<CommandSourceStack> commandsTemp = (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) ClientCommandManager.DISPATCHER;
-        ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());*/
+        ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());
+        boolean[] amber$clientCommandsRegistered = {false};
+        ClientTickEvents.START_CLIENT_TICK.register((client) -> {
+            if (amber$clientCommandsRegistered[0]) {
+                return;
+            }
+            amber$clientCommandsRegistered[0] = true;
+            ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());
+        });*/
         //?}
         //? if >=26.1 {
         HudElementRegistry.addLast(

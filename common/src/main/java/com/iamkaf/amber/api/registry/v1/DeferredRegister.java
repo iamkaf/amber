@@ -119,7 +119,20 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * @param supplier a factory taking the entry key
      */
     public <R extends T> RegistrySupplier<R> register(Identifier id, Function<ResourceKey<T>, ? extends R> supplier) {
-        return register(id, (Supplier<? extends R>) () -> supplier.apply(ResourceKey.create(this.key, id)));
+        return register(id, (Supplier<? extends R>) () -> supplier.apply(entryKey(this.key, id)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> entryKey(ResourceKey<? extends Registry<T>> registryKey, Identifier id) {
+        //? if >=1.19.3
+        return ResourceKey.create(registryKey, id);
+        //? if <1.19.3 {
+        /*try {
+            return (ResourceKey<T>) ResourceKey.class.getMethod("create", ResourceKey.class, Identifier.class).invoke(null, registryKey, id);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to create registry entry key for " + id, exception);
+        }*/
+        //?}
     }
 
     /**
@@ -177,7 +190,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             //? if >=1.21.11
             return getRegistrar().key().identifier();
             //? if <1.21.11
-            /*return getRegistrar().key().location();*/
+            /*return keyLocation(getRegistrar().key());*/
         }
 
         @Override
@@ -190,4 +203,25 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             return (Registrar<R>) DeferredRegister.this.getRegistrar();
         }
     }
+
+    //? if <1.21.11 {
+    /*private static Identifier keyLocation(ResourceKey<?> key) {
+        try {
+            Object value = key.getClass().getMethod("location").invoke(key);
+            if (value instanceof Identifier identifier) {
+                return identifier;
+            }
+        } catch (ReflectiveOperationException ignored) {
+            // Forge 1.18 userdev exposes MCP names at runtime while common sources compile against official names.
+        }
+
+        String value = key.toString();
+        int separator = value.lastIndexOf(" / ");
+        int end = value.lastIndexOf(']');
+        if (separator >= 0 && end > separator) {
+            return new Identifier(value.substring(separator + 3, end));
+        }
+        throw new IllegalStateException("Unable to determine registry key location: " + value);
+    }*/
+    //?}
 }
