@@ -63,6 +63,14 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Forge 1.17.1 ordinary `PlayerEvents.CRAFT_ITEM` callbacks by bridging Forge's native item-crafted event
 - Fixed Forge 1.16.5 `PlayerEvents.CRAFT_ITEM` duplicate ordinary crafting callbacks while preserving broader `Item.onCraftedBy` paths such as smithing
 - Fixed Forge 1.16.5 `PlayerEvents.SHIELD_BLOCK` not firing by bridging the vanilla shield-use damage path
+- Fixed Fabric 1.16 and 1.16.1 `PlayerEvents.CRAFT_ITEM` missing smithing table callbacks
+- Fixed Fabric 1.16.1 and older `PlayerEvents.PLAYER_RESPAWN` not firing because the legacy respawn signature was not bridged
+- Fixed Fabric 1.15.x and 1.14.4 `ItemEvents.ITEM_PICKUP` by targeting the legacy successful-pickup call path
+- Fixed Fabric 1.15.x and 1.14.4 `EntityEvent.SHEAR` by targeting the legacy sheep shearing method
+- Fixed Fabric legacy animal breeding callbacks firing twice from the baby and XP spawn calls
+- Fixed Fabric 1.14.4 `HudEvents.RENDER_HUD` by bridging the legacy GUI render path
+- Fixed Fabric 1.14.4 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the legacy hit-outline renderer
+- Fixed pre-1.16 `ItemFunctions` weapon classification and attack-damage lookup against legacy attribute APIs
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 
 ## 10.0.2

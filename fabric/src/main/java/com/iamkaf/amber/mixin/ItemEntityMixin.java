@@ -16,7 +16,10 @@ public class ItemEntityMixin {
             method = "playerTouch",
             at = @At(
                     value = "INVOKE",
+//? if >=1.16
                     target = "Lnet/minecraft/world/entity/player/Player;onItemPickup(Lnet/minecraft/world/entity/item/ItemEntity;)V"
+//? if <1.16
+                    /*target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"*/
             )
     )
     private void onItemPickup(Player player, CallbackInfo ci) {

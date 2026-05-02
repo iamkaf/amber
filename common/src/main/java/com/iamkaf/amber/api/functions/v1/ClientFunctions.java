@@ -210,9 +210,18 @@ public final class ClientFunctions {
     //? if <1.20 && >=1.16 {
     /*private static void drawText(Font font, PoseStack context, Component message, int x, int y, int color) {
         try {
+            for (var method : font.getClass().getMethods()) {
+                if (method.getName().equals("draw")
+                        && method.getParameterCount() == 5
+                        && method.getParameterTypes()[0].isAssignableFrom(context.getClass())
+                        && method.getParameterTypes()[1].isAssignableFrom(message.getClass())) {
+                    method.invoke(font, context, message, (float) x, (float) y, color);
+                    return;
+                }
+            }
             font.getClass()
-                    .getMethod("draw", PoseStack.class, Component.class, float.class, float.class, int.class)
-                    .invoke(font, context, message, (float) x, (float) y, color);
+                    .getMethod("draw", PoseStack.class, String.class, float.class, float.class, int.class)
+                    .invoke(font, context, message.getString(), (float) x, (float) y, color);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to render text", exception);
         }
@@ -220,7 +229,7 @@ public final class ClientFunctions {
 
     *///?}
 
-    //? if <1.20 && >=1.16.2 {
+    //? if <1.20 {
     /*private static Object screen(Minecraft minecraft) {
         try {
             return fieldValue(minecraft, "screen");
@@ -229,6 +238,10 @@ public final class ClientFunctions {
         }
     }
 
+    *///?}
+
+    //? if <1.20 && >=1.16.2 {
+    /*
     private static void renderComponentTooltip(Object screen, PoseStack guiGraphics, ItemStack stack, int x, int y) {
         try {
             Object tooltip = screen.getClass().getMethod("getTooltipFromItem", ItemStack.class).invoke(screen, stack);

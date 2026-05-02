@@ -29,8 +29,8 @@ tasks.named('stageMergedJavaSources').configure {
 
 if (minecraftVersion == '1.16' || minecraftVersion == '1.16.1') {
     configurations.configureEach {
-        exclude group: 'net.fabricmc.fabric-api', module: 'fabric-resource-loader-v0'
         exclude group: 'maven.modrinth', module: 'mOgUt4GM'
+        resolutionStrategy.force 'net.fabricmc.fabric-api:fabric-resource-loader-v0:0.2.5+059ea8667c'
     }
 }
 
@@ -47,6 +47,8 @@ dependencies {
         modImplementation 'net.fabricmc.fabric-api:fabric-loot-tables-v1:1.0.1+6a2618f53a'
         modImplementation 'net.fabricmc.fabric-api:fabric-networking-api-v1:1.0.0+4358fbc63a'
         modImplementation 'net.fabricmc.fabric-api:fabric-rendering-v1:1.5.0+c26373133a'
+        modImplementation 'net.fabricmc.fabric-api:fabric-item-groups-v0:0.2.0+438f963602'
+        modImplementation 'net.fabricmc.fabric-api:fabric-resource-loader-v0:0.2.5+059ea8667c'
     } else {
         modImplementation library(libs, 'fabric-api')
         modLocalRuntime library(libs, 'fabric-api')
@@ -66,11 +68,18 @@ dependencies {
 
 tasks.withType(ProcessResources).configureEach {
     inputs.property('amberLegacyFabricMixinFilter', minecraftVersion)
+    inputs.property('amberLegacyFabricMixinFilterRules', 'respawn-pre116-v1')
     filesMatching('amber.fabric.mixins.json') {
         if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion == '1.15.1' || minecraftVersion == '1.15.2') {
             filter { line -> line.contains('"AnimalMixin",') ? '' : line }
         } else {
             filter { line -> line.contains('"BreedGoalMixin",') ? '' : line }
+        }
+        if (minecraftVersionAtLeast('1.16.2')) {
+            filter { line -> line.contains('"PlayerListRespawnMixin",') ? '' : line }
+        }
+        if (minecraftVersion != '1.16' && minecraftVersion != '1.16.1') {
+            filter { line -> line.contains('"LegacySmithingMenuMixin",') ? '' : line }
         }
         if (!minecraftVersionAtLeast('1.20.5')) {
             filter { line -> line.contains('"BuiltInRegistriesMixin",') ? '' : line }
@@ -78,6 +87,9 @@ tasks.withType(ProcessResources).configureEach {
         }
         if (minecraftVersion == '1.14.4') {
             filter { line -> line.contains('"LevelRendererMixin",') ? '' : line }
+        } else {
+            filter { line -> line.contains('"LegacyLevelRendererMixin",') ? '' : line }
+            filter { line -> line.contains('"GuiMixin",') ? '' : line }
         }
     }
 
@@ -86,9 +98,11 @@ tasks.withType(ProcessResources).configureEach {
         "fabric-command-api-v1": "*",
         "fabric-events-interaction-v0": "*",
         "fabric-key-binding-api-v1": "*",
+        "fabric-item-groups-v0": "*",
         "fabric-lifecycle-events-v1": "*",
         "fabric-loot-tables-v1": "*",
         "fabric-networking-api-v1": "*",
+        "fabric-resource-loader-v0": "*",
         "fabric-rendering-v1": "*",'''
 
         inputs.property('amberFabricApiModuleDepends', fabricApiModuleDepends)
