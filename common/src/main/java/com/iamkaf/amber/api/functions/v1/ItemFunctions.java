@@ -591,7 +591,7 @@ public final class ItemFunctions {
      */
     public static boolean isWeapon(ItemStack stack) {
         //? if <1.16
-        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE);*/
+        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());*/
         //? if <1.20.5 && >=1.16
         /*return stackAttributeModifiers(stack, EquipmentSlot.MAINHAND).containsKey(attackDamageAttribute());*/
         //? if >=1.20.5 {
@@ -776,7 +776,10 @@ public final class ItemFunctions {
 
     private static Attribute attackDamageAttribute() {
         try {
+            //? if >=1.16
             return (Attribute) Attributes.class.getField("ATTACK_DAMAGE").get(null);
+            //? if <1.16
+            /*return (Attribute) SharedMonsterAttributes.class.getField("ATTACK_DAMAGE").get(null);*/
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve attack damage attribute", exception);
         }

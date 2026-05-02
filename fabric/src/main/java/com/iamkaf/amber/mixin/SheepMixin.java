@@ -120,8 +120,8 @@ public abstract class SheepMixin {
     }
     //?}
 
-    //? if <1.21.2 {
-    /*@Inject(
+    //? if >=1.16 && <1.21.2 {
+    @Inject(
             method = "mobInteract",
             at = @At(
                     value = "INVOKE",
@@ -131,6 +131,27 @@ public abstract class SheepMixin {
     )
     private void amber$fireLegacyShear(Player player, InteractionHand hand,
             CallbackInfoReturnable<InteractionResult> cir) {
+        amber$fireLegacyShearCommon(player, hand);
+    }
+    //?}
+
+    //? if <1.16 {
+    @Inject(
+            method = "mobInteract",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/animal/Sheep;shear()V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void amber$firePre116Shear(Player player, InteractionHand hand,
+            CallbackInfoReturnable<InteractionResult> cir) {
+        amber$fireLegacyShearCommon(player, hand);
+    }
+    //?}
+
+    //? if <1.21.2 {
+    private void amber$fireLegacyShearCommon(Player player, InteractionHand hand) {
         Sheep sheep = (Sheep) (Object) this;
         ItemStack shears = player.getItemInHand(hand);
         if (!(amber$level(sheep) instanceof ServerLevel level)) {
@@ -171,7 +192,7 @@ public abstract class SheepMixin {
             case BLACK -> Items.BLACK_WOOL;
         };
     }
-    *///?}
+    //?}
 
     private static Level amber$level(Sheep sheep) {
         //? if >=1.20

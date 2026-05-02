@@ -30,9 +30,10 @@ public abstract class BreedGoalMixin {
             at = @At(
                     value = "INVOKE",
                     //? if >=1.16.2
-                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"
+                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V",
                     //? if <1.16.2
-                    /*target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"*/
+                    /*target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z",*/
+                    ordinal = 0
             ),
             locals = LocalCapture.CAPTURE_FAILSOFT
     )

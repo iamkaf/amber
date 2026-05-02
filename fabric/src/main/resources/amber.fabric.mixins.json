@@ -22,15 +22,19 @@
     //? if >=1.20.5
     "ItemAccessor",
     "ItemEntityMixin",
+    "LegacySmithingMenuMixin",
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
     "PlayerMixin",
+    "PlayerListRespawnMixin",
     "ServerPlayerDeathMixin",
     "ServerLevelMixin",
     "SheepMixin",
     "TamableAnimalMixin"
   ],
   "client": [
+    "GuiMixin",
+    "LegacyLevelRendererMixin",
     "LevelRendererMixin",
     "MouseHandlerMixin"
   ],
