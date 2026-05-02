@@ -55,8 +55,10 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 //? if <1.19
 /*import net.minecraftforge.client.event.InputEvent;*/
-//? if <1.19
+//? if <1.19 && >=1.17
 /*import net.minecraftforge.client.event.DrawSelectionEvent;*/
+//? if <1.17
+/*import net.minecraftforge.client.event.DrawHighlightEvent;*/
 //? if >=1.18.1
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 //? if >=1.19 && <1.20.5
@@ -148,6 +150,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //?} else {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLootTableEvent);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
+        MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerEntityInteractGeneral);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onCommandRegistration);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLivingDeath);
@@ -175,7 +178,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onShieldBlock);*/
         //?}
-        //? if <1.19
+        // Legacy Forge PlayerEvent.ItemCraftedEvent misses menu families such as smithing; use Item.onCraftedBy instead.
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onItemCrafted);*/
 
         // Creative mode tab events (register with high priority)
@@ -323,6 +326,24 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             return false;
         }
 
+        //? if <1.19 {
+        /*public static boolean onPlayerEntityInteractGeneral(PlayerInteractEvent.EntityInteract event) {
+            InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
+                    .interact(event.getPlayer(), event.getWorld(), event.getHand(), event.getTarget());
+
+            LogicalSide side = event.getSide();
+
+            if (result.equals(InteractionResult.PASS)) {
+                return false;
+            }
+
+            event.setCancellationResult(result.equals(SUCCESS) ? SUCCESS : CONSUME);
+            event.setCanceled(true);
+
+            return side.isClient() && result.equals(SUCCESS);
+        }*/
+        //?}
+
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
                     .register(event.getDispatcher(),
@@ -407,7 +428,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 return true;
             }
 
-            //? if <1.18.1
+            // Legacy shield-block forwarding is handled at the vanilla shield-use call site.
             /*fireLegacyShieldBlock(event);*/
 
             return false;
@@ -419,16 +440,42 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 return;
             }
 
-            if (!player.isDamageSourceBlocked(event.getSource())) {
+            if (!legacyIsDamageSourceBlocked(player, event.getSource())) {
                 return;
             }
 
             ItemStack shield = player.getUseItem();
-            if (shield.isEmpty() || !(shield.getItem() instanceof net.minecraft.world.item.ShieldItem)) {
+            if (shield.isEmpty() || !legacyIsShieldItem(shield.getItem())) {
                 return;
             }
 
             PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, event.getAmount(), event.getSource());
+        }
+
+        private static boolean legacyIsDamageSourceBlocked(Object player, Object source) {
+            Class<?> type = player.getClass();
+            while (type != null) {
+                try {
+                    var method = type.getDeclaredMethod("isDamageSourceBlocked", source.getClass());
+                    method.setAccessible(true);
+                    Object value = method.invoke(player, source);
+                    return value instanceof Boolean blocked && blocked;
+                } catch (NoSuchMethodException ignored) {
+                    type = type.getSuperclass();
+                } catch (ReflectiveOperationException exception) {
+                    throw new IllegalStateException("Unable to resolve legacy shield block state", exception);
+                }
+            }
+            return false;
+        }
+
+        private static boolean legacyIsShieldItem(Object item) {
+            try {
+                return Class.forName("net.minecraft.world.item.ShieldItem").isInstance(item)
+                        || Class.forName("net.minecraft.item.ShieldItem").isInstance(item);
+            } catch (ClassNotFoundException ignored) {
+                return false;
+            }
         }
         *///?}
 
@@ -868,7 +915,12 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         *///?}
 
         //? if <1.19 {
-        /*public static void onBlockOutlineRender(DrawSelectionEvent.HighlightBlock event) {
+        /*public static void onBlockOutlineRender(
+                //? if >=1.17
+                DrawSelectionEvent.HighlightBlock event
+                //? if <1.17
+                /^DrawHighlightEvent.HighlightBlock event^/
+        ) {
             BlockPos pos = event.getTarget().getBlockPos();
             BlockState state = Minecraft.getInstance().level.getBlockState(pos);
             InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(

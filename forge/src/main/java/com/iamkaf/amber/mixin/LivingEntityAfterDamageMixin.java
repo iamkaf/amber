@@ -2,9 +2,12 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -122,6 +125,41 @@ public abstract class LivingEntityAfterDamageMixin {
         this.amber$armAfterDamage(damage, damage, damageBlocked > 0.0F);
         //? if <1.21.9
         /*this.amber$armAfterDamage(damage, damage, false);*/
+    }
+
+    @Inject(
+            //? if >=1.21.2
+            method = "hurtServer",
+            //? if <1.21.2
+            /*method = "hurt",*/
+            at = @At(
+                    value = "INVOKE",
+                    target =
+                    //? if >=1.17
+                    "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
+                    //? if <1.17
+                    /*"Lnet/minecraft/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"*/
+            )
+    )
+    private void amber$fireLegacyShieldBlock(
+            //? if >=1.21.2
+            ServerLevel level,
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        //? if <1.18.1 {
+        /*if (!((Object) this instanceof Player player)) {
+            return;
+        }
+
+        ItemStack shield = player.getUseItem();
+        if (shield.isEmpty() || shield.getItem() != Items.SHIELD) {
+            return;
+        }
+
+        PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, damage, source);
+        *///?}
     }
 
     @Inject(

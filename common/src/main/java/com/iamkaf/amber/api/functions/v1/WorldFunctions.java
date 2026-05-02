@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
@@ -26,6 +25,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 //? if <1.16
 /*import net.minecraft.world.level.dimension.DimensionType;*/
 import net.minecraft.world.level.biome.Biome;
+//? if >=1.17
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -1056,8 +1056,13 @@ public final class WorldFunctions {
     private static <T extends Entity> List<T> typedEntities(Level level, EntityType<T> type, AABB bounds, java.util.function.Predicate<Entity> predicate) {
         try {
             @SuppressWarnings("unchecked")
+            //? if >=1.17 {
             List<T> result = (List<T>) level.getClass().getMethod("getEntities", EntityTypeTest.class, AABB.class, java.util.function.Predicate.class)
                     .invoke(level, type, bounds, predicate);
+            //?} else {
+            /*List<T> result = (List<T>) level.getClass().getMethod("getEntities", EntityType.class, AABB.class, java.util.function.Predicate.class)
+                    .invoke(level, type, bounds, predicate);
+            *///?}
             return result;
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve typed level entities", exception);
@@ -1145,7 +1150,7 @@ public final class WorldFunctions {
         return vectorKey((int) vecX(vector), (int) vecY(vector), (int) vecZ(vector));
     }
 
-    private static String vectorKey(Vec3i vector) {
+    private static String vectorKey(Object vector) {
         return vectorKey(vec3iX(vector), vec3iY(vector), vec3iZ(vector));
     }
 
@@ -1154,11 +1159,11 @@ public final class WorldFunctions {
     }
 
     private static Vec3 directionVector(Direction direction) {
-        Vec3i normal = directionNormal(direction);
+        Object normal = directionNormal(direction);
         return new Vec3(vec3iX(normal), vec3iY(normal), vec3iZ(normal));
     }
 
-    private static int vec3iX(Vec3i vector) {
+    private static int vec3iX(Object vector) {
         try {
             Object value = vector.getClass().getMethod("getX").invoke(vector);
             return value instanceof Integer coordinate ? coordinate : 0;
@@ -1167,7 +1172,7 @@ public final class WorldFunctions {
         }
     }
 
-    private static int vec3iY(Vec3i vector) {
+    private static int vec3iY(Object vector) {
         try {
             Object value = vector.getClass().getMethod("getY").invoke(vector);
             return value instanceof Integer coordinate ? coordinate : 0;
@@ -1176,7 +1181,7 @@ public final class WorldFunctions {
         }
     }
 
-    private static int vec3iZ(Vec3i vector) {
+    private static int vec3iZ(Object vector) {
         try {
             Object value = vector.getClass().getMethod("getZ").invoke(vector);
             return value instanceof Integer coordinate ? coordinate : 0;
@@ -1185,7 +1190,7 @@ public final class WorldFunctions {
         }
     }
 
-    private static Vec3i directionNormal(Direction direction) {
+    private static Object directionNormal(Direction direction) {
         try {
             Object normal;
             try {
@@ -1193,7 +1198,7 @@ public final class WorldFunctions {
             } catch (NoSuchMethodException exception) {
                 normal = direction.getClass().getMethod("getNormal").invoke(direction);
             }
-            return (Vec3i) normal;
+            return normal;
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve direction normal", exception);
         }

@@ -61,6 +61,8 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Forge 1.17.1 `InputEvents.MOUSE_SCROLL_PRE` and `InputEvents.MOUSE_SCROLL_POST` by bridging the native legacy mouse scroll event
 - Fixed Forge 1.17.1 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the native legacy block selection render event
 - Fixed Forge 1.17.1 ordinary `PlayerEvents.CRAFT_ITEM` callbacks by bridging Forge's native item-crafted event
+- Fixed Forge 1.16.5 `PlayerEvents.CRAFT_ITEM` duplicate ordinary crafting callbacks while preserving broader `Item.onCraftedBy` paths such as smithing
+- Fixed Forge 1.16.5 `PlayerEvents.SHIELD_BLOCK` not firing by bridging the vanilla shield-use damage path
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 
 ## 10.0.2
