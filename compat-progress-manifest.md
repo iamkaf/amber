@@ -30,41 +30,41 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | Legacy compat extracted to overlays | `PASS` | Committed in Amber as `a17cec2 Move Amber legacy compat to overlays`. |
 | Versioned `ItemCompat` / `PlayerCompat` / `WorldCompat` overlays added | `PASS` | Committed in Amber as `5753898 Add versioned compat overlays`; representative common compile checks passed before commit. |
 | Overlay guard/comment cleanup | `PASS` | Local uncommitted cleanup removed Stonecutter guard residue from version compat overlays. Residue scan is clean and every common node compiles sequentially. |
-| Reflection and dynamic-dispatch removal | `PARTIAL` | `26.1.x` and `1.21.x` `ItemCompat` are non-reflective, but the full matrix is not complete. This also tracks `Object` shims and method/field-by-string helpers. |
+| Reflection and dynamic-dispatch removal | `PARTIAL` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are clean across version overlays and root common source. Remaining production reflection is outside this slice, with `ClientFunctions` next. This also tracks `Object` shims and method/field-by-string helpers. |
 | `ClientCompat` extraction | `TODO` | Not started. |
 
 ## Version Bands
 
 | Version Band | Overlay Shape | Reflection Removal | Compile Evidence | Runtime Evidence | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `26.1.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | All `26.1.x` common nodes compile after cleanup. `ItemCompat` is directly implemented in overlays. `PlayerCompat` and `WorldCompat` still need reflection scans. |
-| `1.21.x` | `PASS` | `WIP` | `PASS` | `PASS` | All `1.21.x` common nodes compile after splitting `ResourceKey.location()` versus `ResourceKey.identifier()` at `1.21.11`, and restoring `Ingredient#getItems()` helpers for `1.21`/`1.21.1`. |
-| `1.20.5` to `1.20.6` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat` is non-reflective and free of dynamic-dispatch helpers in this band. Data-component era but not identical to `1.21.x`; use Beam before copying modern implementations. Biome precipitation uses `hasPrecipitation()`. |
-| `1.20` to `1.20.4` | `PASS` | `TODO` | `PASS` | `PASS` | All nodes in this band compile after resolving `Biome.hasPrecipitation()`. Legacy networking skips must remain intentional. |
-| `1.19.x` | `PASS` | `TODO` | `PASS` | `PASS` | All `1.19.x` common nodes compile after resolving the precipitation boundary at `1.19.4`. Shared baseline with `1.18.x`; expect many of the same compat constraints. |
-| `1.18.x` | `PASS` | `TODO` | `PASS` | `PASS` | All `1.18.x` common nodes compile. Shared baseline with `1.19.x`; avoid rediscovering solved TeaKit/creative-tab/Forge command issues. |
-| `1.17.x` | `PASS` | `TODO` | `PASS` | `PASS` | All `1.17.x` common nodes compile. Forge `1.17.1` has documented conformance gaps from userdev/mixin limitations. |
-| `1.16.5` | `PASS` | `TODO` | `PASS` | `PASS` | Common compile is green. Final Forge legacy node. Reference this heavily before touching older Fabric-only lines. |
-| `1.16` to `1.16.4` | `PASS` | `TODO` | `PASS` | `PASS` | All nodes in this band compile. `DeferredRegister.entryKey` now casts through `ResourceKey<Registry<T>>` to support the pre-`1.16.2` `ResourceKey.create` signature. |
-| `1.15.x` to `1.14.4` | `PASS` | `TODO` | `PASS` | `PASS` | All nodes in this band compile. Old Fabric-only support; keep changes minimal and evidence-driven. |
+| `26.1.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:26.1.2:compileJava` passed after cleanup. |
+| `1.21.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.21.x` common nodes previously compiled after `ResourceKey` and `Ingredient` boundary fixes. |
+| `1.20.5` to `1.20.6` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.20.5:compileJava` passed after data-component modifier identity cleanup. |
+| `1.20` to `1.20.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.20.4:compileJava` passed after legacy modifier identity cleanup. |
+| `1.19.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.19.x` common nodes previously compiled after resolving the precipitation boundary at `1.19.4`. |
+| `1.18.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.18.x` common nodes previously compiled. |
+| `1.17.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. Forge `1.17.1` has documented conformance gaps from userdev/mixin limitations. |
+| `1.16.5` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. Final Forge legacy node. |
+| `1.16` to `1.16.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All nodes in this band compile. |
+| `1.15.x` to `1.14.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.14.4:compileJava` passed after cleanup. |
 
 ## Compat Classes
 
 | Compat Area | Purpose | Current Status | Next Action |
 | --- | --- | --- | --- |
-| `ItemCompat` | Item stack, inventory, ingredient, attribute, enchantment, tag, and default-instance differences. | `PARTIAL` | `26.1.x`, `1.21.x`, and `1.20.5`-`1.20.6` are non-reflective. Continue with `1.20`-`1.20.4`, then older bands. |
-| `PlayerCompat` | Inventory, abilities, game mode, food, ender chest, packets, selected slot, XP, sleep, and player state differences. | `WIP` | Remove guard residue first, then scan for reflection or stringly API calls. |
-| `WorldCompat` | Time, vectors, sounds, difficulty, biomes, dimensions, entity queries, AABB, and direction differences. | `WIP` | Resolve API differences with Beam, especially `ResourceKey` and biome/direction changes. |
-| `ClientCompat` | Client-only UI/render/input API differences. | `TODO` | Extract after the common compat overlays are cleaner, so the pattern is stable. |
+| `ItemCompat` | Item stack, inventory, ingredient, attribute, enchantment, tag, and default-instance differences. | `PASS` | Clean across root common source and version overlays. Data-component modifier identity is typed through `modifierIdentity`. |
+| `PlayerCompat` | Inventory, abilities, game mode, food, ender chest, packets, selected slot, XP, sleep, and player state differences. | `PASS` | Clean across version overlays. Replaced packet `Object`, field-by-string helpers, and method-by-string helpers with named typed methods. |
+| `WorldCompat` | Time, vectors, sounds, difficulty, biomes, dimensions, entity queries, AABB, and direction differences. | `PASS` | Clean across version overlays. Replaced AABB string selectors plus `Vec3i`/direction `Object` shims with typed helpers. |
+| `ClientCompat` | Client-only UI/render/input API differences. | `READY` | `ClientFunctions` is now the next reflection-heavy API surface to extract into version overlays. |
 
 ## Source Shape Checklist
 
 | Rule | Status | Notes |
 | --- | --- | --- |
 | Version overlays contain resolved Java only | `PASS` | `rg` found no Stonecutter guard residue or inactive block comments in `versions/*/.../compat`; every common node compiles after cleanup. |
-| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. Replace with overlays or small typed adapters. |
-| No untyped `Object` Minecraft API shims | `TODO` | Treat `Object` compat parameters/returns for Minecraft values as a smell unless the public Amber API is itself intentionally untyped. Prefer version overlays with concrete Minecraft types. |
-| No stringly method or field dispatch | `TODO` | Replace helpers that select Minecraft methods/fields by string with typed helper methods in overlays. |
+| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. `ItemCompat`/`PlayerCompat`/`WorldCompat` are clean; remaining known reflection is in client, creative-tab, Forge event/mixin, and registrar paths. |
+| No untyped `Object` Minecraft API shims | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat` and their public function call paths are clean. Continue with `ClientCompat` and then other production surfaces. |
+| No stringly method or field dispatch | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat` and their public function call paths are clean. Continue with `ClientCompat` and then other production surfaces. |
 | Common/root code remains readable | `PARTIAL` | Guards are acceptable in root common code when readable, but large Minecraft API divergence belongs in compat overlays. |
 | No JSON mixin overlay churn unless needed | `PASS` | Keep mixin config as `.json`; use Stonecutter support without breaking existing config expectations. |
 | No conformance or TeaKit paths in Amber production | `PASS` | Amber runtime checks remain external through `amber-conformance` and TeaKit. |
@@ -76,8 +76,8 @@ Use sequential checks. Do not fan out the matrix on this machine.
 | Check | When Required | Status |
 | --- | --- | --- |
 | `rg` scan for Stonecutter residue in version compat overlays | After overlay cleanup edits | `PASS` |
-| `rg` scan for reflection in compat overlays | After each reflection-removal slice | `WIP` |
-| `rg` scan for `Object` compat shims and stringly dispatch | After each dynamic-dispatch cleanup slice | `WIP` |
+| `rg` scan for reflection in compat overlays | After each reflection-removal slice | `PASS` |
+| `rg` scan for `Object` compat shims and stringly dispatch | After each dynamic-dispatch cleanup slice | `PASS` |
 | Representative common compiles per touched band | After source edits | `PASS` |
 | Full touched-node compile | Before committing a band | `PASS` |
 | Amber conformance runtime for touched runtime behavior | Before claiming runtime parity | `TODO` |
@@ -85,11 +85,11 @@ Use sequential checks. Do not fan out the matrix on this machine.
 
 ## Next Suggested Slice
 
-Finish the interrupted overlay cleanup as its own small slice:
+Implement `ClientCompat`:
 
-1. Review the current local cleanup diff and keep only resolved-overlay cleanup that is mechanically correct.
-2. Use Beam for any Minecraft symbol disagreement instead of guessing from generated comments.
-3. Verify `1.21.11`, one mid-band `1.21.x`, `26.1.2`, and one older representative node sequentially.
-4. Commit the cleanup separately from deeper reflection removal.
+1. Move the client-only Minecraft API calls currently hidden behind reflection in `ClientFunctions` into `ClientCompat` overlays.
+2. Keep overlay methods typed by the real Minecraft classes for each version, even when the root common source still needs readable Stonecutter guards.
+3. Preserve behavior for UI messages, option state, font drawing, and tooltip rendering while removing `Object` shims and method lookup by string.
+4. Verify sequentially with `:common:26.1.2:compileJava`, a data-component-era node, and `:common:1.14.4:compileJava`; add runtime checks only if the touched client behavior has existing coverage or a focused TeaKit path.
 
-After that, continue reflection and dynamic-dispatch removal with `ItemCompat` newest-to-oldest, then move to `PlayerCompat` / `WorldCompat`, and only then extract `ClientCompat`.
+After `ClientCompat`, continue the same overlay pattern for creative tabs, Forge event/mixin helpers, and registrar code.

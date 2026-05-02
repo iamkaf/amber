@@ -5,6 +5,7 @@ import net.minecraft.core.GlobalPos;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
 //? if >=1.17 {
@@ -59,7 +60,7 @@ public final class PlayerFunctions {
      * @param amount The amount of experience points to add.
      */
     public static void addExperience(Player player, int amount) {
-        invokePlayerInt(player, "giveExperiencePoints", amount);
+        giveExperiencePoints(player, amount);
     }
 
     /**
@@ -69,7 +70,7 @@ public final class PlayerFunctions {
      * @param levels The number of experience levels to add.
      */
     public static void addLevels(Player player, int levels) {
-        invokePlayerInt(player, "giveExperienceLevels", levels);
+        giveExperienceLevels(player, levels);
     }
 
     /**
@@ -79,7 +80,7 @@ public final class PlayerFunctions {
      * @param level The experience level to set.
      */
     public static void setExperienceLevel(Player player, int level) {
-        setIntField(player, "experienceLevel", level);
+        PlayerCompat.setExperienceLevel(player, level);
     }
 
     /**
@@ -89,7 +90,7 @@ public final class PlayerFunctions {
      * @return The total experience points the player has.
      */
     public static int getExperiencePoints(Player player) {
-        return intField(player, "totalExperience");
+        return totalExperience(player);
     }
 
     /**
@@ -99,7 +100,7 @@ public final class PlayerFunctions {
      * @return The current experience level.
      */
     public static int getExperienceLevel(Player player) {
-        return intField(player, "experienceLevel");
+        return experienceLevel(player);
     }
 
     /**
@@ -109,7 +110,7 @@ public final class PlayerFunctions {
      * @return The experience progress (0.0 to 1.0).
      */
     public static float getExperienceProgress(Player player) {
-        return floatField(player, "experienceProgress");
+        return experienceProgress(player);
     }
 
     /**
@@ -143,7 +144,7 @@ public final class PlayerFunctions {
      */
     public static void setFlying(Player player, boolean flying) {
         Abilities abilities = getAbilities(player);
-        setBooleanField(abilities, "flying", flying);
+        PlayerCompat.setFlying(abilities, flying);
         updateAbilities(player);
     }
 
@@ -154,7 +155,7 @@ public final class PlayerFunctions {
      * @return true if the player is flying, false otherwise.
      */
     public static boolean isFlying(Player player) {
-        return booleanField(getAbilities(player), "flying");
+        return flying(getAbilities(player));
     }
 
     /**
@@ -165,7 +166,7 @@ public final class PlayerFunctions {
      */
     public static void setAllowFlight(Player player, boolean allowFlight) {
         Abilities abilities = getAbilities(player);
-        setBooleanField(abilities, "mayfly", allowFlight);
+        setMayfly(abilities, allowFlight);
         updateAbilities(player);
     }
 
@@ -176,7 +177,7 @@ public final class PlayerFunctions {
      * @return true if the player can fly, false otherwise.
      */
     public static boolean canFly(Player player) {
-        return booleanField(getAbilities(player), "mayfly");
+        return mayfly(getAbilities(player));
     }
 
     /**
@@ -187,7 +188,7 @@ public final class PlayerFunctions {
      */
     public static void setInvulnerable(Player player, boolean invulnerable) {
         Abilities abilities = getAbilities(player);
-        setBooleanField(abilities, "invulnerable", invulnerable);
+        PlayerCompat.setInvulnerable(abilities, invulnerable);
         updateAbilities(player);
     }
 
@@ -198,7 +199,7 @@ public final class PlayerFunctions {
      * @return true if the player is invulnerable, false otherwise.
      */
     public static boolean isInvulnerable(Player player) {
-        return booleanField(getAbilities(player), "invulnerable");
+        return invulnerable(getAbilities(player));
     }
 
     /**
@@ -209,7 +210,7 @@ public final class PlayerFunctions {
      */
     public static void setInstaBuild(Player player, boolean instaBuild) {
         Abilities abilities = getAbilities(player);
-        setBooleanField(abilities, "instabuild", instaBuild);
+        setInstabuild(abilities, instaBuild);
         updateAbilities(player);
     }
 
@@ -220,7 +221,7 @@ public final class PlayerFunctions {
      * @return true if the player has insta-build, false otherwise.
      */
     public static boolean hasInstaBuild(Player player) {
-        return booleanField(getAbilities(player), "instabuild");
+        return instabuild(getAbilities(player));
     }
 
     /**
@@ -231,7 +232,7 @@ public final class PlayerFunctions {
      */
     public static void setMayBuild(Player player, boolean mayBuild) {
         Abilities abilities = getAbilities(player);
-        setBooleanField(abilities, "mayBuild", mayBuild);
+        PlayerCompat.setMayBuild(abilities, mayBuild);
         updateAbilities(player);
     }
 
@@ -242,7 +243,7 @@ public final class PlayerFunctions {
      * @return true if the player may build, false otherwise.
      */
     public static boolean mayBuild(Player player) {
-        return booleanField(getAbilities(player), "mayBuild");
+        return PlayerFunctions.mayBuild(getAbilities(player));
     }
 
     /**
@@ -307,7 +308,7 @@ public final class PlayerFunctions {
      * @return The item stack in the main hand.
      */
     public static ItemStack getMainHandItem(Player player) {
-        return playerItemStack(player, "getMainHandItem");
+        return mainHandItem(player);
     }
 
     /**
@@ -317,7 +318,7 @@ public final class PlayerFunctions {
      * @return The item stack in the off hand.
      */
     public static ItemStack getOffhandItem(Player player) {
-        return playerItemStack(player, "getOffhandItem");
+        return offhandItem(player);
     }
 
     /**
@@ -457,7 +458,7 @@ public final class PlayerFunctions {
      * @return The current attack strength.
      */
     public static float getAttackStrength(Player player) {
-        return playerFloat(player, "getAttackStrengthScale", 0.5f);
+        return attackStrengthScale(player, 0.5f);
     }
 
     /**
@@ -466,7 +467,7 @@ public final class PlayerFunctions {
      * @param player The player to reset cooldown for.
      */
     public static void resetAttackStrength(Player player) {
-        invokePlayer(player, "resetAttackStrengthTicker");
+        resetAttackStrengthTicker(player);
     }
 
     /**
@@ -734,7 +735,7 @@ public final class PlayerFunctions {
      * @return true if the player is sleeping, false otherwise.
      */
     public static boolean isSleeping(Player player) {
-        return playerBoolean(player, "isSleeping");
+        return sleeping(player);
     }
 
     /**
@@ -744,7 +745,7 @@ public final class PlayerFunctions {
      * @param pos The position to sleep at.
      */
     public static void startSleeping(Player player, BlockPos pos) {
-        invokePlayerBlockPos(player, "startSleepInBed", pos);
+        startSleepInBed(player, pos);
     }
 
     /**
@@ -753,7 +754,7 @@ public final class PlayerFunctions {
      * @param player The player to wake up.
      */
     public static void stopSleeping(Player player) {
-        invokePlayer(player, "stopSleeping");
+        PlayerCompat.stopSleeping(player);
     }
 
     /**
@@ -763,7 +764,7 @@ public final class PlayerFunctions {
      * @return The current food level (0-20).
      */
     public static int getFoodLevel(Player player) {
-        return foodInt(playerFoodData(player), "getFoodLevel");
+        return foodLevel(playerFoodData(player));
     }
 
     /**
@@ -773,7 +774,7 @@ public final class PlayerFunctions {
      * @param level The food level to set (0-20).
      */
     public static void setFoodLevel(Player player, int level) {
-        invokeFoodInt(playerFoodData(player), "setFoodLevel", level);
+        PlayerCompat.setFoodLevel(playerFoodData(player), level);
     }
 
     /**
@@ -783,7 +784,7 @@ public final class PlayerFunctions {
      * @return The current saturation level.
      */
     public static float getSaturationLevel(Player player) {
-        return foodFloat(playerFoodData(player), "getSaturationLevel");
+        return saturationLevel(playerFoodData(player));
     }
 
     /**
@@ -793,7 +794,7 @@ public final class PlayerFunctions {
      * @param amount The amount of exhaustion to add.
      */
     public static void addExhaustion(Player player, float amount) {
-        invokeFoodFloat(playerFoodData(player), "addExhaustion", amount);
+        PlayerCompat.addExhaustion(playerFoodData(player), amount);
     }
 
     /**
@@ -804,7 +805,7 @@ public final class PlayerFunctions {
      */
     public static void feed(Player player, int amount) {
         FoodData foodData = playerFoodData(player);
-        invokeFoodInt(foodData, "setFoodLevel", Math.min(20, foodInt(foodData, "getFoodLevel") + amount));
+        PlayerCompat.setFoodLevel(foodData, Math.min(20, foodLevel(foodData) + amount));
     }
 
     /**
@@ -925,7 +926,7 @@ public final class PlayerFunctions {
         PlayerCompat.displayClientMessage(player, message, actionBar);
     }
 
-    private static void sendPacket(ServerPlayer player, Object packet) {
+    private static void sendPacket(ServerPlayer player, Packet<?> packet) {
         PlayerCompat.sendPacket(player, packet);
     }
 
@@ -949,8 +950,12 @@ public final class PlayerFunctions {
         return PlayerCompat.inventoryItem(inventory, slot);
     }
 
-    private static ItemStack playerItemStack(Player player, String method) {
-        return PlayerCompat.playerItemStack(player, method);
+    private static ItemStack mainHandItem(Player player) {
+        return PlayerCompat.mainHandItem(player);
+    }
+
+    private static ItemStack offhandItem(Player player) {
+        return PlayerCompat.offhandItem(player);
     }
 
     private static ItemStack emptyStack() {
@@ -977,59 +982,75 @@ public final class PlayerFunctions {
         PlayerCompat.setSelectedSlot(inventory, slot);
     }
 
-    private static int intField(Object target, String name) {
-        return PlayerCompat.intField(target, name);
+    private static int totalExperience(Player player) {
+        return PlayerCompat.totalExperience(player);
     }
 
-    private static void setIntField(Object target, String name, int value) {
-        PlayerCompat.setIntField(target, name, value);
+    private static int experienceLevel(Player player) {
+        return PlayerCompat.experienceLevel(player);
     }
 
-    private static float floatField(Object target, String name) {
-        return PlayerCompat.floatField(target, name);
+    private static float experienceProgress(Player player) {
+        return PlayerCompat.experienceProgress(player);
     }
 
-    private static boolean booleanField(Object target, String name) {
-        return PlayerCompat.booleanField(target, name);
+    private static boolean flying(Abilities abilities) {
+        return PlayerCompat.flying(abilities);
     }
 
-    private static void setBooleanField(Object target, String name, boolean value) {
-        PlayerCompat.setBooleanField(target, name, value);
+    private static boolean mayfly(Abilities abilities) {
+        return PlayerCompat.mayfly(abilities);
     }
 
-    private static void invokePlayerInt(Player player, String method, int value) {
-        PlayerCompat.invokePlayerInt(player, method, value);
+    private static void setMayfly(Abilities abilities, boolean value) {
+        PlayerCompat.setMayfly(abilities, value);
     }
 
-    private static void invokePlayer(Player player, String method) {
-        PlayerCompat.invokePlayer(player, method);
+    private static boolean invulnerable(Abilities abilities) {
+        return PlayerCompat.invulnerable(abilities);
     }
 
-    private static float playerFloat(Player player, String method, float value) {
-        return PlayerCompat.playerFloat(player, method, value);
+    private static boolean instabuild(Abilities abilities) {
+        return PlayerCompat.instabuild(abilities);
     }
 
-    private static boolean playerBoolean(Player player, String method) {
-        return PlayerCompat.playerBoolean(player, method);
+    private static void setInstabuild(Abilities abilities, boolean value) {
+        PlayerCompat.setInstabuild(abilities, value);
     }
 
-    private static void invokePlayerBlockPos(Player player, String method, BlockPos pos) {
-        PlayerCompat.invokePlayerBlockPos(player, method, pos);
+    private static boolean mayBuild(Abilities abilities) {
+        return PlayerCompat.mayBuild(abilities);
     }
 
-    private static int foodInt(FoodData foodData, String method) {
-        return PlayerCompat.foodInt(foodData, method);
+    private static void giveExperiencePoints(Player player, int amount) {
+        PlayerCompat.giveExperiencePoints(player, amount);
     }
 
-    private static float foodFloat(FoodData foodData, String method) {
-        return PlayerCompat.foodFloat(foodData, method);
+    private static void giveExperienceLevels(Player player, int levels) {
+        PlayerCompat.giveExperienceLevels(player, levels);
     }
 
-    private static void invokeFoodInt(FoodData foodData, String method, int value) {
-        PlayerCompat.invokeFoodInt(foodData, method, value);
+    private static float attackStrengthScale(Player player, float adjustTicks) {
+        return PlayerCompat.attackStrengthScale(player, adjustTicks);
     }
 
-    private static void invokeFoodFloat(FoodData foodData, String method, float value) {
-        PlayerCompat.invokeFoodFloat(foodData, method, value);
+    private static void resetAttackStrengthTicker(Player player) {
+        PlayerCompat.resetAttackStrengthTicker(player);
+    }
+
+    private static boolean sleeping(Player player) {
+        return PlayerCompat.sleeping(player);
+    }
+
+    private static void startSleepInBed(Player player, BlockPos pos) {
+        PlayerCompat.startSleepInBed(player, pos);
+    }
+
+    private static int foodLevel(FoodData foodData) {
+        return PlayerCompat.foodLevel(foodData);
+    }
+
+    private static float saturationLevel(FoodData foodData) {
+        return PlayerCompat.saturationLevel(foodData);
     }
 }

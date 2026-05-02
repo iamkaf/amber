@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
+import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 //? if >=1.16
@@ -974,38 +975,34 @@ public final class WorldFunctions {
     }
 
     private static double aabbMinX(AABB box) {
-        return aabbCoordinate(box, "minX");
+        return WorldCompat.aabbMinX(box);
     }
 
     private static double aabbMinY(AABB box) {
-        return aabbCoordinate(box, "minY");
+        return WorldCompat.aabbMinY(box);
     }
 
     private static double aabbMinZ(AABB box) {
-        return aabbCoordinate(box, "minZ");
+        return WorldCompat.aabbMinZ(box);
     }
 
     private static double aabbMaxX(AABB box) {
-        return aabbCoordinate(box, "maxX");
+        return WorldCompat.aabbMaxX(box);
     }
 
     private static double aabbMaxY(AABB box) {
-        return aabbCoordinate(box, "maxY");
+        return WorldCompat.aabbMaxY(box);
     }
 
     private static double aabbMaxZ(AABB box) {
-        return aabbCoordinate(box, "maxZ");
-    }
-
-    private static double aabbCoordinate(AABB box, String fieldName) {
-        return WorldCompat.aabbCoordinate(box, fieldName);
+        return WorldCompat.aabbMaxZ(box);
     }
 
     private static String vectorKey(Vec3 vector) {
         return vectorKey((int) vecX(vector), (int) vecY(vector), (int) vecZ(vector));
     }
 
-    private static String vectorKey(Object vector) {
+    private static String vectorKey(Vec3i vector) {
         return vectorKey(vec3iX(vector), vec3iY(vector), vec3iZ(vector));
     }
 
@@ -1014,23 +1011,23 @@ public final class WorldFunctions {
     }
 
     private static Vec3 directionVector(Direction direction) {
-        Object normal = directionNormal(direction);
+        Vec3i normal = directionNormal(direction);
         return new Vec3(vec3iX(normal), vec3iY(normal), vec3iZ(normal));
     }
 
-    private static int vec3iX(Object vector) {
+    private static int vec3iX(Vec3i vector) {
         return WorldCompat.vec3iX(vector);
     }
 
-    private static int vec3iY(Object vector) {
+    private static int vec3iY(Vec3i vector) {
         return WorldCompat.vec3iY(vector);
     }
 
-    private static int vec3iZ(Object vector) {
+    private static int vec3iZ(Vec3i vector) {
         return WorldCompat.vec3iZ(vector);
     }
 
-    private static Object directionNormal(Direction direction) {
+    private static Vec3i directionNormal(Direction direction) {
         return WorldCompat.directionNormal(direction);
     }
 
@@ -1038,11 +1035,11 @@ public final class WorldFunctions {
         return WorldCompat.directionOpposite(direction);
     }
 
-    private static Object directionAxis(Direction direction) {
+    private static Direction.Axis directionAxis(Direction direction) {
         return WorldCompat.directionAxis(direction);
     }
 
-    private static Object directionAxisDirection(Direction direction) {
+    private static Direction.AxisDirection directionAxisDirection(Direction direction) {
         return WorldCompat.directionAxisDirection(direction);
     }
 
@@ -1084,12 +1081,12 @@ public final class WorldFunctions {
          * Retrieves the value of a bounding box along a specified direction.
          */
         private static double getAxisValue(AABB box, Direction direction) {
-            Object axis = directionAxis(direction);
-            boolean positive = "POSITIVE".equals(((Enum<?>) directionAxisDirection(direction)).name());
-            return switch (((Enum<?>) axis).name()) {
-                case "X" -> positive ? aabbMaxX(box) : aabbMinX(box);
-                case "Y" -> positive ? aabbMaxY(box) : aabbMinY(box);
-                case "Z" -> positive ? aabbMaxZ(box) : aabbMinZ(box);
+            Direction.Axis axis = directionAxis(direction);
+            boolean positive = directionAxisDirection(direction) == Direction.AxisDirection.POSITIVE;
+            return switch (axis) {
+                case X -> positive ? aabbMaxX(box) : aabbMinX(box);
+                case Y -> positive ? aabbMaxY(box) : aabbMinY(box);
+                case Z -> positive ? aabbMaxZ(box) : aabbMinZ(box);
                 default -> throw new IllegalStateException("Unknown direction axis: " + axis);
             };
         }

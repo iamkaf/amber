@@ -336,22 +336,24 @@ public final class ItemFunctions {
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
         var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<Object> added = new HashSet<>();
+        Set<String> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
-            if (!added.contains(mod.modifier().id())) {
+            String modifierId = modifierIdentity(mod.modifier());
+            if (!added.contains(modifierId)) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(mod.modifier().id());
+                added.add(modifierId);
             }
         }
         for (var mod : extraModifiers.modifiers()) {
-            if (mod.modifier().id().equals(modifier.id())) {
+            String modifierId = modifierIdentity(mod.modifier());
+            if (modifierId.equals(modifierIdentity(modifier))) {
                 // skipping so it can be overwritten
                 continue;
             }
             // prevents duplicates
-            if (!added.contains(mod.modifier().id())) {
+            if (!added.contains(modifierId)) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(mod.modifier().id());
+                added.add(modifierId);
             }
         }
         attributeBuilder.add(attribute, modifier, slotGroup);
@@ -669,6 +671,10 @@ public final class ItemFunctions {
      */
     public static Supplier<Ingredient> createRepairIngredient(Supplier<Item> item) {
         return () -> Ingredient.of(item.get());
+    }
+
+    private static String modifierIdentity(AttributeModifier modifier) {
+        return ItemCompat.modifierIdentity(modifier);
     }
 
     // ==================== ARMOR TIER ENUMS ====================
