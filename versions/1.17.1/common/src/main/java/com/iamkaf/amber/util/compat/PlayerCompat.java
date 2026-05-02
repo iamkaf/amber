@@ -23,17 +23,11 @@ public final class PlayerCompat {
     }
 
     public static Inventory playerInventory(Player player) {
-        //? if >=1.17
         return player.getInventory();
-        //? if <1.17
-        /*return player.inventory;*/
     }
 
     public static Abilities playerAbilities(Player player) {
-        //? if >=1.17
         return player.getAbilities();
-        //? if <1.17
-        /*return player.abilities;*/
     }
 
     public static void updateAbilities(Player player) {
@@ -89,18 +83,10 @@ public final class PlayerCompat {
     }
 
     public static int selectedSlot(Inventory inventory) {
-        //? if >=1.21.5
-        //return inventory.getSelectedSlot();
-        //? if <1.21.5
         return inventory.selected;
     }
 
     public static void setSelectedSlot(Inventory inventory, int slot) {
-        //? if >=1.21.5
-        //inventory.setSelectedSlot(slot);
-        //? if <1.21.5 && >=1.21.2
-        /*inventory.setSelectedHotbarSlot(slot);*/
-        //? if <1.21.2
         inventory.selected = slot;
     }
 

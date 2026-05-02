@@ -2,7 +2,6 @@ package com.iamkaf.amber.util.compat;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
@@ -14,14 +13,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-//? if >=1.16.2
 import net.minecraft.world.level.ServerLevelAccessor;
-//? if <1.16.2
-/*import net.minecraft.world.level.LevelAccessor;*/
-//? if <1.16
-/*import net.minecraft.world.level.dimension.DimensionType;*/
 import net.minecraft.world.level.biome.Biome;
-//? if >=1.16
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -75,10 +68,7 @@ public final class WorldCompat {
     }
 
     public static Vec3 playerEyePosition(Player player) {
-        //? if >=1.17
         return player.getEyePosition();
-        //? if <1.17
-        /*return player.getEyePosition(1.0F);*/
     }
 
     public static Vec3 playerViewVector(Player player, float partialTick) {
@@ -95,62 +85,40 @@ public final class WorldCompat {
             double x,
             double y,
             double z,
-            //? if >=1.18.2
             Holder<SoundEvent> sound,
-            //? if <1.18.2
-            /*SoundEvent sound,*/
             SoundSource source,
             float volume,
             float pitch
     ) {
-        //? if >=1.18.2
         level.playSound(player, x, y, z, sound.value(), source, volume, pitch);
-        //? if <1.18.2
-        /*level.playSound(player, x, y, z, sound, source, volume, pitch);*/
     }
 
     public static DifficultyInstance currentDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             BlockPos position) {
         return level.getCurrentDifficultyAt(position);
     }
 
     public static boolean isDifficultyHard(DifficultyInstance difficulty) {
-        //? if >=1.17
         return difficulty.isHard();
-        //? if <1.17
-        /*return difficulty.getDifficulty() == Difficulty.HARD;*/
     }
 
     public static Biome.Precipitation precipitation(Biome biome) {
-        //? if >=1.21
         return biome.hasPrecipitation() ? Biome.Precipitation.RAIN : Biome.Precipitation.NONE;
-        //? if <1.21
 
-        /*return biome.getPrecipitation();
-*/        /**/
     }
 
     public static List<Player> players(Level level) {
         return new ArrayList<>(level.players());
     }
 
-//? if >=1.18.2 {
     public static <T> T holderValue(Holder<T> holder) {
         return holder.value();
     }
-//?}
 
     public static String dimensionPath(Level level) {
-        //? if >=1.16 {
         ResourceKey<?> key = level.dimension();
-        return key.location().getPath();
-        //?} else {
-        /*return DimensionType.getName(level.dimension.getType()).getPath();*/
-        //?}
+        return key.identifier().getPath();
     }
 
     public static int seaLevel(Level level) {
@@ -162,19 +130,10 @@ public final class WorldCompat {
     }
 
     public static <T extends Entity> List<T> typedEntities(Level level, EntityType<T> type, AABB bounds, java.util.function.Predicate<Entity> predicate) {
-        //? if >=1.17
         return level.getEntities(type, bounds, predicate);
-        //? if <1.17 {
-        /*@SuppressWarnings("unchecked")
-        List<T> result = (List<T>) (List<?>) level.getEntities(type, bounds, predicate);
-        return result;*/
-        //?}
     }
 
-    //? if >=1.18.2
     public static Holder<Biome> biome(Level level, BlockPos position) {
-    //? if <1.18.2
-    /*public static Biome biome(Level level, BlockPos position) {*/
         return level.getBiome(position);
     }
 
@@ -203,10 +162,7 @@ public final class WorldCompat {
     }
 
     public static Vec3i directionNormal(Direction direction) {
-        //? if >=1.21.2
         return direction.getUnitVec3i();
-        //? if <1.21.2
-        /*return direction.getNormal();*/
     }
 
     public static Direction directionOpposite(Direction direction) {

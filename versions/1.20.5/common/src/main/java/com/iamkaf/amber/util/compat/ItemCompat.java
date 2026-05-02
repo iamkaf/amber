@@ -1,16 +1,12 @@
 package com.iamkaf.amber.util.compat;
 
 import com.google.common.collect.Multimap;
-//? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-//? if >=1.16
 import net.minecraft.world.entity.ai.attributes.Attributes;
-//? if <1.16
-/*import net.minecraft.world.entity.monster.SharedMonsterAttributes;*/
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -132,10 +128,7 @@ public final class ItemCompat {
 
     public static Attribute attackDamageAttribute() {
         try {
-            //? if >=1.16
             return (Attribute) Attributes.class.getField("ATTACK_DAMAGE").get(null);
-            //? if <1.16
-            /*return (Attribute) SharedMonsterAttributes.class.getField("ATTACK_DAMAGE").get(null);*/
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve attack damage attribute", exception);
         }
@@ -203,7 +196,6 @@ public final class ItemCompat {
         }
     }
 
-    //? if >=1.18.2 {
     public static Attribute holderValue(Holder<Attribute> holder) {
         try {
             return (Attribute) holder.getClass().getMethod("value").invoke(holder);
@@ -211,7 +203,6 @@ public final class ItemCompat {
             throw new IllegalStateException("Unable to resolve held attribute", exception);
         }
     }
-    //?}
 
     public static void addStackAttributeModifier(ItemStack stack, Attribute attribute,
             AttributeModifier modifier, EquipmentSlot slot) {
