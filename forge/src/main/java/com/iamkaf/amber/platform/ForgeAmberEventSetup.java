@@ -4,10 +4,15 @@ import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
+import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponentMap;
 //? if >=1.20.5
@@ -17,6 +22,7 @@ import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.state.BlockState;
 //? if >=1.20
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 //? if >=1.19.3 && <1.20
@@ -47,6 +53,10 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+//? if <1.19
+/*import net.minecraftforge.client.event.InputEvent;*/
+//? if <1.19
+/*import net.minecraftforge.client.event.DrawSelectionEvent;*/
 //? if >=1.18.1
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 //? if >=1.19 && <1.20.5
@@ -165,6 +175,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onShieldBlock);*/
         //?}
+        //? if <1.19
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onItemCrafted);*/
 
         // Creative mode tab events (register with high priority)
         //? if >=1.21.10
@@ -213,6 +225,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onRenderGuiPost);*/
         //? if <1.19
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onRenderGameOverlayPost);*/
+        //? if <1.19
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onMouseScroll);*/
+        //? if <1.19
+        /*MinecraftForge.EVENT_BUS.addListener(EventHandlerClient::onBlockOutlineRender);*/
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
@@ -572,6 +588,14 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             }
         }
 
+        //? if <1.19 {
+        /*public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
+            if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                PlayerEvents.CRAFT_ITEM.invoker().onCraftItem(serverPlayer, java.util.List.of(event.getCrafting()));
+            }
+        }
+        *///?}
+
         //? if >=1.18.1 {
         public static void onShieldBlock(ShieldBlockEvent event) {
             if (event.getEntity() instanceof net.minecraft.world.entity.player.Player player) {
@@ -807,13 +831,13 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
                 //? if >=1.19
                 RegisterKeyMappingsEvent event
         ) {
-            for (var keyMapping : KeybindHelper.getKeybindings()) {
+            KeybindHelper.forgeEventAlreadyFired = true;
+            for (var keyMapping : new ArrayList<>(KeybindHelper.getKeybindings())) {
                 //? if >=1.19
                 event.register(keyMapping);
                 //? if <1.19
                 /*ClientRegistry.registerKeyBinding(keyMapping);*/
             }
-            KeybindHelper.forgeEventAlreadyFired = true;
         }
 
         //? if >=1.20.4
@@ -829,6 +853,37 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         /*public static void onClientTickEventPost(TickEvent.ClientTickEvent event) { if (event.phase != TickEvent.Phase.END) return;*/
             ClientTickEvents.END_CLIENT_TICK.invoker().onEndTick();
         }
+
+        //? if <1.19 {
+        /*public static void onMouseScroll(InputEvent.MouseScrollEvent event) {
+            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker()
+                    .onMouseScrollPre(event.getMouseX(), event.getMouseY(), 0.0, event.getScrollDelta());
+            if (result != InteractionResult.PASS) {
+                event.setCanceled(true);
+                return;
+            }
+            InputEvents.MOUSE_SCROLL_POST.invoker()
+                    .onMouseScrollPost(event.getMouseX(), event.getMouseY(), 0.0, event.getScrollDelta());
+        }
+        *///?}
+
+        //? if <1.19 {
+        /*public static void onBlockOutlineRender(DrawSelectionEvent.HighlightBlock event) {
+            BlockPos pos = event.getTarget().getBlockPos();
+            BlockState state = Minecraft.getInstance().level.getBlockState(pos);
+            InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+                    event.getInfo(),
+                    event.getBuffers(),
+                    event.getMatrix(),
+                    event.getTarget(),
+                    pos,
+                    state
+            );
+            if (result != InteractionResult.PASS) {
+                event.setCanceled(true);
+            }
+        }
+        *///?}
     }
 
     static public class EventHandlerServer {

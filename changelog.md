@@ -57,6 +57,10 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Forge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
 - Fixed Forge `ItemEvents.MODIFY_DEFAULT_COMPONENTS` missing late consumer registrations after default item component caches were initialized
 - Fixed Forge 1.19.3 custom creative tab content bridging against the current 44.1.x `CreativeModeTabEvent.BuildContents` API
+- Fixed legacy Forge keybind registration racing late consumer registrations after Forge's key mapping event had already fired
+- Fixed Forge 1.17.1 `InputEvents.MOUSE_SCROLL_PRE` and `InputEvents.MOUSE_SCROLL_POST` by bridging the native legacy mouse scroll event
+- Fixed Forge 1.17.1 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the native legacy block selection render event
+- Fixed Forge 1.17.1 ordinary `PlayerEvents.CRAFT_ITEM` callbacks by bridging Forge's native item-crafted event
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 
 ## 10.0.2

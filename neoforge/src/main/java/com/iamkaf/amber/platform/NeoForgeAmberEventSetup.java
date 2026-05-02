@@ -45,6 +45,8 @@ import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
+import java.util.ArrayList;
+
 import static net.minecraft.world.InteractionResult.CONSUME;
 import static net.minecraft.world.InteractionResult.SUCCESS;
 
@@ -375,10 +377,10 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
     static public class EventHandlerClientMod {
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onKeyMappingRegistration(RegisterKeyMappingsEvent event) {
-            for (var keyMapping : KeybindHelper.getKeybindings()) {
+            KeybindHelper.forgeEventAlreadyFired = true;
+            for (var keyMapping : new ArrayList<>(KeybindHelper.getKeybindings())) {
                 event.register(keyMapping);
             }
-            KeybindHelper.forgeEventAlreadyFired = true;
         }
     }
 
