@@ -124,7 +124,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
 
     @SuppressWarnings("unchecked")
     private static <T> ResourceKey<T> entryKey(ResourceKey<? extends Registry<T>> registryKey, Identifier id) {
-        return ResourceKey.create(registryKey, id);
+        return ResourceKey.create((ResourceKey<Registry<T>>) registryKey, id);
     }
 
     /**
