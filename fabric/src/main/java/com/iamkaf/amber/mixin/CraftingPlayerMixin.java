@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ResultSlot.class)
 public abstract class CraftingPlayerMixin {
@@ -40,7 +41,12 @@ public abstract class CraftingPlayerMixin {
     @Inject(method = "onTake", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/inventory/ResultSlot;checkTakeAchievements(Lnet/minecraft/world/item/ItemStack;)V",
             shift = At.Shift.AFTER))
-    private void amber$onResultTaken(Player player, ItemStack carried, CallbackInfo ci) {
+    private void amber$onResultTaken(Player player, ItemStack carried,
+            //? if >=1.17
+            CallbackInfo ci
+            //? if <1.17
+            /*CallbackInfoReturnable<ItemStack> cir*/
+    ) {
         if (amber$removeCountBeforeCheck <= 0) {
             amber$fireCraftEvent(carried);
         }

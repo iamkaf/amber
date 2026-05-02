@@ -161,10 +161,10 @@ public class LevelRendererMixin {
         }
     }
 
-    private static MultiBufferSource.BufferSource bufferSource(Minecraft minecraft) {
+    private static MultiBufferSource bufferSource(Minecraft minecraft) {
         try {
             Object renderBuffers = minecraft.getClass().getMethod("renderBuffers").invoke(minecraft);
-            return (MultiBufferSource.BufferSource) renderBuffers.getClass().getMethod("bufferSource").invoke(renderBuffers);
+            return (MultiBufferSource) renderBuffers.getClass().getMethod("bufferSource").invoke(renderBuffers);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve render buffer source", exception);
         }

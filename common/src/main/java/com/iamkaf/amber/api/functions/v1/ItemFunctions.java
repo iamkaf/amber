@@ -4,8 +4,6 @@ import com.google.common.collect.Multimap;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 //? if >=1.20.5
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
@@ -421,7 +419,6 @@ public final class ItemFunctions {
     public static boolean containsEnchantment(ItemStack stack, Identifier enchantment) {
         //? if <1.20.5 {
         return stackEnchantmentTags(stack).stream()
-                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
                 .anyMatch(tag -> enchantment.toString().equals(tagString(tag, "id")));
         //?} else {
         ItemEnchantments enchantments = stack.getEnchantments();
@@ -509,7 +506,6 @@ public final class ItemFunctions {
     public static int getEnchantmentLevel(ItemStack stack, Identifier enchantment) {
         //? if <1.20.5 {
         return stackEnchantmentTags(stack).stream()
-                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
                 .filter(tag -> enchantment.toString().equals(tagString(tag, "id")))
                 .mapToInt(tag -> tagInt(tag, "lvl"))
                 .findFirst()
@@ -803,9 +799,9 @@ public final class ItemFunctions {
         }
     }
 
-    private static ListTag stackEnchantmentTags(ItemStack stack) {
+    private static List<?> stackEnchantmentTags(ItemStack stack) {
         try {
-            return (ListTag) stack.getClass().getMethod("getEnchantmentTags").invoke(stack);
+            return (List<?>) stack.getClass().getMethod("getEnchantmentTags").invoke(stack);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve item stack enchantment tags", exception);
         }
@@ -819,7 +815,7 @@ public final class ItemFunctions {
         }
     }
 
-    private static String tagString(CompoundTag tag, String key) {
+    private static String tagString(Object tag, String key) {
         try {
             Object value = tag.getClass().getMethod("getString", String.class).invoke(tag, key);
             return value instanceof String text ? text : "";
@@ -828,7 +824,7 @@ public final class ItemFunctions {
         }
     }
 
-    private static int tagInt(CompoundTag tag, String key) {
+    private static int tagInt(Object tag, String key) {
         try {
             Object value = tag.getClass().getMethod("getInt", String.class).invoke(tag, key);
             return value instanceof Integer number ? number : 0;
@@ -869,9 +865,9 @@ public final class ItemFunctions {
         }
     }
 
-    private static CompoundTag modifierTag(AttributeModifier modifier) {
+    private static Object modifierTag(AttributeModifier modifier) {
         try {
-            return (CompoundTag) modifier.getClass().getMethod("save").invoke(modifier);
+            return modifier.getClass().getMethod("save").invoke(modifier);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to serialize attribute modifier", exception);
         }

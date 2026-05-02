@@ -12,6 +12,7 @@ tasks.named('stageMergedJavaSources').configure {
 }
 
 dependencies {
+    compileOnly 'org.apache.logging.log4j:log4j-api:2.17.1'
     compileOnly 'org.slf4j:slf4j-api:1.7.36'
     compileOnly library(libs, 'mixin')
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common

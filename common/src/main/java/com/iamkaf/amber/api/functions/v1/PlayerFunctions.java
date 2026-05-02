@@ -5,7 +5,6 @@ import net.minecraft.core.GlobalPos;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
 //? if >=1.17 {
@@ -899,7 +898,11 @@ public final class PlayerFunctions {
 
     private static Inventory playerInventory(Player player) {
         try {
-            return (Inventory) player.getClass().getMethod("getInventory").invoke(player);
+            try {
+                return (Inventory) player.getClass().getMethod("getInventory").invoke(player);
+            } catch (NoSuchMethodException ignored) {
+                return (Inventory) player.getClass().getField("inventory").get(player);
+            }
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve player inventory", exception);
         }
@@ -907,7 +910,11 @@ public final class PlayerFunctions {
 
     private static Abilities playerAbilities(Player player) {
         try {
-            return (Abilities) player.getClass().getMethod("getAbilities").invoke(player);
+            try {
+                return (Abilities) player.getClass().getMethod("getAbilities").invoke(player);
+            } catch (NoSuchMethodException ignored) {
+                return (Abilities) player.getClass().getField("abilities").get(player);
+            }
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to resolve player abilities", exception);
         }
@@ -954,10 +961,16 @@ public final class PlayerFunctions {
         }
     }
 
-    private static void sendPacket(ServerPlayer player, Packet<?> packet) {
+    private static void sendPacket(ServerPlayer player, Object packet) {
         try {
             Object connection = player.getClass().getField("connection").get(player);
-            connection.getClass().getMethod("send", Packet.class).invoke(connection, packet);
+            for (java.lang.reflect.Method method : connection.getClass().getMethods()) {
+                if (method.getName().equals("send") && method.getParameterCount() == 1) {
+                    method.invoke(connection, packet);
+                    return;
+                }
+            }
+            throw new NoSuchMethodException("send");
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Unable to send packet to player", exception);
         }
