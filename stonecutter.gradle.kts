@@ -7,6 +7,10 @@ plugins {
 
 stonecutter active "26.1.2"
 
+stonecutter handlers {
+    inherit("json5", "json")
+}
+
 stonecutter parameters {
     replacements.string(eval(current.version, ">=1.21.11")) {
         replace("ResourceLocation", "Identifier")

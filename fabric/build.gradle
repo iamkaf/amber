@@ -78,18 +78,9 @@ tasks.withType(ProcessResources).configureEach {
         if (minecraftVersionAtLeast('1.16.2')) {
             filter { line -> line.contains('"PlayerListRespawnMixin",') ? '' : line }
         }
-        if (minecraftVersion != '1.16' && minecraftVersion != '1.16.1') {
-            filter { line -> line.contains('"LegacySmithingMenuMixin",') ? '' : line }
-        }
         if (!minecraftVersionAtLeast('1.20.5')) {
             filter { line -> line.contains('"BuiltInRegistriesMixin",') ? '' : line }
             filter { line -> line.contains('"ItemAccessor",') ? '' : line }
-        }
-        if (minecraftVersion == '1.14.4') {
-            filter { line -> line.contains('"LevelRendererMixin",') ? '' : line }
-        } else {
-            filter { line -> line.contains('"LegacyLevelRendererMixin",') ? '' : line }
-            filter { line -> line.contains('"GuiMixin",') ? '' : line }
         }
     }
 

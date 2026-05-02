@@ -66,10 +66,11 @@ public class FabricRegistrarManager implements IRegistrarManager {
             /*return Optional.empty();*/
         }
         //?}
-        //? if <1.18.2
+        //? if <1.18.2 {
         /*public Optional<T> get(Identifier id) {
             return Optional.ofNullable(registry().get(id));
-        }*/
+        }
+        *///?}
     }
 
     private static class FabricRegistrySupplier<R> implements RegistrySupplier<R> {

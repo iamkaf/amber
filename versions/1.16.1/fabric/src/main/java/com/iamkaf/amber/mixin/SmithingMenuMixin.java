@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(targets = "net.minecraft.world.inventory.SmithingMenu")
-public abstract class LegacySmithingMenuMixin {
+public abstract class SmithingMenuMixin {
     @Inject(method = "onTake", at = @At("RETURN"))
     private void amber$onSmithingTake(Player player, ItemStack craftedItem, CallbackInfoReturnable<ItemStack> cir) {
         if (!craftedItem.isEmpty() && player instanceof ServerPlayer serverPlayer) {
@@ -20,6 +20,6 @@ public abstract class LegacySmithingMenuMixin {
     }
 
     static {
-        AmberMod.AMBER_MIXINS.add("LegacySmithingMenuMixin");
+        AmberMod.AMBER_MIXINS.add("SmithingMenuMixin");
     }
 }

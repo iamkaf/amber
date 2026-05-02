@@ -13,17 +13,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerList.class)
 public abstract class PlayerListRespawnMixin {
-    //? if >=1.16
+    //? if >=1.16 {
     @Inject(method = "respawn", at = @At("RETURN"))
     private void onPlayerRespawn(ServerPlayer oldPlayer, boolean alive, CallbackInfoReturnable<ServerPlayer> cir) {
         PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(oldPlayer, cir.getReturnValue(), alive);
     }
+    //?}
 
-    //? if <1.16
+    //? if <1.16 {
     /*@Inject(method = "respawn", at = @At("RETURN"))
     private void onPlayerRespawn(ServerPlayer oldPlayer, DimensionType dimension, boolean alive, CallbackInfoReturnable<ServerPlayer> cir) {
         PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(oldPlayer, cir.getReturnValue(), alive);
-    }*/
+    }
+    *///?}
 
     static {
         AmberMod.AMBER_MIXINS.add("PlayerListRespawnMixin");

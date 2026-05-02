@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.functions.v1;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.iamkaf.amber.util.compat.WorldCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 //? if >=1.18.2
@@ -32,8 +33,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.Difficulty;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -185,7 +184,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound*/
     ) {
-        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), soundEvent(sound), SoundSource.BLOCKS, 1.0f, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     /**
@@ -202,7 +201,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source) {
-        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), soundEvent(sound), source, 1.0f, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, 1.0f, 1.0f);
     }
 
     /**
@@ -220,7 +219,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume) {
-        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), soundEvent(sound), source, volume, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, volume, 1.0f);
     }
 
     /**
@@ -239,7 +238,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume, float pitch) {
-        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), soundEvent(sound), source, volume, pitch);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, volume, pitch);
     }
 
     /**
@@ -256,7 +255,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source) {
-        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, soundEvent(sound), source, 1.0f, 1.0f);
+        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, sound, source, 1.0f, 1.0f);
     }
 
     /**
@@ -275,19 +274,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume, float pitch) {
-        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, soundEvent(sound), source, volume, pitch);
-    }
-
-    private static SoundEvent soundEvent(
-            //? if >=1.18.2
-            Holder<SoundEvent> sound
-            //? if <1.18.2
-            /*SoundEvent sound*/
-    ) {
-        //? if >=1.18.2
-        return holderValue(sound);
-        //? if <1.18.2
-        /*return sound;*/
+        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, sound, source, volume, pitch);
     }
 
     // ==================== DIMENSION UTILITIES ====================
@@ -837,63 +824,31 @@ public final class WorldFunctions {
     }
 
     private static long gameTime(Level level) {
-        try {
-            Object value = level.getClass().getMethod("getGameTime").invoke(level);
-            return value instanceof Long time ? time : 0L;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level game time", exception);
-        }
+        return WorldCompat.gameTime(level);
     }
 
     private static double vecX(Vec3 vector) {
-        try {
-            return ((Number) vector.getClass().getField("x").get(vector)).doubleValue();
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve vector x", exception);
-        }
+        return WorldCompat.vecX(vector);
     }
 
     private static int blockX(BlockPos position) {
-        try {
-            Object value = position.getClass().getMethod("getX").invoke(position);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve block x", exception);
-        }
+        return WorldCompat.blockX(position);
     }
 
     private static int blockY(BlockPos position) {
-        try {
-            Object value = position.getClass().getMethod("getY").invoke(position);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve block y", exception);
-        }
+        return WorldCompat.blockY(position);
     }
 
     private static int blockZ(BlockPos position) {
-        try {
-            Object value = position.getClass().getMethod("getZ").invoke(position);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve block z", exception);
-        }
+        return WorldCompat.blockZ(position);
     }
 
     private static double vecY(Vec3 vector) {
-        try {
-            return ((Number) vector.getClass().getField("y").get(vector)).doubleValue();
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve vector y", exception);
-        }
+        return WorldCompat.vecY(vector);
     }
 
     private static double vecZ(Vec3 vector) {
-        try {
-            return ((Number) vector.getClass().getField("z").get(vector)).doubleValue();
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve vector z", exception);
-        }
+        return WorldCompat.vecZ(vector);
     }
 
     private static Vec3 blockCenter(BlockPos position) {
@@ -909,181 +864,86 @@ public final class WorldFunctions {
     }
 
     private static Vec3 entityPosition(Entity entity) {
-        try {
-            return (Vec3) entity.getClass().getMethod("position").invoke(entity);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve entity position", exception);
-        }
+        return WorldCompat.entityPosition(entity);
     }
 
     private static long dayTime(Level level) {
-        try {
-            Object value = level.getClass().getMethod("getDayTime").invoke(level);
-            return value instanceof Long time ? time : 0L;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level day time", exception);
-        }
+        return WorldCompat.dayTime(level);
     }
 
     private static void addFreshEntity(Level level, Entity entity) {
-        try {
-            level.getClass().getMethod("addFreshEntity", Entity.class).invoke(level, entity);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to add entity to level", exception);
-        }
+        WorldCompat.addFreshEntity(level, entity);
     }
 
     private static Vec3 playerEyePosition(Player player) {
-        try {
-            return (Vec3) player.getClass().getMethod("getEyePosition").invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player eye position", exception);
-        }
+        return WorldCompat.playerEyePosition(player);
     }
 
     private static Vec3 playerViewVector(Player player, float partialTick) {
-        try {
-            return (Vec3) player.getClass().getMethod("getViewVector", float.class).invoke(player, partialTick);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player view vector", exception);
-        }
+        return WorldCompat.playerViewVector(player, partialTick);
     }
 
     private static BlockHitResult clip(Level level, ClipContext context) {
-        try {
-            return (BlockHitResult) level.getClass().getMethod("clip", ClipContext.class).invoke(level, context);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to raytrace level", exception);
-        }
+        return WorldCompat.clip(level, context);
     }
 
-    private static void playLevelSound(Level level, Player player, double x, double y, double z, SoundEvent sound,
+    private static void playLevelSound(Level level, Player player, double x, double y, double z,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
                                        SoundSource source, float volume, float pitch) {
-        try {
-            level.getClass()
-                    .getMethod("playSound", Player.class, double.class, double.class, double.class, SoundEvent.class, SoundSource.class, float.class, float.class)
-                    .invoke(level, player, x, y, z, sound, source, volume, pitch);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to play level sound", exception);
-        }
+        WorldCompat.playLevelSound(level, player, x, y, z, sound, source, volume, pitch);
     }
 
-    private static DifficultyInstance currentDifficulty(Object level, BlockPos position) {
-        try {
-            return (DifficultyInstance) level.getClass().getMethod("getCurrentDifficultyAt", BlockPos.class).invoke(level, position);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve current difficulty", exception);
-        }
+    private static DifficultyInstance currentDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            BlockPos position) {
+        return WorldCompat.currentDifficulty(level, position);
     }
 
     private static boolean isDifficultyHard(DifficultyInstance difficulty) {
-        try {
-            Object value = difficulty.getClass().getMethod("isHard").invoke(difficulty);
-            return value instanceof Boolean hard && hard;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve difficulty hardness", exception);
-        }
+        return WorldCompat.isDifficultyHard(difficulty);
     }
 
     private static Biome.Precipitation precipitation(Biome biome) {
-        try {
-            return (Biome.Precipitation) biome.getClass().getMethod("getPrecipitation").invoke(biome);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve biome precipitation", exception);
-        }
+        return WorldCompat.precipitation(biome);
     }
 
-    @SuppressWarnings("unchecked")
-    private static List<Player> players(Object level) {
-        try {
-            return new ArrayList<>((List<Player>) level.getClass().getMethod("players").invoke(level));
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level players", exception);
-        }
+    private static List<Player> players(Level level) {
+        return WorldCompat.players(level);
     }
 
     //? if >=1.18.2 {
     private static <T> T holderValue(Holder<T> holder) {
-        try {
-            @SuppressWarnings("unchecked")
-            T value = (T) holder.getClass().getMethod("value").invoke(holder);
-            return value;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve holder value", exception);
-        }
+        return WorldCompat.holderValue(holder);
     }
     //?}
 
     private static String dimensionPath(Level level) {
-        try {
-            ResourceKey<?> key = (ResourceKey<?>) level.getClass().getMethod("dimension").invoke(level);
-            ResourceLocation location = (ResourceLocation) key.getClass().getMethod("location").invoke(key);
-            return resourcePath(location);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level dimension", exception);
-        }
+        return WorldCompat.dimensionPath(level);
     }
 
     private static int seaLevel(Level level) {
-        try {
-            Object value = level.getClass().getMethod("getSeaLevel").invoke(level);
-            return value instanceof Integer number ? number : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level sea level", exception);
-        }
-    }
-
-    private static String resourcePath(ResourceLocation location) {
-        try {
-            Object value = location.getClass().getMethod("getPath").invoke(location);
-            return value instanceof String path ? path : "";
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve resource path", exception);
-        }
+        return WorldCompat.seaLevel(level);
     }
 
     private static List<Entity> entities(Level level, Entity except, AABB bounds, java.util.function.Predicate<Entity> predicate) {
-        try {
-            @SuppressWarnings("unchecked")
-            List<Entity> result = (List<Entity>) level.getClass().getMethod("getEntities", Entity.class, AABB.class, java.util.function.Predicate.class)
-                    .invoke(level, except, bounds, predicate);
-            return result;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve level entities", exception);
-        }
+        return WorldCompat.entities(level, except, bounds, predicate);
     }
 
     private static <T extends Entity> List<T> typedEntities(Level level, EntityType<T> type, AABB bounds, java.util.function.Predicate<Entity> predicate) {
-        try {
-            @SuppressWarnings("unchecked")
-            //? if >=1.17 {
-            List<T> result = (List<T>) level.getClass().getMethod("getEntities", EntityTypeTest.class, AABB.class, java.util.function.Predicate.class)
-                    .invoke(level, type, bounds, predicate);
-            //?} else {
-            /*List<T> result = (List<T>) level.getClass().getMethod("getEntities", EntityType.class, AABB.class, java.util.function.Predicate.class)
-                    .invoke(level, type, bounds, predicate);
-            *///?}
-            return result;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve typed level entities", exception);
-        }
+        return WorldCompat.typedEntities(level, type, bounds, predicate);
     }
 
     //? if >=1.18.2
     private static Holder<Biome> biome(Level level, BlockPos position) {
     //? if <1.18.2
     /*private static Biome biome(Level level, BlockPos position) {*/
-        try {
-            //? if >=1.18.2 {
-            @SuppressWarnings("unchecked")
-            Holder<Biome> result = (Holder<Biome>) level.getClass().getMethod("getBiome", BlockPos.class).invoke(level, position);
-            return result;
-            //?} else {
-            /*return (Biome) level.getClass().getMethod("getBiome", BlockPos.class).invoke(level, position);
-            *///?}
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve biome at " + position, exception);
-        }
+        return WorldCompat.biome(level, position);
     }
 
     private static Vec3 aabbCenter(AABB box) {
@@ -1138,12 +998,7 @@ public final class WorldFunctions {
     }
 
     private static double aabbCoordinate(AABB box, String fieldName) {
-        try {
-            Object value = box.getClass().getField(fieldName).get(box);
-            return value instanceof Number number ? number.doubleValue() : 0.0D;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve AABB " + fieldName, exception);
-        }
+        return WorldCompat.aabbCoordinate(box, fieldName);
     }
 
     private static String vectorKey(Vec3 vector) {
@@ -1164,68 +1019,31 @@ public final class WorldFunctions {
     }
 
     private static int vec3iX(Object vector) {
-        try {
-            Object value = vector.getClass().getMethod("getX").invoke(vector);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve Vec3i x", exception);
-        }
+        return WorldCompat.vec3iX(vector);
     }
 
     private static int vec3iY(Object vector) {
-        try {
-            Object value = vector.getClass().getMethod("getY").invoke(vector);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve Vec3i y", exception);
-        }
+        return WorldCompat.vec3iY(vector);
     }
 
     private static int vec3iZ(Object vector) {
-        try {
-            Object value = vector.getClass().getMethod("getZ").invoke(vector);
-            return value instanceof Integer coordinate ? coordinate : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve Vec3i z", exception);
-        }
+        return WorldCompat.vec3iZ(vector);
     }
 
     private static Object directionNormal(Direction direction) {
-        try {
-            Object normal;
-            try {
-                normal = direction.getClass().getMethod("getUnitVec3i").invoke(direction);
-            } catch (NoSuchMethodException exception) {
-                normal = direction.getClass().getMethod("getNormal").invoke(direction);
-            }
-            return normal;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve direction normal", exception);
-        }
+        return WorldCompat.directionNormal(direction);
     }
 
     private static Direction directionOpposite(Direction direction) {
-        try {
-            return (Direction) direction.getClass().getMethod("getOpposite").invoke(direction);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve opposite direction", exception);
-        }
+        return WorldCompat.directionOpposite(direction);
     }
 
     private static Object directionAxis(Direction direction) {
-        try {
-            return direction.getClass().getMethod("getAxis").invoke(direction);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve direction axis", exception);
-        }
+        return WorldCompat.directionAxis(direction);
     }
 
     private static Object directionAxisDirection(Direction direction) {
-        try {
-            return direction.getClass().getMethod("getAxisDirection").invoke(direction);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve direction axis direction", exception);
-        }
+        return WorldCompat.directionAxisDirection(direction);
     }
 
     // ==================== INTERNAL BOUNDING BOX MERGER CLASS ====================
