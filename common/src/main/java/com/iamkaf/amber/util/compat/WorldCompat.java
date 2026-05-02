@@ -126,7 +126,12 @@ public final class WorldCompat {
     }
 
     public static Biome.Precipitation precipitation(Biome biome) {
+        //? if >=1.21
+        return biome.hasPrecipitation() ? Biome.Precipitation.RAIN : Biome.Precipitation.NONE;
+        //? if <1.21
+        /*
         return biome.getPrecipitation();
+        */
     }
 
     public static List<Player> players(Level level) {

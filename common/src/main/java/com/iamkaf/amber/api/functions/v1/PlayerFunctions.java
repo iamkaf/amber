@@ -898,60 +898,27 @@ public final class PlayerFunctions {
     }
 
     private static Inventory playerInventory(Player player) {
-        try {
-            try {
-                return (Inventory) player.getClass().getMethod("getInventory").invoke(player);
-            } catch (NoSuchMethodException ignored) {
-                return (Inventory) player.getClass().getField("inventory").get(player);
-            }
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player inventory", exception);
-        }
+        return PlayerCompat.playerInventory(player);
     }
 
     private static Abilities playerAbilities(Player player) {
-        try {
-            try {
-                return (Abilities) player.getClass().getMethod("getAbilities").invoke(player);
-            } catch (NoSuchMethodException ignored) {
-                return (Abilities) player.getClass().getField("abilities").get(player);
-            }
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player abilities", exception);
-        }
+        return PlayerCompat.playerAbilities(player);
     }
 
     private static void updateAbilities(Player player) {
-        try {
-            player.getClass().getMethod("onUpdateAbilities").invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to update player abilities", exception);
-        }
+        PlayerCompat.updateAbilities(player);
     }
 
     private static GameType serverPlayerGameMode(ServerPlayer player) {
-        try {
-            Object gameMode = player.getClass().getField("gameMode").get(player);
-            return (GameType) gameMode.getClass().getMethod("getGameModeForPlayer").invoke(gameMode);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve server player game mode", exception);
-        }
+        return PlayerCompat.serverPlayerGameMode(player);
     }
 
     private static FoodData playerFoodData(Player player) {
-        try {
-            return (FoodData) player.getClass().getMethod("getFoodData").invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player food data", exception);
-        }
+        return PlayerCompat.playerFoodData(player);
     }
 
     private static PlayerEnderChestContainer playerEnderChest(Player player) {
-        try {
-            return (PlayerEnderChestContainer) player.getClass().getMethod("getEnderChestInventory").invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player ender chest", exception);
-        }
+        return PlayerCompat.playerEnderChest(player);
     }
 
     private static void displayClientMessage(Player player, Component message, boolean actionBar) {
@@ -959,18 +926,7 @@ public final class PlayerFunctions {
     }
 
     private static void sendPacket(ServerPlayer player, Object packet) {
-        try {
-            Object connection = player.getClass().getField("connection").get(player);
-            for (java.lang.reflect.Method method : connection.getClass().getMethods()) {
-                if (method.getName().equals("send") && method.getParameterCount() == 1) {
-                    method.invoke(connection, packet);
-                    return;
-                }
-            }
-            throw new NoSuchMethodException("send");
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to send packet to player", exception);
-        }
+        PlayerCompat.sendPacket(player, packet);
     }
 
     private static GameType gameType(String name) {
@@ -986,194 +942,94 @@ public final class PlayerFunctions {
     }
 
     private static ItemStack playerItemBySlot(Player player, EquipmentSlot slot) {
-        try {
-            return (ItemStack) player.getClass().getMethod("getItemBySlot", EquipmentSlot.class).invoke(player, slot);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve player item in slot " + slot, exception);
-        }
+        return PlayerCompat.playerItemBySlot(player, slot);
     }
 
     private static ItemStack inventoryItem(Inventory inventory, int slot) {
-        try {
-            return (ItemStack) inventory.getClass().getMethod("getItem", int.class).invoke(inventory, slot);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve inventory item at slot " + slot, exception);
-        }
+        return PlayerCompat.inventoryItem(inventory, slot);
     }
 
     private static ItemStack playerItemStack(Player player, String method) {
-        try {
-            return (ItemStack) player.getClass().getMethod(method).invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player item method " + method, exception);
-        }
+        return PlayerCompat.playerItemStack(player, method);
     }
 
     private static ItemStack emptyStack() {
-        try {
-            return (ItemStack) ItemStack.class.getField("EMPTY").get(null);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve empty item stack", exception);
-        }
+        return PlayerCompat.emptyStack();
     }
 
     private static void inventorySetItem(Inventory inventory, int slot, ItemStack stack) {
-        try {
-            inventory.getClass().getMethod("setItem", int.class, ItemStack.class).invoke(inventory, slot, stack);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to set inventory item at slot " + slot, exception);
-        }
+        PlayerCompat.inventorySetItem(inventory, slot, stack);
     }
 
     private static ItemStack containerItem(Container container, int slot) {
-        try {
-            return (ItemStack) container.getClass().getMethod("getItem", int.class).invoke(container, slot);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve container item at slot " + slot, exception);
-        }
+        return PlayerCompat.containerItem(container, slot);
     }
 
     private static void containerSetItem(Container container, int slot, ItemStack stack) {
-        try {
-            container.getClass().getMethod("setItem", int.class, ItemStack.class).invoke(container, slot, stack);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to set container item at slot " + slot, exception);
-        }
+        PlayerCompat.containerSetItem(container, slot, stack);
     }
 
     private static int selectedSlot(Inventory inventory) {
-        try {
-            Object value = inventory.getClass().getField("selected").get(inventory);
-            return value instanceof Integer slot ? slot : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve selected hotbar slot", exception);
-        }
+        return PlayerCompat.selectedSlot(inventory);
     }
 
     private static void setSelectedSlot(Inventory inventory, int slot) {
-        try {
-            inventory.getClass().getField("selected").set(inventory, slot);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to set selected hotbar slot", exception);
-        }
+        PlayerCompat.setSelectedSlot(inventory, slot);
     }
 
     private static int intField(Object target, String name) {
-        try {
-            Object value = target.getClass().getField(name).get(target);
-            return value instanceof Integer number ? number : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve int field " + name, exception);
-        }
+        return PlayerCompat.intField(target, name);
     }
 
     private static void setIntField(Object target, String name, int value) {
-        try {
-            target.getClass().getField(name).set(target, value);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to set int field " + name, exception);
-        }
+        PlayerCompat.setIntField(target, name, value);
     }
 
     private static float floatField(Object target, String name) {
-        try {
-            Object value = target.getClass().getField(name).get(target);
-            return value instanceof Float number ? number : 0.0f;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve float field " + name, exception);
-        }
+        return PlayerCompat.floatField(target, name);
     }
 
     private static boolean booleanField(Object target, String name) {
-        try {
-            Object value = target.getClass().getField(name).get(target);
-            return value instanceof Boolean flag && flag;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve boolean field " + name, exception);
-        }
+        return PlayerCompat.booleanField(target, name);
     }
 
     private static void setBooleanField(Object target, String name, boolean value) {
-        try {
-            target.getClass().getField(name).set(target, value);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to set boolean field " + name, exception);
-        }
+        PlayerCompat.setBooleanField(target, name, value);
     }
 
     private static void invokePlayerInt(Player player, String method, int value) {
-        try {
-            player.getClass().getMethod(method, int.class).invoke(player, value);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player method " + method, exception);
-        }
+        PlayerCompat.invokePlayerInt(player, method, value);
     }
 
     private static void invokePlayer(Player player, String method) {
-        try {
-            player.getClass().getMethod(method).invoke(player);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player method " + method, exception);
-        }
+        PlayerCompat.invokePlayer(player, method);
     }
 
     private static float playerFloat(Player player, String method, float value) {
-        try {
-            Object result = player.getClass().getMethod(method, float.class).invoke(player, value);
-            return result instanceof Float number ? number : 0.0f;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player float method " + method, exception);
-        }
+        return PlayerCompat.playerFloat(player, method, value);
     }
 
     private static boolean playerBoolean(Player player, String method) {
-        try {
-            Object result = player.getClass().getMethod(method).invoke(player);
-            return result instanceof Boolean flag && flag;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player boolean method " + method, exception);
-        }
+        return PlayerCompat.playerBoolean(player, method);
     }
 
     private static void invokePlayerBlockPos(Player player, String method, BlockPos pos) {
-        try {
-            player.getClass().getMethod(method, BlockPos.class).invoke(player, pos);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke player block position method " + method, exception);
-        }
+        PlayerCompat.invokePlayerBlockPos(player, method, pos);
     }
 
     private static int foodInt(FoodData foodData, String method) {
-        try {
-            Object value = foodData.getClass().getMethod(method).invoke(foodData);
-            return value instanceof Integer number ? number : 0;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke food data int method " + method, exception);
-        }
+        return PlayerCompat.foodInt(foodData, method);
     }
 
     private static float foodFloat(FoodData foodData, String method) {
-        try {
-            Object value = foodData.getClass().getMethod(method).invoke(foodData);
-            return value instanceof Float number ? number : 0.0f;
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke food data float method " + method, exception);
-        }
+        return PlayerCompat.foodFloat(foodData, method);
     }
 
     private static void invokeFoodInt(FoodData foodData, String method, int value) {
-        try {
-            foodData.getClass().getMethod(method, int.class).invoke(foodData, value);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke food data int method " + method, exception);
-        }
+        PlayerCompat.invokeFoodInt(foodData, method, value);
     }
 
     private static void invokeFoodFloat(FoodData foodData, String method, float value) {
-        try {
-            foodData.getClass().getMethod(method, float.class).invoke(foodData, value);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to invoke food data float method " + method, exception);
-        }
+        PlayerCompat.invokeFoodFloat(foodData, method, value);
     }
 }
