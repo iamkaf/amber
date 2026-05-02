@@ -153,37 +153,19 @@ public class LevelRendererMixin {
 
     //? if <1.21.2 {
     /*private static Camera mainCamera(Minecraft minecraft) {
-        try {
-            Object gameRenderer = minecraft.getClass().getField("gameRenderer").get(minecraft);
-            return (Camera) gameRenderer.getClass().getMethod("getMainCamera").invoke(gameRenderer);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve main camera", exception);
-        }
+        return minecraft.gameRenderer.getMainCamera();
     }
 
     private static MultiBufferSource bufferSource(Minecraft minecraft) {
-        try {
-            Object renderBuffers = minecraft.getClass().getMethod("renderBuffers").invoke(minecraft);
-            return (MultiBufferSource) renderBuffers.getClass().getMethod("bufferSource").invoke(renderBuffers);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve render buffer source", exception);
-        }
+        return minecraft.renderBuffers().bufferSource();
     }
 
     private static HitResult hitResult(Minecraft minecraft) {
-        try {
-            return (HitResult) minecraft.getClass().getField("hitResult").get(minecraft);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve hit result", exception);
-        }
+        return minecraft.hitResult;
     }
 
     private static HitResult.Type hitResultType(HitResult hitResult) {
-        try {
-            return (HitResult.Type) hitResult.getClass().getMethod("getType").invoke(hitResult);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resolve hit result type", exception);
-        }
+        return hitResult.getType();
     }
     *///?}
 

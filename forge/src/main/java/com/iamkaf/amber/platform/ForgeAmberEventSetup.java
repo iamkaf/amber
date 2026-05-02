@@ -7,9 +7,12 @@ import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
+//? if >=1.20.5
+import com.iamkaf.amber.mixin.ItemAccessor;
+//? if <1.20.1
+import com.iamkaf.amber.mixin.LootTableAccessor;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -85,8 +88,6 @@ import static net.minecraft.world.InteractionResult.SUCCESS;
 
 public class ForgeAmberEventSetup implements IAmberEventSetup {
     //? if >=1.20.5
-    private static final Field ITEM_BUILT_COMPONENTS_FIELD = findItemBuiltComponentsField();
-    //? if >=1.20.5
     private static volatile boolean itemComponentCacheDirty;
 
     /**
@@ -150,6 +151,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //?} else {
         /*MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onLootTableEvent);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerEntityInteract);
+        //? if <1.19
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onPlayerEntityInteractGeneral);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onCommandRegistration);
         MinecraftForge.EVENT_BUS.addListener(EventHandlerCommon::onEntityJoinLevel);
@@ -278,16 +280,11 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
         //? if <1.20.1 {
         /*private static void addLootPool(net.minecraft.world.level.storage.loot.LootTable table, net.minecraft.world.level.storage.loot.LootPool pool) {
-            try {
-                java.lang.reflect.Field poolsField = net.minecraft.world.level.storage.loot.LootTable.class.getDeclaredField("pools");
-                poolsField.setAccessible(true);
-                net.minecraft.world.level.storage.loot.LootPool[] pools = (net.minecraft.world.level.storage.loot.LootPool[]) poolsField.get(table);
-                net.minecraft.world.level.storage.loot.LootPool[] expanded = java.util.Arrays.copyOf(pools, pools.length + 1);
-                expanded[pools.length] = pool;
-                poolsField.set(table, expanded);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException("Failed to modify loot table", e);
-            }
+            LootTableAccessor accessor = (LootTableAccessor) table;
+            net.minecraft.world.level.storage.loot.LootPool[] pools = accessor.amber$getPools();
+            net.minecraft.world.level.storage.loot.LootPool[] expanded = java.util.Arrays.copyOf(pools, pools.length + 1);
+            expanded[pools.length] = pool;
+            accessor.amber$setPools(expanded);
         }*/
         //?}
 
@@ -360,21 +357,10 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
 	        //? if <1.19 {
 	        /*private static net.minecraft.core.RegistryAccess legacyBuiltinRegistryAccess() {
-	            try {
-	                Object supplier = net.minecraft.core.RegistryAccess.class.getField("BUILTIN").get(null);
-	                if (supplier instanceof java.util.function.Supplier<?> registrySupplier) {
-	                    return (net.minecraft.core.RegistryAccess) registrySupplier.get();
-	                }
-	            } catch (ReflectiveOperationException ignored) {
-	            }
-
-	            try {
-	                return (net.minecraft.core.RegistryAccess) net.minecraft.core.RegistryAccess.class
-	                        .getMethod("builtin")
-	                        .invoke(null);
-	            } catch (ReflectiveOperationException exception) {
-	                throw new IllegalStateException("Unable to resolve builtin registry access", exception);
-	            }
+	            //? if >=1.18.2
+	            return net.minecraft.core.RegistryAccess.BUILTIN.get();
+	            //? if <1.18.2
+	            /^return net.minecraft.core.RegistryAccess.builtin();^/
 	        }
 
 	        private static net.minecraft.commands.Commands.CommandSelection commandSelectionAll() {
@@ -452,30 +438,15 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, event.getAmount(), event.getSource());
         }
 
-        private static boolean legacyIsDamageSourceBlocked(Object player, Object source) {
-            Class<?> type = player.getClass();
-            while (type != null) {
-                try {
-                    var method = type.getDeclaredMethod("isDamageSourceBlocked", source.getClass());
-                    method.setAccessible(true);
-                    Object value = method.invoke(player, source);
-                    return value instanceof Boolean blocked && blocked;
-                } catch (NoSuchMethodException ignored) {
-                    type = type.getSuperclass();
-                } catch (ReflectiveOperationException exception) {
-                    throw new IllegalStateException("Unable to resolve legacy shield block state", exception);
-                }
-            }
-            return false;
+        private static boolean legacyIsDamageSourceBlocked(net.minecraft.world.entity.player.Player player, net.minecraft.world.damagesource.DamageSource source) {
+            //? if >=1.17
+            return player.isDamageSourceBlocked(source);
+            //? if <1.17
+            /^return ((com.iamkaf.amber.mixin.LivingEntityAccessor) player).amber$isDamageSourceBlocked(source);^/
         }
 
-        private static boolean legacyIsShieldItem(Object item) {
-            try {
-                return Class.forName("net.minecraft.world.item.ShieldItem").isInstance(item)
-                        || Class.forName("net.minecraft.item.ShieldItem").isInstance(item);
-            } catch (ClassNotFoundException ignored) {
-                return false;
-            }
+        private static boolean legacyIsShieldItem(Item item) {
+            return item instanceof net.minecraft.world.item.ShieldItem;
         }
         *///?}
 
@@ -605,20 +576,11 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         }
 
         private static boolean hasPickUpDelay(ItemEntity item) {
-            try {
-                Object value = item.getClass().getMethod("hasPickUpDelay").invoke(item);
-                return value instanceof Boolean delayed && delayed;
-            } catch (ReflectiveOperationException exception) {
-                throw new IllegalStateException("Unable to resolve item pickup delay", exception);
-            }
+            return item.hasPickUpDelay();
         }
 
         private static ItemStack itemStack(ItemEntity item) {
-            try {
-                return (ItemStack) item.getClass().getMethod("getItem").invoke(item);
-            } catch (ReflectiveOperationException exception) {
-                throw new IllegalStateException("Unable to resolve item entity stack", exception);
-            }
+            return item.getItem();
         }
 
         public static boolean onAnimalTame(AnimalTameEvent event) {
@@ -705,21 +667,11 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
 
 	        //? if <1.19 {
 	        /*private static net.minecraft.server.MinecraftServer legacyServer(Object level) {
-	            try {
-	                return (net.minecraft.server.MinecraftServer) level.getClass().getMethod("getServer").invoke(level);
-	            } catch (ReflectiveOperationException exception) {
-	                throw new IllegalStateException("Unable to resolve server for Forge world event", exception);
-	            }
+	            return ((net.minecraft.world.level.Level) level).getServer();
 	        }*/
 
 	        /*private static boolean legacyIsClientSide(net.minecraft.world.entity.Entity entity) {
-	            try {
-	                Object level = net.minecraft.world.entity.Entity.class.getField("level").get(entity);
-	                Object value = level.getClass().getField("isClientSide").get(level);
-	                return value instanceof Boolean clientSide && clientSide;
-	            } catch (ReflectiveOperationException exception) {
-	                throw new IllegalStateException("Unable to resolve entity level side", exception);
-	            }
+	            return entity.level.isClientSide;
 	        }*/
 	        //?}
 
@@ -924,8 +876,17 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
             BlockPos pos = event.getTarget().getBlockPos();
             BlockState state = Minecraft.getInstance().level.getBlockState(pos);
             InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
+                    //? if >=1.18
+                    event.getCamera(),
+                    //? if <1.18
                     event.getInfo(),
+                    //? if >=1.18
+                    event.getMultiBufferSource(),
+                    //? if <1.18
                     event.getBuffers(),
+                    //? if >=1.18
+                    event.getPoseStack(),
+                    //? if <1.18
                     event.getMatrix(),
                     event.getTarget(),
                     pos,
@@ -955,16 +916,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
     }
 
     //? if >=1.20.5 {
-    private static Field findItemBuiltComponentsField() {
-        try {
-            Field field = Item.class.getDeclaredField("builtComponents");
-            field.setAccessible(true);
-            return field;
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Unable to access Forge item component cache", e);
-        }
-    }
-
     private static void invalidateItemComponentCache() {
         itemComponentCacheDirty = true;
         rebuildItemComponentCacheIfReady();
@@ -981,11 +932,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         //?}
 
         for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
-            try {
-                ITEM_BUILT_COMPONENTS_FIELD.set(item, null);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Unable to invalidate Forge item component cache", e);
-            }
+            ((ItemAccessor) item).amber$setBuiltComponents(null);
         }
         //? if >=26.1 {
         for (Item item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
