@@ -255,11 +255,6 @@ public class TabBuilder {
 
         builder.title(title);
         builder.icon(icon);
-        //? if >=1.20 {
-        if (com.iamkaf.amber.api.platform.v1.Platform.isFabric()) {
-            configureFabricDisplayItems(builder);
-        }
-        //?}
         //? if <26.1
         /*// Items are added via MODIFY_ENTRIES in platform-specific implementations.*/
 
@@ -272,9 +267,6 @@ public class TabBuilder {
         if (!canScroll) {
             builder.noScrollBar();
         }
-        // Note: backgroundTexture and type methods are protected in Minecraft,
-        // but they can be accessed through reflection in platform-specific implementations if needed
-
         return builder.build();
         //?} else {
         /*return new CreativeModeTab(nextLegacyTabIndex(), legacyTabName(id)) {
@@ -304,22 +296,12 @@ public class TabBuilder {
     }
 
     //? if <1.19.3 {
+    /*@SuppressWarnings("deprecation")*/
     private static int nextLegacyTabIndex() {
-        try {
-            Object count = CreativeModeTab.class.getMethod("getGroupCountSafe").invoke(null);
-            if (count instanceof Integer value) {
-                return value;
-            }
-        } catch (ReflectiveOperationException ignored) {
-            // Vanilla and Fabric do not expose Forge's dynamically-sized group counter.
-        }
-
-        try {
-            Object tabs = CreativeModeTab.class.getField("TABS").get(null);
-            return java.lang.reflect.Array.getLength(tabs);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to determine legacy creative tab index", exception);
-        }
+        //? if <1.19.3
+        /*return CreativeModeTab.TABS.length;*/
+        //? if >=1.19.3
+        return 0;
     }
 
     private static String legacyTabName(Identifier id) {
@@ -344,6 +326,20 @@ public class TabBuilder {
         return icon;
     }
 
+    public int getColumn() {
+        return column;
+    }
+
+    //? if >=1.19.3 {
+    public CreativeModeTab.Row getRow() {
+        return row;
+    }
+
+    public CreativeModeTab.Type getType() {
+        return type;
+    }
+    //?}
+
     public boolean canScroll() {
         return canScroll;
     }
@@ -364,70 +360,4 @@ public class TabBuilder {
     public List<Supplier<ItemLike>> getItems() {
         return items;
     }
-
-    //? if >=1.20 {
-    private void configureFabricDisplayItems(CreativeModeTab.Builder builder) {
-        try {
-            java.lang.reflect.Field displayItemsGenerator = CreativeModeTab.Builder.class.getDeclaredField("displayItemsGenerator");
-            displayItemsGenerator.setAccessible(true);
-            Class<?> generatorType = displayItemsGenerator.getType();
-            Object generator = java.lang.reflect.Proxy.newProxyInstance(
-                    generatorType.getClassLoader(),
-                    new Class<?>[]{generatorType},
-                    (proxy, method, args) -> {
-                        if ("accept".equals(method.getName()) && args != null && args.length == 2) {
-                            Object output = args[1];
-                            for (Supplier<ItemLike> itemSupplier : items) {
-                                acceptCreativeTabOutput(output, new ItemStack(itemSupplier.get()));
-                            }
-
-                            com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                                    .modifyEntries(
-                                            net.minecraft.resources.ResourceKey.create(
-                                                    net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
-                                                    id
-                                            ),
-                                            new com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput() {
-                                                @Override
-                                                public void accept(ItemStack stack, com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput.TabVisibility visibility) {
-                                                    acceptCreativeTabOutput(output, stack);
-                                                }
-                                            }
-                                    );
-                        }
-                        return null;
-                    }
-            );
-            displayItemsGenerator.set(builder, generator);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Failed to configure Fabric creative tab contents for " + id, exception);
-        }
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static void acceptCreativeTabOutput(Object output, ItemStack stack) {
-        try {
-            Class<?> visibilityType = Class.forName("net.minecraft.world.item.CreativeModeTab$TabVisibility");
-            Object visibility = java.lang.Enum.valueOf((Class) visibilityType.asSubclass(Enum.class), "PARENT_AND_SEARCH_TABS");
-            java.lang.reflect.Method accept = null;
-            for (java.lang.reflect.Method method : output.getClass().getMethods()) {
-                Class<?>[] parameterTypes = method.getParameterTypes();
-                if ("accept".equals(method.getName())
-                        && parameterTypes.length == 2
-                        && parameterTypes[0].isAssignableFrom(ItemStack.class)
-                        && parameterTypes[1].isAssignableFrom(visibilityType)) {
-                    accept = method;
-                    break;
-                }
-            }
-            if (accept == null) {
-                throw new NoSuchMethodException("Creative tab output accept(ItemStack, TabVisibility)");
-            }
-            accept.setAccessible(true);
-            accept.invoke(output, stack, visibility);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Failed to add item to creative tab output", exception);
-        }
-    }
-    //?}
 }

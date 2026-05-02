@@ -2,6 +2,7 @@ package com.iamkaf.amber.api.registry.v1.creativetabs;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.registry.v1.RegistrySupplier;
+import com.iamkaf.amber.platform.Services;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 //? if >=1.20
@@ -80,7 +81,7 @@ public final class CreativeModeTabRegistry {
         //? if >=1.20 {
         return com.iamkaf.amber.api.registry.v1.RegistrarManager.get(builder.getId().getNamespace())
             .get(Registries.CREATIVE_MODE_TAB)
-            .register(builder.getId(), builder::build);
+            .register(builder.getId(), () -> Services.CREATIVE_MODE_TABS.build(builder));
         //?} else {
         /*CreativeModeTab tab = com.iamkaf.amber.platform.Services.CREATIVE_MODE_TABS.build(builder);
         Identifier registryId = id("minecraft", "creative_mode_tab");

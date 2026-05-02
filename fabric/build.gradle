@@ -101,6 +101,12 @@ tasks.withType(ProcessResources).configureEach {
             filter { line -> line.replace('"fabric-api": "*",', fabricApiModuleDepends) }
         }
     }
+    if (!minecraftVersionAtLeast('1.20')) {
+        inputs.property('amberAccessWidener', 'none')
+        filesMatching('fabric.mod.json') {
+            filter { line -> line.contains('"accessWidener": "amber.accesswidener",') ? '' : line }
+        }
+    }
     if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion == '1.15.1' || minecraftVersion == '1.15.2' || minecraftVersion == '1.16.2' || minecraftVersion == '1.16.3' || minecraftVersion == '1.16.4' || minecraftVersion == '1.16.5' || minecraftVersion == '1.17' || minecraftVersion == '1.17.1' || minecraftVersion == '1.18' || minecraftVersion == '1.18.1') {
         inputs.property('amberFabricApiModuleDepends', 'fabric')
         filesMatching('fabric.mod.json') {

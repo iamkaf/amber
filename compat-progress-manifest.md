@@ -33,6 +33,7 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | Compat package promotion | `PASS` | Compat classes live in `com.iamkaf.amber.compat`, not under `util`, because they define Amber's version boundary rather than miscellaneous helpers. |
 | Reflection and dynamic-dispatch removal | `PARTIAL` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are clean across version overlays. Remaining production reflection is in creative-tab and Forge platform/mixin paths. This also tracks `Object` shims and method/field-by-string helpers. |
 | `ClientCompat` extraction | `PASS` | `ClientFunctions` delegates Minecraft client calls to typed `ClientCompat` overlays. Representative API split nodes compiled sequentially. |
+| Modern Fabric creative tab display generator | `PASS` | `TabBuilder` no longer uses reflection/proxy dispatch to configure modern Fabric tab contents. Modern creative-tab registration now builds through the loader service, and Fabric access wideners expose `CreativeModeTab.Output` and `TabVisibility` only on `1.20+` nodes. Focused `26.1.2-fabric` creative-tab conformance passed. |
 
 ## Version Bands
 
@@ -63,9 +64,9 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | Rule | Status | Notes |
 | --- | --- | --- |
 | Version overlays contain resolved Java only | `PASS` | `rg` found no Stonecutter guard residue or inactive block comments in `versions/*/.../compat`; every common node compiles after cleanup. |
-| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` are clean; remaining known reflection is in creative-tab, Forge event/mixin, and registrar paths. |
-| No untyped `Object` Minecraft API shims | `PARTIAL` | Compat overlays are clean. The only remaining `Object` in this slice is the legacy guarded public `ClientFunctions` 1.14 graphics-context placeholder, not a compat dispatch path. Continue with other production surfaces. |
-| No stringly method or field dispatch | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` and their public function call paths are clean. Continue with creative tabs and Forge platform/mixin paths. |
+| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` are clean; `TabBuilder` modern Fabric creative-tab display setup is clean. Remaining known reflection is in Forge event/mixin and registrar paths. |
+| No untyped `Object` Minecraft API shims | `PARTIAL` | Compat overlays are clean. Remaining accepted guarded public shims include legacy `ClientFunctions` 1.14 graphics-context placeholders and legacy creative-tab `row(Object)`/`type(Object)` signatures. Continue with other production surfaces. |
+| No stringly method or field dispatch | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` and `TabBuilder` modern Fabric display setup are clean. Continue with Forge platform/mixin paths and registrar code. |
 | Common/root code remains readable | `PARTIAL` | Guards are acceptable in root common code when readable, but large Minecraft API divergence belongs in compat overlays. |
 | No JSON mixin overlay churn unless needed | `PASS` | Keep mixin config as `.json`; use Stonecutter support without breaking existing config expectations. |
 | No conformance or TeaKit paths in Amber production | `PASS` | Amber runtime checks remain external through `amber-conformance` and TeaKit. |
