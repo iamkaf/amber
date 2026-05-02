@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// 1.14.4 exposes block outline rendering through renderHitOutline(Camera, HitResult, int), unlike the shared modern mixin target.
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
     @Shadow

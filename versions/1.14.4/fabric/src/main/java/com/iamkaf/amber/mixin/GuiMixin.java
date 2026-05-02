@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// 1.14.4 renders HUD overlays through Gui#render(float); newer versions use a PoseStack/GuiGraphics-aware hook.
 @Mixin(Gui.class)
 public abstract class GuiMixin {
     @Inject(method = "render", at = @At("TAIL"))

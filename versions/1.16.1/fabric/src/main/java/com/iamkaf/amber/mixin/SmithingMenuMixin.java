@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// 1.16.1 has SmithingMenu but does not route smithing output through the shared crafted-item hook.
 @Mixin(targets = "net.minecraft.world.inventory.SmithingMenu")
 public abstract class SmithingMenuMixin {
     @Inject(method = "onTake", at = @At("RETURN"))

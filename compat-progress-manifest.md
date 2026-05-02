@@ -30,6 +30,7 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | Legacy compat extracted to overlays | `PASS` | Committed in Amber as `a17cec2 Move Amber legacy compat to overlays`. |
 | Versioned `ItemCompat` / `PlayerCompat` / `WorldCompat` overlays added | `PASS` | Committed in Amber as `5753898 Add versioned compat overlays`; representative common compile checks passed before commit. |
 | Overlay guard/comment cleanup | `PASS` | Local uncommitted cleanup removed Stonecutter guard residue from version compat overlays. Residue scan is clean and every common node compiles sequentially. |
+| Compat package promotion | `PASS` | Compat classes live in `com.iamkaf.amber.compat`, not under `util`, because they define Amber's version boundary rather than miscellaneous helpers. |
 | Reflection and dynamic-dispatch removal | `PARTIAL` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are clean across version overlays. Remaining production reflection is in creative-tab and Forge platform/mixin paths. This also tracks `Object` shims and method/field-by-string helpers. |
 | `ClientCompat` extraction | `PASS` | `ClientFunctions` delegates Minecraft client calls to typed `ClientCompat` overlays. Representative API split nodes compiled sequentially. |
 
@@ -37,16 +38,16 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 
 | Version Band | Overlay Shape | Reflection Removal | Compile Evidence | Runtime Evidence | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `26.1.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:26.1.2:compileJava` passed after cleanup. |
-| `1.21.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.21.x` common nodes previously compiled after `ResourceKey` and `Ingredient` boundary fixes. |
-| `1.20.5` to `1.20.6` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.20.5:compileJava` passed after data-component modifier identity cleanup. |
-| `1.20` to `1.20.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.20.4:compileJava` passed after legacy modifier identity cleanup. |
-| `1.19.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.19.x` common nodes previously compiled after resolving the precipitation boundary at `1.19.4`. |
-| `1.18.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All `1.18.x` common nodes previously compiled. |
-| `1.17.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. Forge `1.17.1` has documented conformance gaps from userdev/mixin limitations. |
-| `1.16.5` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. Final Forge legacy node. |
-| `1.16` to `1.16.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. All nodes in this band compile. |
-| `1.15.x` to `1.14.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are non-reflective and free of `Object` shims/string dispatch. `:common:1.14.4:compileJava` passed after cleanup. |
+| `26.1.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. `:common:26.1.2:compileJava` passed after cleanup. |
+| `1.21.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. All `1.21.x` common nodes previously compiled after `ResourceKey` and `Ingredient` boundary fixes. |
+| `1.20.5` to `1.20.6` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. `:common:1.20.5:compileJava` passed after data-component modifier identity cleanup. |
+| `1.20` to `1.20.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. `:common:1.20.4:compileJava` passed after legacy modifier identity cleanup. |
+| `1.19.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. All `1.19.x` common nodes previously compiled after resolving the precipitation boundary at `1.19.4`. |
+| `1.18.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. All `1.18.x` common nodes previously compiled. |
+| `1.17.x` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. Forge `1.17.1` has documented conformance gaps from userdev/mixin limitations. |
+| `1.16.5` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. Final Forge legacy node. |
+| `1.16` to `1.16.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. All nodes in this band compile. |
+| `1.15.x` to `1.14.4` | `PASS` | `PARTIAL` | `PASS` | `PASS` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are non-reflective and free of compat `Object` shims/string dispatch. `:common:1.14.4:compileJava` passed after cleanup. |
 
 ## Compat Classes
 

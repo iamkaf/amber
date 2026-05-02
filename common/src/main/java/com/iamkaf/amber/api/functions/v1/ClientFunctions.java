@@ -1,6 +1,6 @@
 package com.iamkaf.amber.api.functions.v1;
 
-import com.iamkaf.amber.util.compat.ClientCompat;
+import com.iamkaf.amber.compat.ClientCompat;
 //? if <1.20 && >=1.15
 /*import com.mojang.blaze3d.vertex.PoseStack;*/
 import net.minecraft.client.KeyMapping;
