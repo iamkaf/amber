@@ -8,6 +8,8 @@
     "CraftedItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
+    //? if <1.19.3
+    "CreativeModeTabMixin",
     "FarmBlockMixin",
     "ForgeSheepMixin",
     "LivingEntityAfterDamageMixin"

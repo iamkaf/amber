@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.List;
 //? if >=1.21.2
 import net.minecraft.resources.ResourceKey;
-//? if >=1.20 {
+//? if >=1.18 {
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 //? if >=26.1
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 //? if >=1.21.2
 import net.minecraft.world.level.storage.loot.LootTable;
 //?}
@@ -39,7 +40,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-//? if >=1.20
+//? if >=1.18
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Sheep.class)
@@ -102,7 +103,7 @@ public abstract class SheepMixin {
     private void amber$fireShear(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         Sheep sheep = (Sheep) (Object) this;
         ItemStack shears = player.getItemInHand(hand);
-        if (!(sheep.level() instanceof ServerLevel level)) {
+        if (!(amber$level(sheep) instanceof ServerLevel level)) {
             return;
         }
 
@@ -135,7 +136,7 @@ public abstract class SheepMixin {
             CallbackInfoReturnable<InteractionResult> cir) {
         Sheep sheep = (Sheep) (Object) this;
         ItemStack shears = player.getItemInHand(hand);
-        if (!(sheep.level() instanceof ServerLevel level)) {
+        if (!(amber$level(sheep) instanceof ServerLevel level)) {
             return;
         }
 
@@ -174,6 +175,13 @@ public abstract class SheepMixin {
         };
     }
     *///?}
+
+    private static Level amber$level(Sheep sheep) {
+        //? if >=1.20
+        return sheep.level();
+        //? if <1.20
+        /*return sheep.level;*/
+    }
 
     static {
         AmberMod.AMBER_MIXINS.add("SheepMixin");

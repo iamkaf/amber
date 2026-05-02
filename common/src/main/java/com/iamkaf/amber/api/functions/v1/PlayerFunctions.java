@@ -5,6 +5,7 @@ import net.minecraft.core.GlobalPos;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
 //? if >=1.17 {
@@ -29,7 +30,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.Nullable;
 
+//? if <1.19
+/*import java.util.Map;*/
 import java.util.Optional;
+//? if <1.19
+/*import java.util.WeakHashMap;*/
 
 /**
  * Consolidated utility class for player-specific operations and mechanics.
@@ -38,6 +43,8 @@ import java.util.Optional;
  * @since 8.3.0
  */
 public final class PlayerFunctions {
+    //? if <1.19
+    /*private static final Map<Player, GlobalPos> LAST_DEATH_LOCATIONS = new WeakHashMap<>();*/
 
     private PlayerFunctions() {
         // Utility class - prevent instantiation
@@ -52,7 +59,7 @@ public final class PlayerFunctions {
      * @param amount The amount of experience points to add.
      */
     public static void addExperience(Player player, int amount) {
-        player.giveExperiencePoints(amount);
+        invokePlayerInt(player, "giveExperiencePoints", amount);
     }
 
     /**
@@ -62,7 +69,7 @@ public final class PlayerFunctions {
      * @param levels The number of experience levels to add.
      */
     public static void addLevels(Player player, int levels) {
-        player.giveExperienceLevels(levels);
+        invokePlayerInt(player, "giveExperienceLevels", levels);
     }
 
     /**
@@ -72,7 +79,7 @@ public final class PlayerFunctions {
      * @param level The experience level to set.
      */
     public static void setExperienceLevel(Player player, int level) {
-        player.experienceLevel = level;
+        setIntField(player, "experienceLevel", level);
     }
 
     /**
@@ -82,7 +89,7 @@ public final class PlayerFunctions {
      * @return The total experience points the player has.
      */
     public static int getExperiencePoints(Player player) {
-        return player.totalExperience;
+        return intField(player, "totalExperience");
     }
 
     /**
@@ -92,7 +99,7 @@ public final class PlayerFunctions {
      * @return The current experience level.
      */
     public static int getExperienceLevel(Player player) {
-        return player.experienceLevel;
+        return intField(player, "experienceLevel");
     }
 
     /**
@@ -102,7 +109,7 @@ public final class PlayerFunctions {
      * @return The experience progress (0.0 to 1.0).
      */
     public static float getExperienceProgress(Player player) {
-        return player.experienceProgress;
+        return floatField(player, "experienceProgress");
     }
 
     /**
@@ -113,7 +120,7 @@ public final class PlayerFunctions {
      * @return true if the player has enough experience, false otherwise.
      */
     public static boolean hasEnoughExperience(Player player, int amount) {
-        return player.totalExperience >= amount;
+        return getExperiencePoints(player) >= amount;
     }
 
     // ==================== ABILITIES & GAME MODE UTILITIES ====================
@@ -125,10 +132,7 @@ public final class PlayerFunctions {
      * @return The player's abilities.
      */
     public static Abilities getAbilities(Player player) {
-        //? if >=1.17
-        return player.getAbilities();
-        //? if <1.17
-        /*return player.abilities;*/
+        return playerAbilities(player);
     }
 
     /**
@@ -139,8 +143,8 @@ public final class PlayerFunctions {
      */
     public static void setFlying(Player player, boolean flying) {
         Abilities abilities = getAbilities(player);
-        abilities.flying = flying;
-        player.onUpdateAbilities();
+        setBooleanField(abilities, "flying", flying);
+        updateAbilities(player);
     }
 
     /**
@@ -150,7 +154,7 @@ public final class PlayerFunctions {
      * @return true if the player is flying, false otherwise.
      */
     public static boolean isFlying(Player player) {
-        return getAbilities(player).flying;
+        return booleanField(getAbilities(player), "flying");
     }
 
     /**
@@ -161,8 +165,8 @@ public final class PlayerFunctions {
      */
     public static void setAllowFlight(Player player, boolean allowFlight) {
         Abilities abilities = getAbilities(player);
-        abilities.mayfly = allowFlight;
-        player.onUpdateAbilities();
+        setBooleanField(abilities, "mayfly", allowFlight);
+        updateAbilities(player);
     }
 
     /**
@@ -172,7 +176,7 @@ public final class PlayerFunctions {
      * @return true if the player can fly, false otherwise.
      */
     public static boolean canFly(Player player) {
-        return getAbilities(player).mayfly;
+        return booleanField(getAbilities(player), "mayfly");
     }
 
     /**
@@ -183,8 +187,8 @@ public final class PlayerFunctions {
      */
     public static void setInvulnerable(Player player, boolean invulnerable) {
         Abilities abilities = getAbilities(player);
-        abilities.invulnerable = invulnerable;
-        player.onUpdateAbilities();
+        setBooleanField(abilities, "invulnerable", invulnerable);
+        updateAbilities(player);
     }
 
     /**
@@ -194,7 +198,7 @@ public final class PlayerFunctions {
      * @return true if the player is invulnerable, false otherwise.
      */
     public static boolean isInvulnerable(Player player) {
-        return getAbilities(player).invulnerable;
+        return booleanField(getAbilities(player), "invulnerable");
     }
 
     /**
@@ -205,8 +209,8 @@ public final class PlayerFunctions {
      */
     public static void setInstaBuild(Player player, boolean instaBuild) {
         Abilities abilities = getAbilities(player);
-        abilities.instabuild = instaBuild;
-        player.onUpdateAbilities();
+        setBooleanField(abilities, "instabuild", instaBuild);
+        updateAbilities(player);
     }
 
     /**
@@ -216,7 +220,7 @@ public final class PlayerFunctions {
      * @return true if the player has insta-build, false otherwise.
      */
     public static boolean hasInstaBuild(Player player) {
-        return getAbilities(player).instabuild;
+        return booleanField(getAbilities(player), "instabuild");
     }
 
     /**
@@ -227,8 +231,8 @@ public final class PlayerFunctions {
      */
     public static void setMayBuild(Player player, boolean mayBuild) {
         Abilities abilities = getAbilities(player);
-        abilities.mayBuild = mayBuild;
-        player.onUpdateAbilities();
+        setBooleanField(abilities, "mayBuild", mayBuild);
+        updateAbilities(player);
     }
 
     /**
@@ -238,7 +242,7 @@ public final class PlayerFunctions {
      * @return true if the player may build, false otherwise.
      */
     public static boolean mayBuild(Player player) {
-        return getAbilities(player).mayBuild;
+        return booleanField(getAbilities(player), "mayBuild");
     }
 
     /**
@@ -249,9 +253,9 @@ public final class PlayerFunctions {
      */
     public static GameType getGameMode(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.gameMode.getGameModeForPlayer();
+            return serverPlayerGameMode(serverPlayer);
         }
-        return GameType.SURVIVAL; // Default fallback
+        return gameType("SURVIVAL"); // Default fallback
     }
 
     /**
@@ -261,7 +265,7 @@ public final class PlayerFunctions {
      * @return true if the player is in creative mode, false otherwise.
      */
     public static boolean isCreativeMode(Player player) {
-        return getGameMode(player) == GameType.CREATIVE;
+        return isGameType(player, "CREATIVE");
     }
 
     /**
@@ -271,7 +275,7 @@ public final class PlayerFunctions {
      * @return true if the player is in survival mode, false otherwise.
      */
     public static boolean isSurvivalMode(Player player) {
-        return getGameMode(player) == GameType.SURVIVAL;
+        return isGameType(player, "SURVIVAL");
     }
 
     /**
@@ -281,7 +285,7 @@ public final class PlayerFunctions {
      * @return true if the player is in adventure mode, false otherwise.
      */
     public static boolean isAdventureMode(Player player) {
-        return getGameMode(player) == GameType.ADVENTURE;
+        return isGameType(player, "ADVENTURE");
     }
 
     /**
@@ -291,7 +295,7 @@ public final class PlayerFunctions {
      * @return true if the player is in spectator mode, false otherwise.
      */
     public static boolean isSpectatorMode(Player player) {
-        return getGameMode(player) == GameType.SPECTATOR;
+        return isGameType(player, "SPECTATOR");
     }
 
     // ==================== INVENTORY & SLOT UTILITIES ====================
@@ -303,7 +307,7 @@ public final class PlayerFunctions {
      * @return The item stack in the main hand.
      */
     public static ItemStack getMainHandItem(Player player) {
-        return player.getMainHandItem();
+        return playerItemStack(player, "getMainHandItem");
     }
 
     /**
@@ -313,7 +317,7 @@ public final class PlayerFunctions {
      * @return The item stack in the off hand.
      */
     public static ItemStack getOffhandItem(Player player) {
-        return player.getOffhandItem();
+        return playerItemStack(player, "getOffhandItem");
     }
 
     /**
@@ -323,7 +327,7 @@ public final class PlayerFunctions {
      * @return The item stack in the helmet slot.
      */
     public static ItemStack getHelmet(Player player) {
-        return player.getItemBySlot(EquipmentSlot.HEAD);
+        return playerItemBySlot(player, EquipmentSlot.HEAD);
     }
 
     /**
@@ -333,7 +337,7 @@ public final class PlayerFunctions {
      * @return The item stack in the chestplate slot.
      */
     public static ItemStack getChestplate(Player player) {
-        return player.getItemBySlot(EquipmentSlot.CHEST);
+        return playerItemBySlot(player, EquipmentSlot.CHEST);
     }
 
     /**
@@ -343,7 +347,7 @@ public final class PlayerFunctions {
      * @return The item stack in the leggings slot.
      */
     public static ItemStack getLeggings(Player player) {
-        return player.getItemBySlot(EquipmentSlot.LEGS);
+        return playerItemBySlot(player, EquipmentSlot.LEGS);
     }
 
     /**
@@ -353,7 +357,7 @@ public final class PlayerFunctions {
      * @return The item stack in the boots slot.
      */
     public static ItemStack getBoots(Player player) {
-        return player.getItemBySlot(EquipmentSlot.FEET);
+        return playerItemBySlot(player, EquipmentSlot.FEET);
     }
 
     /**
@@ -363,7 +367,7 @@ public final class PlayerFunctions {
      * @param stack The item stack to set.
      */
     public static void setMainHandItem(Player player, ItemStack stack) {
-        player.setItemInHand(player.getUsedItemHand(), stack);
+        inventorySetItem(playerInventory(player), getSelectedSlot(player), stack);
     }
 
     /**
@@ -374,7 +378,7 @@ public final class PlayerFunctions {
      */
     public static void setOffhandItem(Player player, ItemStack stack) {
         //? if >=1.17
-        player.getInventory().setItem(Inventory.SLOT_OFFHAND, stack);
+        inventorySetItem(playerInventory(player), offhandSlot(), stack);
         //? if <1.17
         /*player.inventory.offhand.set(0, stack);*/
     }
@@ -389,7 +393,7 @@ public final class PlayerFunctions {
         //? if >=1.21.5
         return player.getInventory().getSelectedSlot();
         //? if <1.21.5 && >=1.17
-        /*return player.getInventory().selected;*/
+        /*return selectedSlot(playerInventory(player));*/
         //? if <1.17
         /*return player.inventory.selected;*/
     }
@@ -407,7 +411,7 @@ public final class PlayerFunctions {
             //? if <1.21.5 && >=1.21.2
             /*player.getInventory().setSelectedHotbarSlot(slot);*/
             //? if <1.21.2 && >=1.17
-            /*player.getInventory().selected = slot;*/
+            /*setSelectedSlot(playerInventory(player), slot);*/
             //? if <1.17
             /*player.inventory.selected = slot;*/
         }
@@ -423,11 +427,11 @@ public final class PlayerFunctions {
     public static ItemStack getHotbarItem(Player player, int slot) {
         if (slot >= 0 && slot <= 8) {
             //? if >=1.17
-            return player.getInventory().getItem(slot);
+            return inventoryItem(playerInventory(player), slot);
             //? if <1.17
             /*return player.inventory.getItem(slot);*/
         }
-        return ItemStack.EMPTY;
+        return emptyStack();
     }
 
     /**
@@ -440,7 +444,7 @@ public final class PlayerFunctions {
     public static void setHotbarItem(Player player, int slot, ItemStack stack) {
         if (slot >= 0 && slot <= 8) {
             //? if >=1.17
-            player.getInventory().setItem(slot, stack);
+            inventorySetItem(playerInventory(player), slot, stack);
             //? if <1.17
             /*player.inventory.setItem(slot, stack);*/
         }
@@ -453,7 +457,7 @@ public final class PlayerFunctions {
      * @return The current attack strength.
      */
     public static float getAttackStrength(Player player) {
-        return player.getAttackStrengthScale(0.5f);
+        return playerFloat(player, "getAttackStrengthScale", 0.5f);
     }
 
     /**
@@ -462,7 +466,7 @@ public final class PlayerFunctions {
      * @param player The player to reset cooldown for.
      */
     public static void resetAttackStrength(Player player) {
-        player.resetAttackStrengthTicker();
+        invokePlayer(player, "resetAttackStrengthTicker");
     }
 
     /**
@@ -472,7 +476,7 @@ public final class PlayerFunctions {
      * @return true if the player has an attack cooldown, false otherwise.
      */
     public static boolean hasAttackCooldown(Player player) {
-        return player.getAttackStrengthScale(0.5f) < 1.0f;
+        return getAttackStrength(player) < 1.0f;
     }
 
     /**
@@ -482,7 +486,7 @@ public final class PlayerFunctions {
      * @return The attack cooldown progress.
      */
     public static float getAttackCooldownProgress(Player player) {
-        return player.getAttackStrengthScale(0.5f);
+        return getAttackStrength(player);
     }
 
     // ==================== COMMUNICATION & FEEDBACK UTILITIES ====================
@@ -494,10 +498,7 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendMessage(Player player, Component message) {
-        //? if >=26.1
-        player.sendSystemMessage(message);
-        //? if <26.1
-        /*player.displayClientMessage(message, false);*/
+        displayClientMessage(player, message, false);
     }
 
     /**
@@ -507,10 +508,7 @@ public final class PlayerFunctions {
      * @param message The message to send.
      */
     public static void sendActionBarMessage(Player player, Component message) {
-        //? if >=26.1
-        player.sendOverlayMessage(message);
-        //? if <26.1
-        /*player.displayClientMessage(message, true);*/
+        displayClientMessage(player, message, true);
     }
 
     /**
@@ -520,10 +518,7 @@ public final class PlayerFunctions {
      * @param message The action bar message to send.
      */
     public static void sendActionBar(Player player, Component message) {
-        //? if >=26.1
-        player.sendOverlayMessage(message);
-        //? if <26.1
-        /*player.displayClientMessage(message, true);*/
+        displayClientMessage(player, message, true);
     }
 
     /**
@@ -541,16 +536,16 @@ public final class PlayerFunctions {
         if (player instanceof ServerPlayer serverPlayer) {
             //? if >=1.17 {
             ClientboundSetTitlesAnimationPacket timesPacket = new ClientboundSetTitlesAnimationPacket(fadeIn, stay, fadeOut);
-            serverPlayer.connection.send(timesPacket);
+            sendPacket(serverPlayer, timesPacket);
 
             if (title != null) {
                 ClientboundSetTitleTextPacket titlePacket = new ClientboundSetTitleTextPacket(title);
-                serverPlayer.connection.send(titlePacket);
+                sendPacket(serverPlayer, titlePacket);
             }
 
             if (subtitle != null) {
                 ClientboundSetSubtitleTextPacket subtitlePacket = new ClientboundSetSubtitleTextPacket(subtitle);
-                serverPlayer.connection.send(subtitlePacket);
+                sendPacket(serverPlayer, subtitlePacket);
             }
             //?} else {
             /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(fadeIn, stay, fadeOut));
@@ -586,9 +581,9 @@ public final class PlayerFunctions {
         if (player instanceof ServerPlayer serverPlayer) {
             // Send empty title packets to clear the title
             //? if >=1.17 {
-            serverPlayer.connection.send(new ClientboundSetTitleTextPacket(emptyComponent()));
-            serverPlayer.connection.send(new ClientboundSetSubtitleTextPacket(emptyComponent()));
-            serverPlayer.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, 0));
+            sendPacket(serverPlayer, new ClientboundSetTitleTextPacket(emptyComponent()));
+            sendPacket(serverPlayer, new ClientboundSetSubtitleTextPacket(emptyComponent()));
+            sendPacket(serverPlayer, new ClientboundSetTitlesAnimationPacket(0, 0, 0));
             //?} else {
             /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.TITLE, emptyComponent()));
             serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.SUBTITLE, emptyComponent()));
@@ -643,7 +638,7 @@ public final class PlayerFunctions {
     public static void playSound(Player player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (player instanceof ServerPlayer serverPlayer) {
             //? if >=1.19 {
-            serverPlayer.connection.send(new ClientboundSoundPacket(
+            sendPacket(serverPlayer, new ClientboundSoundPacket(
                     //? if >=1.19.3
                     Holder.direct(sound),
                     //? if <1.19.3
@@ -702,7 +697,7 @@ public final class PlayerFunctions {
         //? if >=1.19
         return player.getLastDeathLocation();
         //? if <1.19
-        /*return Optional.empty();*/
+        /*return Optional.ofNullable(LAST_DEATH_LOCATIONS.get(player));*/
     }
 
     /**
@@ -715,7 +710,7 @@ public final class PlayerFunctions {
         //? if >=1.19
         player.setLastDeathLocation(Optional.of(position));
         //? if <1.19
-        /*return;*/
+        /*LAST_DEATH_LOCATIONS.put(player, position);*/
     }
 
     /**
@@ -739,7 +734,7 @@ public final class PlayerFunctions {
      * @return true if the player is sleeping, false otherwise.
      */
     public static boolean isSleeping(Player player) {
-        return player.isSleeping();
+        return playerBoolean(player, "isSleeping");
     }
 
     /**
@@ -749,7 +744,7 @@ public final class PlayerFunctions {
      * @param pos The position to sleep at.
      */
     public static void startSleeping(Player player, BlockPos pos) {
-        player.startSleepInBed(pos);
+        invokePlayerBlockPos(player, "startSleepInBed", pos);
     }
 
     /**
@@ -758,7 +753,7 @@ public final class PlayerFunctions {
      * @param player The player to wake up.
      */
     public static void stopSleeping(Player player) {
-        player.stopSleeping();
+        invokePlayer(player, "stopSleeping");
     }
 
     /**
@@ -768,7 +763,7 @@ public final class PlayerFunctions {
      * @return The current food level (0-20).
      */
     public static int getFoodLevel(Player player) {
-        return player.getFoodData().getFoodLevel();
+        return foodInt(playerFoodData(player), "getFoodLevel");
     }
 
     /**
@@ -778,8 +773,7 @@ public final class PlayerFunctions {
      * @param level The food level to set (0-20).
      */
     public static void setFoodLevel(Player player, int level) {
-        FoodData foodData = player.getFoodData();
-        foodData.setFoodLevel(level);
+        invokeFoodInt(playerFoodData(player), "setFoodLevel", level);
     }
 
     /**
@@ -789,7 +783,7 @@ public final class PlayerFunctions {
      * @return The current saturation level.
      */
     public static float getSaturationLevel(Player player) {
-        return player.getFoodData().getSaturationLevel();
+        return foodFloat(playerFoodData(player), "getSaturationLevel");
     }
 
     /**
@@ -799,7 +793,7 @@ public final class PlayerFunctions {
      * @param amount The amount of exhaustion to add.
      */
     public static void addExhaustion(Player player, float amount) {
-        player.getFoodData().addExhaustion(amount);
+        invokeFoodFloat(playerFoodData(player), "addExhaustion", amount);
     }
 
     /**
@@ -809,8 +803,8 @@ public final class PlayerFunctions {
      * @param amount The amount of food to restore.
      */
     public static void feed(Player player, int amount) {
-        FoodData foodData = player.getFoodData();
-        foodData.setFoodLevel(Math.min(20, foodData.getFoodLevel() + amount));
+        FoodData foodData = playerFoodData(player);
+        invokeFoodInt(foodData, "setFoodLevel", Math.min(20, foodInt(foodData, "getFoodLevel") + amount));
     }
 
     /**
@@ -821,7 +815,7 @@ public final class PlayerFunctions {
      */
     @Nullable
     public static PlayerEnderChestContainer getEnderChest(Player player) {
-        return player.getEnderChestInventory();
+        return playerEnderChest(player);
     }
 
     /**
@@ -833,7 +827,7 @@ public final class PlayerFunctions {
      */
     public static ItemStack getEnderChestItem(Player player, int slot) {
         Container enderChest = getEnderChest(player);
-        return enderChest != null && slot >= 0 && slot < 27 ? enderChest.getItem(slot) : ItemStack.EMPTY;
+        return enderChest != null && slot >= 0 && slot < 27 ? containerItem(enderChest, slot) : emptyStack();
     }
 
     /**
@@ -846,7 +840,7 @@ public final class PlayerFunctions {
     public static void setEnderChestItem(Player player, int slot, ItemStack stack) {
         Container enderChest = getEnderChest(player);
         if (enderChest != null && slot >= 0 && slot < 27) {
-            enderChest.setItem(slot, stack);
+            containerSetItem(enderChest, slot, stack);
         }
     }
 
@@ -901,5 +895,275 @@ public final class PlayerFunctions {
         // This would need to be implemented using the player's persistent data container
         // Note: Minecraft's persistent data system typically uses CompoundTag
         // This is a placeholder implementation
+    }
+
+    private static Inventory playerInventory(Player player) {
+        try {
+            return (Inventory) player.getClass().getMethod("getInventory").invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve player inventory", exception);
+        }
+    }
+
+    private static Abilities playerAbilities(Player player) {
+        try {
+            return (Abilities) player.getClass().getMethod("getAbilities").invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve player abilities", exception);
+        }
+    }
+
+    private static void updateAbilities(Player player) {
+        try {
+            player.getClass().getMethod("onUpdateAbilities").invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to update player abilities", exception);
+        }
+    }
+
+    private static GameType serverPlayerGameMode(ServerPlayer player) {
+        try {
+            Object gameMode = player.getClass().getField("gameMode").get(player);
+            return (GameType) gameMode.getClass().getMethod("getGameModeForPlayer").invoke(gameMode);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve server player game mode", exception);
+        }
+    }
+
+    private static FoodData playerFoodData(Player player) {
+        try {
+            return (FoodData) player.getClass().getMethod("getFoodData").invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve player food data", exception);
+        }
+    }
+
+    private static PlayerEnderChestContainer playerEnderChest(Player player) {
+        try {
+            return (PlayerEnderChestContainer) player.getClass().getMethod("getEnderChestInventory").invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve player ender chest", exception);
+        }
+    }
+
+    private static void displayClientMessage(Player player, Component message, boolean actionBar) {
+        try {
+            player.getClass().getMethod("displayClientMessage", Component.class, boolean.class).invoke(player, message, actionBar);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to display client message", exception);
+        }
+    }
+
+    private static void sendPacket(ServerPlayer player, Packet<?> packet) {
+        try {
+            Object connection = player.getClass().getField("connection").get(player);
+            connection.getClass().getMethod("send", Packet.class).invoke(connection, packet);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to send packet to player", exception);
+        }
+    }
+
+    private static GameType gameType(String name) {
+        return GameType.valueOf(name);
+    }
+
+    private static boolean isGameType(Player player, String name) {
+        return getGameMode(player).name().equals(name);
+    }
+
+    private static int offhandSlot() {
+        return 40;
+    }
+
+    private static ItemStack playerItemBySlot(Player player, EquipmentSlot slot) {
+        try {
+            return (ItemStack) player.getClass().getMethod("getItemBySlot", EquipmentSlot.class).invoke(player, slot);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve player item in slot " + slot, exception);
+        }
+    }
+
+    private static ItemStack inventoryItem(Inventory inventory, int slot) {
+        try {
+            return (ItemStack) inventory.getClass().getMethod("getItem", int.class).invoke(inventory, slot);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve inventory item at slot " + slot, exception);
+        }
+    }
+
+    private static ItemStack playerItemStack(Player player, String method) {
+        try {
+            return (ItemStack) player.getClass().getMethod(method).invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player item method " + method, exception);
+        }
+    }
+
+    private static ItemStack emptyStack() {
+        try {
+            return (ItemStack) ItemStack.class.getField("EMPTY").get(null);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve empty item stack", exception);
+        }
+    }
+
+    private static void inventorySetItem(Inventory inventory, int slot, ItemStack stack) {
+        try {
+            inventory.getClass().getMethod("setItem", int.class, ItemStack.class).invoke(inventory, slot, stack);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to set inventory item at slot " + slot, exception);
+        }
+    }
+
+    private static ItemStack containerItem(Container container, int slot) {
+        try {
+            return (ItemStack) container.getClass().getMethod("getItem", int.class).invoke(container, slot);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve container item at slot " + slot, exception);
+        }
+    }
+
+    private static void containerSetItem(Container container, int slot, ItemStack stack) {
+        try {
+            container.getClass().getMethod("setItem", int.class, ItemStack.class).invoke(container, slot, stack);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to set container item at slot " + slot, exception);
+        }
+    }
+
+    private static int selectedSlot(Inventory inventory) {
+        try {
+            Object value = inventory.getClass().getField("selected").get(inventory);
+            return value instanceof Integer slot ? slot : 0;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve selected hotbar slot", exception);
+        }
+    }
+
+    private static void setSelectedSlot(Inventory inventory, int slot) {
+        try {
+            inventory.getClass().getField("selected").set(inventory, slot);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to set selected hotbar slot", exception);
+        }
+    }
+
+    private static int intField(Object target, String name) {
+        try {
+            Object value = target.getClass().getField(name).get(target);
+            return value instanceof Integer number ? number : 0;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve int field " + name, exception);
+        }
+    }
+
+    private static void setIntField(Object target, String name, int value) {
+        try {
+            target.getClass().getField(name).set(target, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to set int field " + name, exception);
+        }
+    }
+
+    private static float floatField(Object target, String name) {
+        try {
+            Object value = target.getClass().getField(name).get(target);
+            return value instanceof Float number ? number : 0.0f;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve float field " + name, exception);
+        }
+    }
+
+    private static boolean booleanField(Object target, String name) {
+        try {
+            Object value = target.getClass().getField(name).get(target);
+            return value instanceof Boolean flag && flag;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve boolean field " + name, exception);
+        }
+    }
+
+    private static void setBooleanField(Object target, String name, boolean value) {
+        try {
+            target.getClass().getField(name).set(target, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to set boolean field " + name, exception);
+        }
+    }
+
+    private static void invokePlayerInt(Player player, String method, int value) {
+        try {
+            player.getClass().getMethod(method, int.class).invoke(player, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player method " + method, exception);
+        }
+    }
+
+    private static void invokePlayer(Player player, String method) {
+        try {
+            player.getClass().getMethod(method).invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player method " + method, exception);
+        }
+    }
+
+    private static float playerFloat(Player player, String method, float value) {
+        try {
+            Object result = player.getClass().getMethod(method, float.class).invoke(player, value);
+            return result instanceof Float number ? number : 0.0f;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player float method " + method, exception);
+        }
+    }
+
+    private static boolean playerBoolean(Player player, String method) {
+        try {
+            Object result = player.getClass().getMethod(method).invoke(player);
+            return result instanceof Boolean flag && flag;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player boolean method " + method, exception);
+        }
+    }
+
+    private static void invokePlayerBlockPos(Player player, String method, BlockPos pos) {
+        try {
+            player.getClass().getMethod(method, BlockPos.class).invoke(player, pos);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke player block position method " + method, exception);
+        }
+    }
+
+    private static int foodInt(FoodData foodData, String method) {
+        try {
+            Object value = foodData.getClass().getMethod(method).invoke(foodData);
+            return value instanceof Integer number ? number : 0;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke food data int method " + method, exception);
+        }
+    }
+
+    private static float foodFloat(FoodData foodData, String method) {
+        try {
+            Object value = foodData.getClass().getMethod(method).invoke(foodData);
+            return value instanceof Float number ? number : 0.0f;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke food data float method " + method, exception);
+        }
+    }
+
+    private static void invokeFoodInt(FoodData foodData, String method, int value) {
+        try {
+            foodData.getClass().getMethod(method, int.class).invoke(foodData, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke food data int method " + method, exception);
+        }
+    }
+
+    private static void invokeFoodFloat(FoodData foodData, String method, float value) {
+        try {
+            foodData.getClass().getMethod(method, float.class).invoke(foodData, value);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to invoke food data float method " + method, exception);
+        }
     }
 }

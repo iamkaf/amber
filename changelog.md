@@ -25,6 +25,28 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Fabric `LootEvents.MODIFY` not forwarding loot table callbacks on 1.20.5 and 1.20.6
 - Fixed Fabric `NetworkChannel.sendToAllPlayers` not having an active server for `PlayerLookup.all`
 - Fixed Fabric custom creative tabs registered by consumer mods not receiving Amber creative tab content callbacks on 26.1, 1.21.x, 1.20.6, and 1.20.5
+- Fixed Fabric custom creative tab registration crashing on 1.19.2 by using Fabric API's legacy item group builder instead of vanilla's fixed tab array
+- Fixed Fabric 1.19.2 vanilla creative tab content callbacks by bridging legacy `CreativeModeTab#fillItemList`
+- Fixed Fabric 1.19.2 custom creative tabs not invoking Amber content callbacks when their item lists are built
+- Fixed Forge 1.19.2 compiling against the 1.19.3-only `CreativeModeTabEvent` bridge
+- Fixed Forge 1.19.2 vanilla creative tab content callbacks by bridging legacy `CreativeModeTab#fillItemList`
+- Fixed legacy custom creative tabs not invoking Amber content callbacks when their item lists are built on pre-1.19.3 loaders
+- Fixed Forge 1.18.x custom creative tab creation crashing from direct legacy tab array and identifier method links
+- Fixed Forge 1.18.x deferred registry supplier metadata crashing from direct resource-key location links
+- Fixed Forge 1.18.x command and client-command registration crashing from direct legacy registry-access field links
+- Fixed Forge 1.18.x world lifecycle events crashing from direct legacy server accessor method links
+- Fixed Forge 1.18.x entity damage events crashing from direct legacy level side field links
+- Fixed Forge 1.18.x `HudEvents.RENDER_HUD` not firing by bridging legacy overlay render events
+- Fixed Forge 1.18.x `RenderEvents.BLOCK_OUTLINE_RENDER` crashing from direct client renderer field links
+- Fixed Forge 1.18 `PlayerEvents.SHIELD_BLOCK` not firing by falling back to the legacy blocked-damage path when Forge has no shield-block event
+- Fixed Forge 1.18.x `ClientFunctions.shouldRenderHud` crashing from direct client singleton and options links
+- Fixed Forge 1.18.x `ClientFunctions.renderText` and legacy tooltip helpers crashing from direct client rendering and item-stack links
+- Fixed Forge 1.18.x `ItemFunctions` inventory helpers crashing from direct inventory method links
+- Fixed old Fabric `ClientCommandEvents.EVENT` registrations becoming invisible to consumer callbacks that register after Amber setup
+- Fixed pre-1.18.2 function helpers directly linking `Holder` APIs that do not exist on older Minecraft versions
+- Fixed Forge 1.19 event guards to use the patched 41.1.x `level` event package and key mapping APIs
+- Fixed Fabric legacy sheep shearing mixin imports on 1.18.x
+- Fixed `PlayerFunctions` last-death-location helpers on pre-1.19 Minecraft versions
 - Fixed NeoForge `NetworkChannel.sendToAllPlayers` not broadcasting clientbound packets
 - Fixed NeoForge `BlockEvents.BLOCK_BREAK_BEFORE` firing twice from client and server break events
 - Fixed NeoForge `FarmingEvents.FARMLAND_TRAMPLE` not firing on modern Minecraft versions
@@ -34,6 +56,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Forge `RenderEvents.BLOCK_OUTLINE_RENDER` not firing because the client render mixin was not loaded
 - Fixed Forge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
 - Fixed Forge `ItemEvents.MODIFY_DEFAULT_COMPONENTS` missing late consumer registrations after default item component caches were initialized
+- Fixed Forge 1.19.3 custom creative tab content bridging against the current 44.1.x `CreativeModeTabEvent.BuildContents` API
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 
 ## 10.0.2

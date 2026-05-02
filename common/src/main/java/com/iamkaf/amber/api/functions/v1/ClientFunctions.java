@@ -52,7 +52,7 @@ public final class ClientFunctions {
      * @return true if the HUD should be rendered, false otherwise.
      */
     public static boolean shouldRenderHud() {
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft mc = minecraft();
         if (mc == null) {
             return false;
         }
@@ -60,7 +60,7 @@ public final class ClientFunctions {
             //? if >=1.20.2
             return !(mc.getDebugOverlay().showDebugScreen() || mc.options.hideGui || mc.level == null || mc.player == null);
             //? if <1.20.2
-            /*return !(mc.options.renderDebug || mc.options.hideGui || mc.level == null || mc.player == null);*/
+            /*return !(optionBoolean(mc, "renderDebug") || optionBoolean(mc, "hideGui") || fieldValue(mc, "level") == null || fieldValue(mc, "player") == null);*/
         } catch (Exception e) {
             // Handle any exceptions that may occur
             Constants.LOG.error("An error occurred while checking if the HUD should be rendered: {}", e.getMessage());
@@ -86,7 +86,7 @@ public final class ClientFunctions {
         context.drawString(font, message, x, y, color);*/
     //?} else if >=1.16 {
     /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
-        font.draw(context, message, x, y, color);*/
+        drawText(font, context, message, x, y, color);*/
     //?} else if >=1.15 {
     /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
         font.draw(message.getString(), x, y, color);*/
@@ -112,23 +112,24 @@ public final class ClientFunctions {
     /*public static void renderTooltip(PoseStack guiGraphics, ItemStack stack, int x, int y) {*/
     //? if <1.15
     /*public static void renderTooltip(Object guiGraphics, ItemStack stack, int x, int y) {*/
-        Minecraft mc = Minecraft.getInstance();
+        Minecraft mc = minecraft();
 
         if (mc == null) {
             return;
         }
 
-        if (stack == null || stack.isEmpty()) {
+        if (stack == null || isEmpty(stack)) {
             return;
         }
 
         //? if <1.20
-        /*if (mc.screen == null) {
+        /*Object screen = screen(mc);
+        if (screen == null) {
             return;
         }*/
 
         //? if <1.20 && >=1.16.2
-        /*mc.screen.renderComponentTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
+        /*renderComponentTooltip(screen, guiGraphics, stack, x, y);*/
         //? if <1.16.2 && >=1.16
         /*mc.screen.renderTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
         //? if <1.16
@@ -164,6 +165,82 @@ public final class ClientFunctions {
         //?} else if >=1.20
         /*guiGraphics.renderTooltip(mc.font, stack, x, y);*/
     }
+
+    private static Minecraft minecraft() {
+        try {
+            return (Minecraft) Minecraft.class.getMethod("getInstance").invoke(null);
+        } catch (ReflectiveOperationException exception) {
+            Constants.LOG.error("An error occurred while resolving Minecraft instance: {}", exception.getMessage());
+            return null;
+        }
+    }
+
+    private static boolean isEmpty(ItemStack stack) {
+        try {
+            Object value = stack.getClass().getMethod("isEmpty").invoke(stack);
+            return value instanceof Boolean empty && empty;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to inspect item stack", exception);
+        }
+    }
+
+    //? if <1.20.2 {
+    /*private static boolean optionBoolean(Minecraft minecraft, String fieldName) throws ReflectiveOperationException {
+        Object options = fieldValue(minecraft, "options");
+        Object value = fieldValue(options, fieldName);
+        return value instanceof Boolean enabled && enabled;
+    }
+
+    private static Object fieldValue(Object target, String fieldName) throws ReflectiveOperationException {
+        Class<?> type = target.getClass();
+        while (type != null) {
+            try {
+                var field = type.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (NoSuchFieldException ignored) {
+                type = type.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
+    }
+
+    *///?}
+
+    //? if <1.20 && >=1.16 {
+    /*private static void drawText(Font font, PoseStack context, Component message, int x, int y, int color) {
+        try {
+            font.getClass()
+                    .getMethod("draw", PoseStack.class, Component.class, float.class, float.class, int.class)
+                    .invoke(font, context, message, (float) x, (float) y, color);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to render text", exception);
+        }
+    }
+
+    *///?}
+
+    //? if <1.20 && >=1.16.2 {
+    /*private static Object screen(Minecraft minecraft) {
+        try {
+            return fieldValue(minecraft, "screen");
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve screen", exception);
+        }
+    }
+
+    private static void renderComponentTooltip(Object screen, PoseStack guiGraphics, ItemStack stack, int x, int y) {
+        try {
+            Object tooltip = screen.getClass().getMethod("getTooltipFromItem", ItemStack.class).invoke(screen, stack);
+            screen.getClass()
+                    .getMethod("renderComponentTooltip", PoseStack.class, List.class, int.class, int.class)
+                    .invoke(screen, guiGraphics, tooltip, x, y);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to render tooltip", exception);
+        }
+    }
+
+    *///?}
 
     // ==================== SMART TOOLTIP OPERATIONS ====================
 

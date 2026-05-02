@@ -78,17 +78,17 @@ public class LevelRendererMixin {
             CallbackInfo ci
     ) {
         //? if <1.21.2 {
-        /*if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        /*if (!(hitResult(this.minecraft) instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
-        if (blockHitResult.getType() == HitResult.Type.MISS) {
+        if (hitResultType(blockHitResult) == HitResult.Type.MISS) {
             return;
         }
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                this.minecraft.gameRenderer.getMainCamera(),
-                this.minecraft.renderBuffers().bufferSource(),
+                mainCamera(this.minecraft),
+                bufferSource(this.minecraft),
                 poseStack,
                 blockHitResult,
                 outlinePos,
@@ -150,6 +150,42 @@ public class LevelRendererMixin {
         }
         //?}
     }
+
+    //? if <1.21.2 {
+    /*private static Camera mainCamera(Minecraft minecraft) {
+        try {
+            Object gameRenderer = minecraft.getClass().getField("gameRenderer").get(minecraft);
+            return (Camera) gameRenderer.getClass().getMethod("getMainCamera").invoke(gameRenderer);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve main camera", exception);
+        }
+    }
+
+    private static MultiBufferSource.BufferSource bufferSource(Minecraft minecraft) {
+        try {
+            Object renderBuffers = minecraft.getClass().getMethod("renderBuffers").invoke(minecraft);
+            return (MultiBufferSource.BufferSource) renderBuffers.getClass().getMethod("bufferSource").invoke(renderBuffers);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve render buffer source", exception);
+        }
+    }
+
+    private static HitResult hitResult(Minecraft minecraft) {
+        try {
+            return (HitResult) minecraft.getClass().getField("hitResult").get(minecraft);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve hit result", exception);
+        }
+    }
+
+    private static HitResult.Type hitResultType(HitResult hitResult) {
+        try {
+            return (HitResult.Type) hitResult.getClass().getMethod("getType").invoke(hitResult);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resolve hit result type", exception);
+        }
+    }
+    *///?}
 
     static {
         AmberMod.AMBER_MIXINS.add("LevelRendererMixin");
