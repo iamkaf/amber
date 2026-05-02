@@ -30,8 +30,8 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | Legacy compat extracted to overlays | `PASS` | Committed in Amber as `a17cec2 Move Amber legacy compat to overlays`. |
 | Versioned `ItemCompat` / `PlayerCompat` / `WorldCompat` overlays added | `PASS` | Committed in Amber as `5753898 Add versioned compat overlays`; representative common compile checks passed before commit. |
 | Overlay guard/comment cleanup | `PASS` | Local uncommitted cleanup removed Stonecutter guard residue from version compat overlays. Residue scan is clean and every common node compiles sequentially. |
-| Reflection and dynamic-dispatch removal | `PARTIAL` | `ItemCompat`, `PlayerCompat`, and `WorldCompat` are clean across version overlays and root common source. Remaining production reflection is outside this slice, with `ClientFunctions` next. This also tracks `Object` shims and method/field-by-string helpers. |
-| `ClientCompat` extraction | `TODO` | Not started. |
+| Reflection and dynamic-dispatch removal | `PARTIAL` | `ItemCompat`, `PlayerCompat`, `WorldCompat`, and `ClientCompat` are clean across version overlays. Remaining production reflection is in creative-tab and Forge platform/mixin paths. This also tracks `Object` shims and method/field-by-string helpers. |
+| `ClientCompat` extraction | `PASS` | `ClientFunctions` delegates Minecraft client calls to typed `ClientCompat` overlays. Representative API split nodes compiled sequentially. |
 
 ## Version Bands
 
@@ -55,16 +55,16 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | `ItemCompat` | Item stack, inventory, ingredient, attribute, enchantment, tag, and default-instance differences. | `PASS` | Clean across root common source and version overlays. Data-component modifier identity is typed through `modifierIdentity`. |
 | `PlayerCompat` | Inventory, abilities, game mode, food, ender chest, packets, selected slot, XP, sleep, and player state differences. | `PASS` | Clean across version overlays. Replaced packet `Object`, field-by-string helpers, and method-by-string helpers with named typed methods. |
 | `WorldCompat` | Time, vectors, sounds, difficulty, biomes, dimensions, entity queries, AABB, and direction differences. | `PASS` | Clean across version overlays. Replaced AABB string selectors plus `Vec3i`/direction `Object` shims with typed helpers. |
-| `ClientCompat` | Client-only UI/render/input API differences. | `READY` | `ClientFunctions` is now the next reflection-heavy API surface to extract into version overlays. |
+| `ClientCompat` | Client-only UI/render/input API differences. | `PASS` | Clean across root common source and version overlays. Replaced reflective Minecraft lookup, stack emptiness, HUD option/screen access, text drawing, and tooltip rendering with typed per-version calls. |
 
 ## Source Shape Checklist
 
 | Rule | Status | Notes |
 | --- | --- | --- |
 | Version overlays contain resolved Java only | `PASS` | `rg` found no Stonecutter guard residue or inactive block comments in `versions/*/.../compat`; every common node compiles after cleanup. |
-| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. `ItemCompat`/`PlayerCompat`/`WorldCompat` are clean; remaining known reflection is in client, creative-tab, Forge event/mixin, and registrar paths. |
-| No untyped `Object` Minecraft API shims | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat` and their public function call paths are clean. Continue with `ClientCompat` and then other production surfaces. |
-| No stringly method or field dispatch | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat` and their public function call paths are clean. Continue with `ClientCompat` and then other production surfaces. |
+| No reflection for Minecraft or loader APIs | `PARTIAL` | Hard ban. `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` are clean; remaining known reflection is in creative-tab, Forge event/mixin, and registrar paths. |
+| No untyped `Object` Minecraft API shims | `PARTIAL` | Compat overlays are clean. The only remaining `Object` in this slice is the legacy guarded public `ClientFunctions` 1.14 graphics-context placeholder, not a compat dispatch path. Continue with other production surfaces. |
+| No stringly method or field dispatch | `PARTIAL` | `ItemCompat`/`PlayerCompat`/`WorldCompat`/`ClientCompat` and their public function call paths are clean. Continue with creative tabs and Forge platform/mixin paths. |
 | Common/root code remains readable | `PARTIAL` | Guards are acceptable in root common code when readable, but large Minecraft API divergence belongs in compat overlays. |
 | No JSON mixin overlay churn unless needed | `PASS` | Keep mixin config as `.json`; use Stonecutter support without breaking existing config expectations. |
 | No conformance or TeaKit paths in Amber production | `PASS` | Amber runtime checks remain external through `amber-conformance` and TeaKit. |
@@ -85,11 +85,4 @@ Use sequential checks. Do not fan out the matrix on this machine.
 
 ## Next Suggested Slice
 
-Implement `ClientCompat`:
-
-1. Move the client-only Minecraft API calls currently hidden behind reflection in `ClientFunctions` into `ClientCompat` overlays.
-2. Keep overlay methods typed by the real Minecraft classes for each version, even when the root common source still needs readable Stonecutter guards.
-3. Preserve behavior for UI messages, option state, font drawing, and tooltip rendering while removing `Object` shims and method lookup by string.
-4. Verify sequentially with `:common:26.1.2:compileJava`, a data-component-era node, and `:common:1.14.4:compileJava`; add runtime checks only if the touched client behavior has existing coverage or a focused TeaKit path.
-
-After `ClientCompat`, continue the same overlay pattern for creative tabs, Forge event/mixin helpers, and registrar code.
+Continue the same overlay pattern for creative tabs, Forge event/mixin helpers, and registrar code. Those are the remaining known Minecraft/loader API reflection sites after the common compat classes.
