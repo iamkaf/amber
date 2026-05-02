@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
-public abstract class LegacyLevelRendererMixin {
+public abstract class LevelRendererMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -50,6 +50,6 @@ public abstract class LegacyLevelRendererMixin {
     }
 
     static {
-        AmberMod.AMBER_MIXINS.add("LegacyLevelRendererMixin");
+        AmberMod.AMBER_MIXINS.add("LevelRendererMixin");
     }
 }

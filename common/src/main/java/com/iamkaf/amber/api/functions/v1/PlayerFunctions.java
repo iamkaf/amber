@@ -18,6 +18,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import com.iamkaf.amber.util.compat.PlayerCompat;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Abilities;
@@ -954,11 +955,7 @@ public final class PlayerFunctions {
     }
 
     private static void displayClientMessage(Player player, Component message, boolean actionBar) {
-        try {
-            player.getClass().getMethod("displayClientMessage", Component.class, boolean.class).invoke(player, message, actionBar);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to display client message", exception);
-        }
+        PlayerCompat.displayClientMessage(player, message, actionBar);
     }
 
     private static void sendPacket(ServerPlayer player, Object packet) {
