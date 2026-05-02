@@ -5,7 +5,9 @@
   "compatibilityLevel": "${mixin_compat_forge}",
   "mixins": [
     "BoneMealItemMixin",
+    //? if >=1.19
     "CraftedItemMixin",
+    //? if >=1.19
     "CraftingPlayerMixin",
     "CropBlockMixin",
     //? if <1.19.3
@@ -16,7 +18,9 @@
   ],
   "client": [
     "GuiMixin",
+    //? if >=1.19
     "LevelRendererMixin",
+    //? if >=1.19
     "MouseHandlerMixin"
   ],
   "server": [],
