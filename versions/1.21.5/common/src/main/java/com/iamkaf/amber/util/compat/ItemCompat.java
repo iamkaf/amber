@@ -2,6 +2,7 @@ package com.iamkaf.amber.util.compat;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -58,6 +59,10 @@ public final class ItemCompat {
 
     public static ItemStack playerItemBySlot(Player player, EquipmentSlot slot) {
         return player.getItemBySlot(slot);
+    }
+
+    public static String modifierIdentity(AttributeModifier modifier) {
+        return modifier.id().toString();
     }
 
     public static ItemStack emptyStack() {

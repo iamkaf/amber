@@ -133,28 +133,23 @@ public final class WorldCompat {
         return level.getBiome(position);
     }
 
-    public static double aabbCoordinate(AABB box, String fieldName) {
-        return switch (fieldName) {
-            case "minX" -> box.minX;
-            case "minY" -> box.minY;
-            case "minZ" -> box.minZ;
-            case "maxX" -> box.maxX;
-            case "maxY" -> box.maxY;
-            case "maxZ" -> box.maxZ;
-            default -> throw new IllegalArgumentException("Unknown AABB coordinate: " + fieldName);
-        };
+    public static double aabbMinX(AABB box) { return box.minX; }
+    public static double aabbMinY(AABB box) { return box.minY; }
+    public static double aabbMinZ(AABB box) { return box.minZ; }
+    public static double aabbMaxX(AABB box) { return box.maxX; }
+    public static double aabbMaxY(AABB box) { return box.maxY; }
+    public static double aabbMaxZ(AABB box) { return box.maxZ; }
+
+    public static int vec3iX(Vec3i vector) {
+        return vector.getX();
     }
 
-    public static int vec3iX(Object vector) {
-        return ((Vec3i) vector).getX();
+    public static int vec3iY(Vec3i vector) {
+        return vector.getY();
     }
 
-    public static int vec3iY(Object vector) {
-        return ((Vec3i) vector).getY();
-    }
-
-    public static int vec3iZ(Object vector) {
-        return ((Vec3i) vector).getZ();
+    public static int vec3iZ(Vec3i vector) {
+        return vector.getZ();
     }
 
     public static Vec3i directionNormal(Direction direction) {
@@ -165,11 +160,11 @@ public final class WorldCompat {
         return direction.getOpposite();
     }
 
-    public static Object directionAxis(Direction direction) {
+    public static Direction.Axis directionAxis(Direction direction) {
         return direction.getAxis();
     }
 
-    public static Object directionAxisDirection(Direction direction) {
+    public static Direction.AxisDirection directionAxisDirection(Direction direction) {
         return direction.getAxisDirection();
     }
 }
