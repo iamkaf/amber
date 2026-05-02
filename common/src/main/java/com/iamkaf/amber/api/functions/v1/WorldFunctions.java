@@ -2,7 +2,7 @@ package com.iamkaf.amber.api.functions.v1;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.iamkaf.amber.util.compat.WorldCompat;
+import com.iamkaf.amber.compat.WorldCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 //? if >=1.18.2

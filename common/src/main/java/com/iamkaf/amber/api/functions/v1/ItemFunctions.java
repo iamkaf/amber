@@ -1,6 +1,6 @@
 package com.iamkaf.amber.api.functions.v1;
 
-import com.iamkaf.amber.util.compat.ItemCompat;
+import com.iamkaf.amber.compat.ItemCompat;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.iamkaf.amber.util.compat.ItemCompat.*;
+import static com.iamkaf.amber.compat.ItemCompat.*;
 
 /**
  * Consolidated utility class for item, inventory, and armor operations.
