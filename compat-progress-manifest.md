@@ -35,6 +35,7 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | `ClientCompat` extraction | `PASS` | `ClientFunctions` delegates Minecraft client calls to typed `ClientCompat` overlays. Representative API split nodes compiled sequentially. |
 | Modern Fabric creative tab display generator | `PASS` | `TabBuilder` no longer uses reflection/proxy dispatch to configure modern Fabric tab contents. Modern creative-tab registration now builds through the loader service, and Fabric access wideners expose `CreativeModeTab.Output` and `TabVisibility` only on `1.20+` nodes. Focused `26.1.2-fabric` creative-tab conformance passed. |
 | Forge creative tabs and platform/mixin helpers | `PASS` | Legacy Forge creative-tab mixins live in version overlays. Forge loot-table mutation, item component cache invalidation, renderer access, registrar keys, world lifecycle helpers, item pickup helpers, and shield-block fallbacks use typed calls or mixin accessors. All Forge compile/resource nodes passed sequentially; focused `26.1.2-forge` creative-tab conformance passed. |
+| Loader event setup routers | `PASS` | Fabric, Forge, and NeoForge `AmberEventSetup` classes are explicit service routers. Loader bus registration and callback forwarding live in version-overlay `*AmberEventHandlers` classes. All Forge, Fabric, and NeoForge compile/resource nodes passed sequentially after extraction. |
 
 ## Version Bands
 
@@ -50,6 +51,16 @@ Do not mark a row `PASS` only because a file exists. For overlay work, `PASS` re
 | `1.16.5` | `PASS` | `PASS` | `PASS` | `PASS` | Common compat classes and Forge platform/mixin paths are non-reflective outside event internals. Final Forge legacy node compiles and processes resources sequentially. |
 | `1.16` to `1.16.4` | `PASS` | `PASS` | `PASS` | `PASS` | Common compat classes are non-reflective and free of compat `Object` shims/string dispatch. Fabric-only band; previous full compile coverage remains intact. |
 | `1.15.x` to `1.14.4` | `PASS` | `PASS` | `PASS` | `PASS` | Common compat classes are non-reflective and free of compat `Object` shims/string dispatch. Fabric-only band; previous full compile coverage remains intact. |
+
+## Loader Event Setup Shape
+
+| Loader | Setup Class | Handler Class | Status | Verification |
+| --- | --- | --- | --- | --- |
+| Fabric | `FabricAmberEventSetup` | `versions/<mc>/fabric/.../FabricAmberEventHandlers` | `PASS` | Full Fabric compile and resource matrices passed sequentially. |
+| Forge | `ForgeAmberEventSetup` | `versions/<mc>/forge/.../ForgeAmberEventHandlers` | `PASS` | Full Forge compile and resource matrices passed sequentially. |
+| NeoForge | `NeoForgeAmberEventSetup` | `versions/<mc>/neoforge/.../NeoForgeAmberEventHandlers` | `PASS` | Full NeoForge compile and resource matrices passed sequentially. |
+
+The setup classes should stay as service-entry routers. Event handler classes should stay in version overlays so compile failures surface loader/version drift at the concrete implementation boundary.
 
 ## Compat Classes
 

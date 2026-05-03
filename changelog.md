@@ -12,6 +12,7 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Changed
 
 - Ported the mod to Stonecutter
+- Split Fabric, Forge, and NeoForge event setup service classes into explicit loader routers backed by version-overlay event handler classes
 
 ### Fixed
 
@@ -73,6 +74,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed pre-1.16 `ItemFunctions` weapon classification and attack-damage lookup against legacy attribute APIs
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 - Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods
+- Fixed legacy Fabric creative-tab service generation so pre-1.19.3 Fabric nodes compile through the shared legacy `TabBuilder` implementation
 - Replaced Forge creative-tab, loot-table, item-component, render, registrar, and legacy event reflection with typed calls, mixin accessors, and version overlays
 
 ## 10.0.2

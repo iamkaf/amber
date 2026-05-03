@@ -14,8 +14,6 @@ import com.iamkaf.amber.platform.services.ICreativeModeTabService;
 import net.minecraft.core.registries.Registries;
 //? if >=1.19.3 && <1.20
 /*import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;*/
-//? if <1.19.3
-/*import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;*/
 //? if >=1.20
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
@@ -51,7 +49,7 @@ public class FabricCreativeModeTabService implements ICreativeModeTabService {
             tabBuilder.noScrollBar();
         }
         return tabBuilder.build();
-        //?} else
+        //?}
         //? if >=1.19.3 && <1.20 {
         /*CreativeModeTab.Builder tabBuilder = FabricItemGroup.builder(builder.getId());
         tabBuilder.title(builder.getTitle());
@@ -66,28 +64,9 @@ public class FabricCreativeModeTabService implements ICreativeModeTabService {
             tabBuilder.noScrollBar();
         }
         return tabBuilder.build();*/
-        //?} else if <1.19.3 {
-        /*return FabricItemGroupBuilder.create(builder.getId())
-                .icon(builder.getIcon())
-                .appendItems(stacks -> {
-                    for (var item : builder.getItems()) {
-                        stacks.add(new ItemStack(item.get()));
-                    }
-                    net.minecraft.resources.ResourceKey<CreativeModeTab> tabKey = net.minecraft.resources.ResourceKey.create(
-                            net.minecraft.resources.ResourceKey.createRegistryKey(new net.minecraft.resources.ResourceLocation("minecraft", "creative_mode_tab")),
-                            builder.getId()
-                    );
-                    CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                        @Override
-                        public void accept(ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                            stacks.add(stack);
-                        }
-                    });
-                })
-                .build();*/
-        //?} else {
-        return builder.build();
         //?}
+        //? if <1.19.3
+        /*return builder.build();*/
     }
 
     //? if >=1.20 {
