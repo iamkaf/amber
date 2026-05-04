@@ -309,10 +309,9 @@ public final class ItemFunctions {
      * @param stack     The {@code ItemStack} to add the modifier to.
      * @param attribute Which {@code Attribute} to add the modifier to.
      * @param modifier  Your attribute modifier.
-     * @param slotGroup The {@code EquipmentSlotGroup} the modifier is applicable for.
+     * @param slotGroup The equipment slot or slot group the modifier is applicable for.
      * @see Attribute
      * @see AttributeModifier
-     * @see EquipmentSlotGroup
      */
     public static void addModifier(ItemStack stack,
             //? if >=1.18.2
