@@ -38,7 +38,6 @@ public interface CommandEvents {
      *
      * @param dispatcher the command dispatcher to register commands to
      * @param registryAccess object exposing access to the game's registries
-     * @param environment environment the registrations should be done for, used for commands that are dedicated or integrated server only
      */
     void register(CommandDispatcher<CommandSourceStack> dispatcher,
             //? if >=1.19
