@@ -24,7 +24,7 @@ public class ItemEntityMixin {
     )
     private void onItemPickup(Player player, CallbackInfo ci) {
         ItemEntity itemEntity = (ItemEntity) (Object) this;
-        ItemEvents.ITEM_PICKUP.invoker().onItemPickup(player, itemEntity, itemEntity.getItem().copy());
+        ItemEvents.ITEM_PICKUP.invoker().onItemPickup(player, itemEntity, itemEntity.getItem());
     }
 
     static {

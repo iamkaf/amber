@@ -65,7 +65,7 @@ public abstract class SheepMixin {
             /*ItemStack tool,*/
             BiConsumer<ServerLevel, ItemStack> dropConsumer, Operation<Void> original) {
         original.call(sheep, level, lootTable, tool, (BiConsumer<ServerLevel, ItemStack>) (dropLevel, drop) -> {
-            amber$capturedShearDrops.add(drop.copy());
+            amber$capturedShearDrops.add(drop);
             dropConsumer.accept(dropLevel, drop);
         });
     }

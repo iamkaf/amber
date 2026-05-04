@@ -17,6 +17,7 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Fixed
 
 - Fixed Fabric `ItemEvents.ITEM_PICKUP` firing repeatedly before vanilla completed the pickup
+- Fixed event payloads cloning `ItemStack` instances before consumer callbacks instead of preserving vanilla stack identity
 - Fixed Fabric `EntityEvent.SHEAR` not firing for player-sheared sheep on modern Minecraft versions
 - Fixed Fabric `EntityEvent.SHEAR` reporting an empty drops list for player-sheared sheep on modern Minecraft versions
 - Fixed Fabric `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
