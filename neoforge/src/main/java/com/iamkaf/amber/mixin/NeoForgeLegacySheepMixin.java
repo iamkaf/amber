@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class NeoForgeLegacySheepMixin {
     //? if <1.21.2 {
     @Inject(
+            require = 0,
             method = "mobInteract",
             at = @At(
                     value = "INVOKE",

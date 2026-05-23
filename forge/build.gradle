@@ -242,19 +242,76 @@ if (useLegacy1165ForgeRunHack) {
             "caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}_mapped_official_${minecraftVersion}"
         )
     }
+    def legacyForgeMavenizedDir = providers.provider {
+        rootProject.layout.projectDirectory.dir(
+            ".gradle/mavenizer/repo/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}"
+        ).asFile
+    }
+    def legacyForgeMavenizerCacheDir = providers.provider {
+        new File(
+            gradle.gradleUserHomeDir,
+            "caches/minecraftforge/forgegradle/mavenizer/caches/maven/forge/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}"
+        )
+    }
     def legacyForgeUserdevJar = providers.provider {
         def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-recomp.jar' }.files
-        if (matches.size() != 1) {
-            throw new GradleException("Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()}")
+        if (matches.size() == 1) {
+            return matches.first()
         }
-        matches.first()
+
+        def mavenizedJar = new File(
+            legacyForgeMavenizedDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}.jar"
+        )
+        if (mavenizedJar.isFile()) {
+            return mavenizedJar
+        }
+
+        throw new GradleException(
+            "Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()} " +
+                "or Mavenizer jar at ${mavenizedJar}"
+        )
     }
     def legacyForgeLauncherJar = providers.provider {
         def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-launcher.jar' }.files
-        if (matches.size() != 1) {
-            throw new GradleException("Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()}")
+        if (matches.size() == 1) {
+            return matches.first()
         }
-        matches.first()
+
+        def mavenizedLauncherJar = new File(
+            legacyForgeMavenizedDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}-launcher.jar"
+        )
+        if (mavenizedLauncherJar.isFile()) {
+            return mavenizedLauncherJar
+        }
+
+        throw new GradleException(
+            "Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()} " +
+                "or Mavenizer launcher jar at ${mavenizedLauncherJar}"
+        )
+    }
+    def legacyForgeRawUserdevJar = providers.provider {
+        def userdevJar = new File(
+            legacyForgeMavenizerCacheDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}-userdev.jar"
+        )
+        if (userdevJar.isFile()) {
+            return userdevJar
+        }
+
+        throw new GradleException("Missing legacy Forge userdev jar at ${userdevJar}")
+    }
+    def legacyForgeUserdevInjectJar = tasks.register('legacyForgeUserdevInjectJar', Jar) {
+        archiveClassifier.set('legacy-forge-userdev-inject')
+        from({
+            zipTree(legacyForgeRawUserdevJar.get()).matching { include 'inject/**' }
+        }) {
+            eachFile { details ->
+                details.path = details.path.replaceFirst('^inject/', '')
+            }
+            includeEmptyDirs = false
+        }
     }
 
     dependencies {
@@ -262,6 +319,7 @@ if (useLegacy1165ForgeRunHack) {
         compileOnly(files(legacyForgeLauncherJar))
         runtimeOnly(files(legacyForgeUserdevJar))
         runtimeOnly(files(legacyForgeLauncherJar))
+        runtimeOnly(files(legacyForgeUserdevInjectJar))
         runtimeOnly 'net.jodah:typetools:0.6.3'
     }
 
@@ -281,6 +339,12 @@ if (useLegacy1165ForgeRunHack) {
         }
         eachFile { details -> details.path = details.name }
         includeEmptyDirs = false
+    }
+    def prepareLegacyForgeAssets = tasks.register('prepareLegacyForgeAssets') {
+        outputs.dir(assetsDir)
+        doLast {
+            assetsDir.get().mkdirs()
+        }
     }
     def stageTeaKitLegacyForgeMod = tasks.register('stageTeaKitLegacyForgeMod') {
         onlyIf { useTeaKit && teaKitVersion != null && teaKitVersion != 'null' }
@@ -346,6 +410,7 @@ if (useLegacy1165ForgeRunHack) {
         }
         if (task.name in ['runClient', 'runData']) {
             task.dependsOn(stageLegacyForgeNatives)
+            task.dependsOn(prepareLegacyForgeAssets)
         }
         if (task.name == 'runClient') {
             task.dependsOn(stageTeaKitLegacyForgeMod)

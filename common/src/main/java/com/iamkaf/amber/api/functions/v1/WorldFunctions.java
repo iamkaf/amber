@@ -8,6 +8,9 @@ import net.minecraft.core.Direction;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
+//? if >=1.19
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 //? if >=1.16
@@ -29,6 +32,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 //? if >=1.17
 import net.minecraft.world.level.entity.EntityTypeTest;
+//? if >=1.19
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -738,6 +743,30 @@ public final class WorldFunctions {
         //? if <1.18.2
         /*return level.getBiome(new BlockPos(position));*/
     }
+
+    //? if >=1.19 {
+    /**
+     * Checks whether a position is inside a generated structure.
+     *
+     * @param level The level to check.
+     * @param position The position to test.
+     * @param structure The structure key to match.
+     * @return true when the position is inside a valid matching structure piece.
+     */
+    public static boolean isInsideStructure(Level level, BlockPos position, ResourceKey<Structure> structure) {
+        if (!(level instanceof ServerLevel serverLevel) || !serverLevel.isLoaded(position)) {
+            return false;
+        }
+
+        //? if >=1.20.5 {
+        return serverLevel.structureManager()
+                .getStructureWithPieceAt(position, holder -> holder.is(structure))
+                .isValid();
+        //?} else {
+        /*return serverLevel.structureManager().getStructureWithPieceAt(position, structure).isValid();*/
+        //?}
+    }
+    //?}
 
     /**
      * Checks if the position is in a specific precipitation type.

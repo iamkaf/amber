@@ -15,6 +15,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerLightningStrikeEvents();
         ForgeAmberEventHandlers.registerBlockEvents();
         ForgeAmberEventHandlers.registerAnimalEvents();
+        ForgeAmberEventHandlers.registerFishingEvents();
         ForgeAmberEventHandlers.registerShieldBlockEvents();
         ForgeAmberEventHandlers.registerCreativeTabEvents();
         ForgeAmberEventHandlers.registerDefaultItemComponentEvents();
@@ -37,5 +38,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerServerTickEvents();
         ForgeAmberEventHandlers.registerPlayerLifecycleEvents();
         ForgeAmberEventHandlers.registerItemEvents();
+        ForgeAmberEventHandlers.registerCraftItemEvents();
     }
 }
