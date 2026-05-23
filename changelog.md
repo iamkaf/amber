@@ -11,80 +11,22 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
-- Added `WorldFunctions.isInsideStructure` for checking whether a server position is inside a generated structure piece.
+- Added `FishingEvents.MODIFY_CATCH`, which lets mods inspect and mutate fishing drops when a player reels in a catch.
+- Added `WorldFunctions.isInsideStructure` on Minecraft 1.19+ for checking whether a server position is inside a generated structure piece.
+- Added Forge builds to the 26.1.x line.
 
 ### Changed
 
-- Added `FishingEvents.MODIFY_CATCH` so mods can inspect and mutate fishing drops at real rod retrieval time.
-- Ported the mod to Stonecutter
-- Split Fabric, Forge, and NeoForge event setup service classes into explicit loader routers backed by version-overlay event handler classes
+- Expanded Amber's release matrix through Stonecutter-backed Minecraft version builds.
 
 ### Fixed
 
-- Fixed Fabric `ItemEvents.ITEM_PICKUP` firing repeatedly before vanilla completed the pickup
-- Fixed event payloads cloning `ItemStack` instances before consumer callbacks instead of preserving vanilla stack identity
-- Fixed Fabric `EntityEvent.SHEAR` not firing for player-sheared sheep on modern Minecraft versions
-- Fixed Fabric `EntityEvent.SHEAR` reporting an empty drops list for player-sheared sheep on modern Minecraft versions
-- Fixed Fabric `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
-- Fixed Fabric `PlayerEvents.SHIELD_BLOCK` not firing for fully blocked shield damage
-- Fixed Fabric `FarmingEvents.BONEMEAL_USE` firing once on the client and once on the server for a single use
-- Fixed Fabric `FarmingEvents.FARMLAND_TRAMPLE` not firing or supporting cancellation on modern Minecraft versions
-- Fixed Fabric `LootEvents.MODIFY` not forwarding loot table callbacks on 1.20.5 and 1.20.6
-- Fixed Fabric `NetworkChannel.sendToAllPlayers` not having an active server for `PlayerLookup.all`
-- Fixed Fabric custom creative tabs registered by consumer mods not receiving Amber creative tab content callbacks on 26.1, 1.21.x, 1.20.6, and 1.20.5
-- Fixed Fabric custom creative tab registration crashing on 1.19.2 by using Fabric API's legacy item group builder instead of vanilla's fixed tab array
-- Fixed Fabric 1.19.2 vanilla creative tab content callbacks by bridging legacy `CreativeModeTab#fillItemList`
-- Fixed Fabric 1.19.2 custom creative tabs not invoking Amber content callbacks when their item lists are built
-- Fixed Forge 1.19.2 compiling against the 1.19.3-only `CreativeModeTabEvent` bridge
-- Fixed Forge 1.19.2 vanilla creative tab content callbacks by bridging legacy `CreativeModeTab#fillItemList`
-- Fixed legacy custom creative tabs not invoking Amber content callbacks when their item lists are built on pre-1.19.3 loaders
-- Fixed Forge 1.18.x custom creative tab creation crashing from direct legacy tab array and identifier method links
-- Fixed Forge 1.18.x deferred registry supplier metadata crashing from direct resource-key location links
-- Fixed Forge 1.18.x command and client-command registration crashing from direct legacy registry-access field links
-- Fixed Forge 1.18.x world lifecycle events crashing from direct legacy server accessor method links
-- Fixed Forge 1.18.x entity damage events crashing from direct legacy level side field links
-- Fixed Forge 1.18.x `HudEvents.RENDER_HUD` not firing by bridging legacy overlay render events
-- Fixed Forge 1.18.x `RenderEvents.BLOCK_OUTLINE_RENDER` crashing from direct client renderer field links
-- Fixed Forge 1.18 `PlayerEvents.SHIELD_BLOCK` not firing by falling back to the legacy blocked-damage path when Forge has no shield-block event
-- Fixed Forge 1.18.x `ClientFunctions.shouldRenderHud` crashing from direct client singleton and options links
-- Fixed Forge 1.18.x `ClientFunctions.renderText` and legacy tooltip helpers crashing from direct client rendering and item-stack links
-- Fixed Forge 1.18.x `ItemFunctions` inventory helpers crashing from direct inventory method links
-- Fixed old Fabric `ClientCommandEvents.EVENT` registrations becoming invisible to consumer callbacks that register after Amber setup
-- Fixed pre-1.18.2 function helpers directly linking `Holder` APIs that do not exist on older Minecraft versions
-- Fixed Forge 1.19 event guards to use the patched 41.1.x `level` event package and key mapping APIs
-- Fixed Fabric legacy sheep shearing mixin imports on 1.18.x
-- Fixed `PlayerFunctions` last-death-location helpers on pre-1.19 Minecraft versions
-- Fixed NeoForge `NetworkChannel.sendToAllPlayers` not broadcasting clientbound packets
-- Fixed NeoForge `BlockEvents.BLOCK_BREAK_BEFORE` firing twice from client and server break events
-- Fixed NeoForge `FarmingEvents.FARMLAND_TRAMPLE` not firing on modern Minecraft versions
-- Fixed NeoForge `EntityEvent.SHEAR` not firing for player-sheared sheep on modern and legacy 1.21 Minecraft versions
-- Fixed NeoForge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
-- Fixed Forge `EntityEvent.SHEAR` not firing for player-sheared sheep on modern Minecraft versions
-- Fixed Forge `RenderEvents.BLOCK_OUTLINE_RENDER` not firing because the client render mixin was not loaded
-- Fixed Forge `PlayerEvents.CRAFT_ITEM` missing crafted-item callback paths such as normal result-slot pickup and smithing table upgrades
-- Fixed Forge `ItemEvents.MODIFY_DEFAULT_COMPONENTS` missing late consumer registrations after default item component caches were initialized
-- Fixed Forge 1.19.3 custom creative tab content bridging against the current 44.1.x `CreativeModeTabEvent.BuildContents` API
-- Fixed legacy Forge keybind registration racing late consumer registrations after Forge's key mapping event had already fired
-- Fixed Forge 1.17.1 `InputEvents.MOUSE_SCROLL_PRE` and `InputEvents.MOUSE_SCROLL_POST` by bridging the native legacy mouse scroll event
-- Fixed Forge 1.17.1 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the native legacy block selection render event
-- Fixed Forge 1.17.1 ordinary `PlayerEvents.CRAFT_ITEM` callbacks by bridging Forge's native item-crafted event
-- Fixed Forge 1.16.5 `PlayerEvents.CRAFT_ITEM` duplicate ordinary crafting callbacks while preserving broader `Item.onCraftedBy` paths such as smithing
-- Fixed Forge 1.16.5 `PlayerEvents.SHIELD_BLOCK` not firing by bridging the vanilla shield-use damage path
-- Fixed Fabric 1.16 and 1.16.1 `PlayerEvents.CRAFT_ITEM` missing smithing table callbacks
-- Fixed Fabric 1.16.1 and older `PlayerEvents.PLAYER_RESPAWN` not firing because the legacy respawn signature was not bridged
-- Fixed Fabric 1.15.x and 1.14.4 `ItemEvents.ITEM_PICKUP` by targeting the legacy successful-pickup call path
-- Fixed Fabric 1.15.x and 1.14.4 `EntityEvent.SHEAR` by targeting the legacy sheep shearing method
-- Fixed Fabric 1.15.x and 1.14.4 `FishingEvents.MODIFY_CATCH` by targeting the legacy fishing loot assignment path
-- Completed `FishingEvents.MODIFY_CATCH` and `WorldFunctions.isInsideStructure` parity verification across the full Amber compile, build, and boot matrix
-- Fixed Fabric legacy animal breeding callbacks firing twice from the baby and XP spawn calls
-- Fixed Fabric 1.14.4 `HudEvents.RENDER_HUD` by bridging the legacy GUI render path
-- Fixed Fabric 1.14.4 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the legacy hit-outline renderer
-- Fixed pre-1.16 `ItemFunctions` weapon classification and attack-damage lookup against legacy attribute APIs
-- Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
-- Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods
-- Fixed legacy Fabric creative-tab service generation so pre-1.19.3 Fabric nodes compile through the shared legacy `TabBuilder` implementation
-- Fixed Fabric `ClientCommandEvents.EVENT` registering callbacks against a throwaway dispatcher, making consumer client commands unavailable in-game
-- Replaced Forge creative-tab, loot-table, item-component, render, registrar, and legacy event reflection with typed calls, mixin accessors, and version overlays
+- Fixed event callback delivery preserving vanilla `ItemStack` identity instead of cloning stacks before consumer callbacks.
+- Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts.
+- Fixed Fabric custom creative tab registration and content callbacks across legacy and modern creative tab APIs.
+- Fixed Fabric `ClientCommandEvents.EVENT` registering callbacks against a throwaway dispatcher, making consumer client commands unavailable in-game.
+- Fixed NeoForge `NetworkChannel.sendToAllPlayers` not broadcasting clientbound packets.
+- Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods.
 
 ## 10.0.2
 
