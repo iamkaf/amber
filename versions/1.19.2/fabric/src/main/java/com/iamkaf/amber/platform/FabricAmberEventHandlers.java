@@ -144,7 +144,8 @@ final class FabricAmberEventHandlers {
     static void registerClientCommandEvents() {
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
+            CommandDispatcher<CommandSourceStack> commandsTemp =
+                    (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) dispatcher;
             ClientCommandEvents.EVENT.invoker().register(commandsTemp, registryAccess);
         });
 

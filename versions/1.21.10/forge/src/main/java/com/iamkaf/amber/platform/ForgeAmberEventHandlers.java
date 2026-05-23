@@ -33,6 +33,7 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 
 import net.minecraftforge.event.level.BlockEvent;
 
@@ -152,6 +153,11 @@ final class ForgeAmberEventHandlers {
 
 
     }
+
+    static void registerFishingEvents() {
+        ItemFishedEvent.BUS.addListener(true, ForgeAmberEventHandlers.EventHandlerCommon::onItemFished);
+    }
+
 
     static void registerShieldBlockEvents() {
 
@@ -279,6 +285,19 @@ final class ForgeAmberEventHandlers {
 
             });
         }
+        public static void onItemFished(ItemFishedEvent event) {
+            FishingEvents.MODIFY_CATCH.invoker().modify(
+                    (net.minecraft.server.level.ServerPlayer) event.getEntity(),
+                    event.getHookEntity(),
+                    event.getEntity().getMainHandItem(),
+                    event.getDrops()
+            );
+            for (ItemStack drop : event.getDrops()) {
+                event.getEntity().addItem(drop.copy());
+            }
+        }
+
+
 
 
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {

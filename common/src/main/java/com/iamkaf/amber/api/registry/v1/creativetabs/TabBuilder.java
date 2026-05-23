@@ -10,9 +10,15 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
+//? if <1.19.3
+/*import java.lang.reflect.Field;*/
 import java.util.ArrayList;
+//? if <1.19.3
+/*import java.util.Arrays;*/
 import java.util.List;
 import java.util.function.Supplier;
+//? if <1.19.3
+/*import sun.misc.Unsafe;*/
 
 /**
  * Builder for creating custom creative mode tabs.
@@ -298,11 +304,48 @@ public class TabBuilder {
     //? if <1.19.3 {
     /*@SuppressWarnings("deprecation")*/
     private static int nextLegacyTabIndex() {
-        //? if <1.19.3
-        /*return CreativeModeTab.TABS.length;*/
+        //? if <1.19.3 {
+        /*CreativeModeTab[] tabs = legacyTabs();
+        int index = tabs.length;
+        setLegacyTabs(Arrays.copyOf(tabs, index + 1));
+        return index;*/
+        //?}
         //? if >=1.19.3
         return 0;
     }
+
+    //? if <1.19.3 {
+    /*private static CreativeModeTab[] legacyTabs() {
+        return legacyTabsReflectively();
+    }
+
+    private static void setLegacyTabs(CreativeModeTab[] tabs) {
+        setLegacyTabsReflectively(tabs);
+    }
+
+    private static CreativeModeTab[] legacyTabsReflectively() {
+        try {
+            Field field = CreativeModeTab.class.getDeclaredField("TABS");
+            field.setAccessible(true);
+            return (CreativeModeTab[]) field.get(null);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to read legacy creative tabs", exception);
+        }
+    }
+
+    private static void setLegacyTabsReflectively(CreativeModeTab[] tabs) {
+        try {
+            Field field = CreativeModeTab.class.getDeclaredField("TABS");
+            field.setAccessible(true);
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            Unsafe unsafe = (Unsafe) unsafeField.get(null);
+            unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), tabs);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resize legacy creative tabs", exception);
+        }
+    }*/
+    //?}
 
     private static String legacyTabName(Identifier id) {
         return id.toString().replace(':', '.');

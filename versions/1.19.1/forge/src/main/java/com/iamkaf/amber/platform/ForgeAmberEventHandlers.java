@@ -26,6 +26,7 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 
 import net.minecraftforge.event.level.BlockEvent;
 
@@ -150,6 +151,11 @@ final class ForgeAmberEventHandlers {
 
     }
 
+    static void registerFishingEvents() {
+        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onItemFished);
+    }
+
+
     static void registerShieldBlockEvents() {
 
 
@@ -250,11 +256,26 @@ final class ForgeAmberEventHandlers {
 
         private static void addLootPool(net.minecraft.world.level.storage.loot.LootTable table, net.minecraft.world.level.storage.loot.LootPool pool) {
             LootTableAccessor accessor = (LootTableAccessor) table;
-            net.minecraft.world.level.storage.loot.LootPool[] pools = accessor.amber$getPools();
-            net.minecraft.world.level.storage.loot.LootPool[] expanded = java.util.Arrays.copyOf(pools, pools.length + 1);
-            expanded[pools.length] = pool;
-            accessor.amber$setPools(expanded);
+            java.util.List<net.minecraft.world.level.storage.loot.LootPool> pools = new java.util.ArrayList<>(accessor.amber$getPools());
+
+            pools.add(pool);
+
+            accessor.amber$setPools(pools);
         }
+        public static void onItemFished(ItemFishedEvent event) {
+            FishingEvents.MODIFY_CATCH.invoker().modify(
+                    (net.minecraft.server.level.ServerPlayer) event.getEntity(),
+                    event.getHookEntity(),
+                    event.getEntity().getMainHandItem(),
+                    event.getDrops()
+            );
+            event.setCanceled(true);
+            for (ItemStack drop : event.getDrops()) {
+                event.getEntity().addItem(drop.copy());
+            }
+        }
+
+
 
 
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {

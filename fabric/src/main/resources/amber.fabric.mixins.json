@@ -19,6 +19,7 @@
     "CreativeModeTabMixin",
     "CropBlockMixin",
     "FarmlandBlockMixin",
+    "FishingHookMixin",
     //? if >=1.20.5
     "ItemAccessor",
     "ItemEntityMixin",

@@ -5,7 +5,7 @@
   "compatibilityLevel": "${mixin_compat_forge}",
   "mixins": [
     "BoneMealItemMixin",
-    //? if >=1.19
+    //? if >=1.16
     "CraftedItemMixin",
     //? if >=1.19
     "CraftingPlayerMixin",

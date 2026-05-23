@@ -9,8 +9,13 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ## 11.0.0
 
+### Added
+
+- Added `WorldFunctions.isInsideStructure` for checking whether a server position is inside a generated structure piece.
+
 ### Changed
 
+- Added `FishingEvents.MODIFY_CATCH` so mods can inspect and mutate fishing drops at real rod retrieval time.
 - Ported the mod to Stonecutter
 - Split Fabric, Forge, and NeoForge event setup service classes into explicit loader routers backed by version-overlay event handler classes
 
@@ -69,6 +74,8 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed Fabric 1.16.1 and older `PlayerEvents.PLAYER_RESPAWN` not firing because the legacy respawn signature was not bridged
 - Fixed Fabric 1.15.x and 1.14.4 `ItemEvents.ITEM_PICKUP` by targeting the legacy successful-pickup call path
 - Fixed Fabric 1.15.x and 1.14.4 `EntityEvent.SHEAR` by targeting the legacy sheep shearing method
+- Fixed Fabric 1.15.x and 1.14.4 `FishingEvents.MODIFY_CATCH` by targeting the legacy fishing loot assignment path
+- Completed `FishingEvents.MODIFY_CATCH` and `WorldFunctions.isInsideStructure` parity verification across the full Amber compile, build, and boot matrix
 - Fixed Fabric legacy animal breeding callbacks firing twice from the baby and XP spawn calls
 - Fixed Fabric 1.14.4 `HudEvents.RENDER_HUD` by bridging the legacy GUI render path
 - Fixed Fabric 1.14.4 `RenderEvents.BLOCK_OUTLINE_RENDER` by bridging the legacy hit-outline renderer
@@ -76,6 +83,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts
 - Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods
 - Fixed legacy Fabric creative-tab service generation so pre-1.19.3 Fabric nodes compile through the shared legacy `TabBuilder` implementation
+- Fixed Fabric `ClientCommandEvents.EVENT` registering callbacks against a throwaway dispatcher, making consumer client commands unavailable in-game
 - Replaced Forge creative-tab, loot-table, item-component, render, registrar, and legacy event reflection with typed calls, mixin accessors, and version overlays
 
 ## 10.0.2
