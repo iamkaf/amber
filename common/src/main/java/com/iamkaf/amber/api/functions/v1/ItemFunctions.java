@@ -1,5 +1,6 @@
 package com.iamkaf.amber.api.functions.v1;
 
+import com.iamkaf.amber.compat.ItemCompat;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
@@ -39,6 +40,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.iamkaf.amber.compat.ItemCompat.*;
+
 /**
  * Consolidated utility class for item, inventory, and armor operations.
  * This class combines functionality from the old InventoryHelper, ItemHelper, and ArmorTierHelper
@@ -62,10 +65,10 @@ public final class ItemFunctions {
      * @return true if the item was found and consumed, false otherwise.
      */
     public static boolean consumeIfAvailable(Inventory inventory, ItemLike item) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.getItem() == item.asItem() && stack.getCount() > 0) {
-                stack.shrink(1);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stackItem(stack) == itemLikeItem(item) && stackCount(stack) > 0) {
+                shrinkStack(stack, 1);
                 return true;
             }
         }
@@ -81,10 +84,10 @@ public final class ItemFunctions {
      * @return true if the item was found and consumed, false otherwise.
      */
     public static boolean consumeIfAvailable(Inventory inventory, ItemLike item, int amount) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.getItem() == item.asItem() && stack.getCount() >= amount) {
-                stack.shrink(amount);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stackItem(stack) == itemLikeItem(item) && stackCount(stack) >= amount) {
+                shrinkStack(stack, amount);
                 return true;
             }
         }
@@ -96,10 +99,10 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean consumeIfAvailable(Inventory inventory, Ingredient ingredient, int amount) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (ingredient.test(stack) && stack.getCount() >= amount) {
-                stack.shrink(amount);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (ingredient.test(stack) && stackCount(stack) >= amount) {
+                shrinkStack(stack, amount);
                 return true;
             }
         }
@@ -112,10 +115,10 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean consumeIfAvailable(Inventory inventory, TagKey<Item> tag) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.is(tag) && stack.getCount() > 0) {
-                stack.shrink(1);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stack.is(tag) && stackCount(stack) > 0) {
+                shrinkStack(stack, 1);
                 return true;
             }
         }
@@ -127,10 +130,10 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean consumeIfAvailable(Inventory inventory, TagKey<Item> tag, int amount) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.is(tag) && stack.getCount() >= amount) {
-                stack.shrink(amount);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stack.is(tag) && stackCount(stack) >= amount) {
+                shrinkStack(stack, amount);
                 return true;
             }
         }
@@ -138,15 +141,14 @@ public final class ItemFunctions {
     }
     //?}
 
-    //? if >=1.18.2 {
     /**
      * Checks if the inventory contains the item.
      * Returns true if it does.
      */
     public static boolean has(Inventory inventory, ItemLike item) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.getItem() == item.asItem() && stack.getCount() > 0) {
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stackItem(stack) == itemLikeItem(item) && stackCount(stack) > 0) {
                 return true;
             }
         }
@@ -158,8 +160,8 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean has(Inventory inventory, Ingredient ingredient) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
             if (ingredient.test(stack)) {
                 return true;
             }
@@ -172,23 +174,24 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean has(Inventory inventory, Ingredient ingredient, int amount) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (ingredient.test(stack) && stack.getCount() >= amount) {
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (ingredient.test(stack) && stackCount(stack) >= amount) {
                 return true;
             }
         }
         return false;
     }
 
+    //? if >=1.18.2 {
     /**
      * Checks if the inventory contains the item.
      * Returns true if it does.
      */
     public static boolean has(Inventory inventory, TagKey<Item> tag) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.is(tag) && stack.getCount() > 0) {
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stack.is(tag) && stackCount(stack) > 0) {
                 return true;
             }
         }
@@ -200,9 +203,9 @@ public final class ItemFunctions {
      * Returns true if it does.
      */
     public static boolean has(Inventory inventory, TagKey<Item> tag, int amount) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (stack.is(tag) && stack.getCount() > amount) {
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            ItemStack stack = inventoryItem(inventory, i);
+            if (stack.is(tag) && stackCount(stack) > amount) {
                 return true;
             }
         }
@@ -214,8 +217,8 @@ public final class ItemFunctions {
      * Executes a predicate on each ItemStack in the inventory.
      */
     public static void forEach(Inventory inventory, Consumer<ItemStack> predicate) {
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            predicate.accept(inventory.getItem(i));
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            predicate.accept(inventoryItem(inventory, i));
         }
     }
 
@@ -228,9 +231,9 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static NonNullList<ItemStack> getInventoryItems(Inventory inventory) {
-        NonNullList<ItemStack> items = NonNullList.withSize(inventory.getContainerSize(), ItemStack.EMPTY);
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            items.set(i, inventory.getItem(i));
+        NonNullList<ItemStack> items = nonNullListWithSize(inventorySize(inventory), emptyStack());
+        for (int i = 0; i < inventorySize(inventory); i++) {
+            items.set(i, inventoryItem(inventory, i));
         }
         return items;
     }
@@ -245,10 +248,10 @@ public final class ItemFunctions {
      */
     public static List<ItemStack> getArmorSlots(Player player) {
         return List.of(
-                player.getItemBySlot(EquipmentSlot.HEAD),
-                player.getItemBySlot(EquipmentSlot.CHEST),
-                player.getItemBySlot(EquipmentSlot.LEGS),
-                player.getItemBySlot(EquipmentSlot.FEET)
+                playerItemBySlot(player, EquipmentSlot.HEAD),
+                playerItemBySlot(player, EquipmentSlot.CHEST),
+                playerItemBySlot(player, EquipmentSlot.LEGS),
+                playerItemBySlot(player, EquipmentSlot.FEET)
         );
     }
 
@@ -263,7 +266,7 @@ public final class ItemFunctions {
      * @param percent The percentage of the item's maximum durability to repair.
      */
     public static void repairBy(ItemStack item, float percent) {
-        item.setDamageValue(Math.round(item.getDamageValue() - (float) item.getMaxDamage() * percent));
+        setStackDamage(item, Math.round(stackDamage(item) - (float) stackMaxDamage(item) * percent));
     }
 
     /**
@@ -285,16 +288,16 @@ public final class ItemFunctions {
                 .map(itemHolder -> itemHolder.value().getDefaultInstance())
                 .toArray(ItemStack[]::new);
         *///?} else {
-        /*ItemStack[] items = ingredient.getItems();
+        /*ItemStack[] items = ingredientItems(ingredient);
         *///?}
 
         if (items.length == 1) {
-            return items[0].getDisplayName().getString();
+            return displayNameString(items[0]);
         }
 
         String itemNames = Arrays.stream(items)
                 .limit(3)
-                .map(item -> item.getDisplayName().getString())
+                .map(ItemCompat::displayNameString)
                 .collect(Collectors.joining(", "));
 
         return "One of " + itemNames + ", etc...";
@@ -306,10 +309,9 @@ public final class ItemFunctions {
      * @param stack     The {@code ItemStack} to add the modifier to.
      * @param attribute Which {@code Attribute} to add the modifier to.
      * @param modifier  Your attribute modifier.
-     * @param slotGroup The {@code EquipmentSlotGroup} the modifier is applicable for.
+     * @param slotGroup The equipment slot or slot group the modifier is applicable for.
      * @see Attribute
      * @see AttributeModifier
-     * @see EquipmentSlotGroup
      */
     public static void addModifier(ItemStack stack,
             //? if >=1.18.2
@@ -323,7 +325,7 @@ public final class ItemFunctions {
             /*EquipmentSlot slotGroup) {*/
         //? if <1.20.5 {
         //? if >=1.18.2
-        stack.addAttributeModifier(attribute.value(), modifier, slotGroup);
+        addStackAttributeModifier(stack, holderValue(attribute), modifier, slotGroup);
         //? if <1.18.2 && >=1.16
         /*stack.addAttributeModifier(attribute, modifier, slotGroup);*/
         //? if <1.16
@@ -333,22 +335,24 @@ public final class ItemFunctions {
         assert extraModifiers != null;
         var attributeBuilder = ItemAttributeModifiers.builder();
         var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<Object> added = new HashSet<>();
+        Set<String> added = new HashSet<>();
         for (var mod : defaultModifiers.modifiers()) {
-            if (!added.contains(mod.modifier().id())) {
+            String modifierId = modifierIdentity(mod.modifier());
+            if (!added.contains(modifierId)) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(mod.modifier().id());
+                added.add(modifierId);
             }
         }
         for (var mod : extraModifiers.modifiers()) {
-            if (mod.modifier().id().equals(modifier.id())) {
+            String modifierId = modifierIdentity(mod.modifier());
+            if (modifierId.equals(modifierIdentity(modifier))) {
                 // skipping so it can be overwritten
                 continue;
             }
             // prevents duplicates
-            if (!added.contains(mod.modifier().id())) {
+            if (!added.contains(modifierId)) {
                 attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(mod.modifier().id());
+                added.add(modifierId);
             }
         }
         attributeBuilder.add(attribute, modifier, slotGroup);
@@ -366,9 +370,9 @@ public final class ItemFunctions {
     public static boolean hasModifier(ItemStack stack, Identifier id) {
         //? if <1.20.5 {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (stack.getAttributeModifiers(slot).entries().stream()
+            if (stackAttributeModifiers(stack, slot).entries().stream()
                     //? if >=1.16
-                    .anyMatch(entry -> entry.getValue().save().getString("Name").equals(id.toString()))) {
+                    .anyMatch(entry -> tagString(modifierTag(entry.getValue()), "Name").equals(id.toString()))) {
                     //? if <1.16
                     /*.anyMatch(entry -> entry.getValue().getName().equals(id.toString()))) {*/
                 return true;
@@ -396,7 +400,7 @@ public final class ItemFunctions {
      */
     //? if >=1.20.5 {
     public static ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-        Item item = stack.getItem();
+        Item item = stackItem(stack);
 
         ItemStack defaultInstance = item.getDefaultInstance();
 
@@ -416,9 +420,8 @@ public final class ItemFunctions {
      */
     public static boolean containsEnchantment(ItemStack stack, Identifier enchantment) {
         //? if <1.20.5 {
-        return stack.getEnchantmentTags().stream()
-                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
-                .anyMatch(tag -> enchantment.toString().equals(tag.getString("id")));
+        return stackEnchantmentTags(stack).stream()
+                .anyMatch(tag -> enchantment.toString().equals(tagString(tag, "id")));
         //?} else {
         ItemEnchantments enchantments = stack.getEnchantments();
         if (enchantments.isEmpty()) {
@@ -475,7 +478,7 @@ public final class ItemFunctions {
      */
     public static int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
         //? if <1.20.5 {
-        return net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
+        return itemEnchantmentLevel(enchantment, stack);
         //?} else {
         if (enchantment == null) {
             return 0;
@@ -504,10 +507,9 @@ public final class ItemFunctions {
      */
     public static int getEnchantmentLevel(ItemStack stack, Identifier enchantment) {
         //? if <1.20.5 {
-        return stack.getEnchantmentTags().stream()
-                .map(tag -> (net.minecraft.nbt.CompoundTag) tag)
-                .filter(tag -> enchantment.toString().equals(tag.getString("id")))
-                .mapToInt(tag -> tag.getInt("lvl"))
+        return stackEnchantmentTags(stack).stream()
+                .filter(tag -> enchantment.toString().equals(tagString(tag, "id")))
+                .mapToInt(tag -> tagInt(tag, "lvl"))
                 .findFirst()
                 .orElse(0);
         //?} else {
@@ -534,7 +536,7 @@ public final class ItemFunctions {
      * @return true if the item has any enchantments, false otherwise.
      */
     public static boolean isEnchanted(ItemStack stack) {
-        return stack.isEnchanted();
+        return stackIsEnchanted(stack);
     }
 
     /**
@@ -561,7 +563,7 @@ public final class ItemFunctions {
      */
     public static boolean isTool(ItemStack stack) {
         //? if <1.20.5
-        /*return stack.getItem() instanceof net.minecraft.world.item.TieredItem;*/
+        /*return stackItem(stack) instanceof net.minecraft.world.item.TieredItem;*/
         //? if >=1.20.5
         return stack.has(DataComponents.TOOL);
     }
@@ -591,18 +593,19 @@ public final class ItemFunctions {
      */
     public static boolean isWeapon(ItemStack stack) {
         //? if <1.16
-        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE);*/
+        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());*/
         //? if <1.20.5 && >=1.16
-        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(Attributes.ATTACK_DAMAGE);*/
+        /*return stackAttributeModifiers(stack, EquipmentSlot.MAINHAND).containsKey(attackDamageAttribute());*/
         //? if >=1.20.5 {
         //? if >=1.21.5
         return stack.has(DataComponents.WEAPON);
-        //? if <1.21.5
+        //? if <1.21.5 {
         /*return stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
                 .modifiers()
                 .stream()
                 .anyMatch(modifier -> modifier.attribute().equals(Attributes.ATTACK_DAMAGE)
-                        && modifier.modifier().amount() > 0.0D);*/
+                        && modifier.modifier().amount() > 0.0D);
+        *///?}
         //?}
     }
 
@@ -616,7 +619,7 @@ public final class ItemFunctions {
      */
     public static boolean isWeapon(Item item) {
         //? if <1.20.5
-        /*return isWeapon(item.getDefaultInstance());*/
+        /*return isWeapon(itemDefaultInstance(item));*/
         //? if >=1.20.5 {
         //? if >=1.21.5
         return item.getDefaultInstance().has(DataComponents.WEAPON);
@@ -638,7 +641,7 @@ public final class ItemFunctions {
         //? if >=1.21.2
         return stack.has(DataComponents.EQUIPPABLE);
         //? if <1.21.2
-        /*return stack.getItem() instanceof ArmorItem;*/
+        /*return stackItem(stack) instanceof ArmorItem;*/
     }
 
     /**
@@ -667,6 +670,10 @@ public final class ItemFunctions {
      */
     public static Supplier<Ingredient> createRepairIngredient(Supplier<Item> item) {
         return () -> Ingredient.of(item.get());
+    }
+
+    private static String modifierIdentity(AttributeModifier modifier) {
+        return ItemCompat.modifierIdentity(modifier);
     }
 
     // ==================== ARMOR TIER ENUMS ====================

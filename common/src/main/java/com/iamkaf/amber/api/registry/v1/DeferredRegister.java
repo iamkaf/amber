@@ -119,7 +119,12 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
      * @param supplier a factory taking the entry key
      */
     public <R extends T> RegistrySupplier<R> register(Identifier id, Function<ResourceKey<T>, ? extends R> supplier) {
-        return register(id, (Supplier<? extends R>) () -> supplier.apply(ResourceKey.create(this.key, id)));
+        return register(id, (Supplier<? extends R>) () -> supplier.apply(entryKey(this.key, id)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ResourceKey<T> entryKey(ResourceKey<? extends Registry<T>> registryKey, Identifier id) {
+        return ResourceKey.create((ResourceKey<Registry<T>>) registryKey, id);
     }
 
     /**
@@ -177,7 +182,7 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             //? if >=1.21.11
             return getRegistrar().key().identifier();
             //? if <1.21.11
-            /*return getRegistrar().key().location();*/
+            /*return keyLocation(getRegistrar().key());*/
         }
 
         @Override
@@ -190,4 +195,10 @@ public class DeferredRegister<T> implements Iterable<RegistrySupplier<T>> {
             return (Registrar<R>) DeferredRegister.this.getRegistrar();
         }
     }
+
+    //? if <1.21.11 {
+    /*private static Identifier keyLocation(ResourceKey<?> key) {
+        return key.location();
+    }*/
+    //?}
 }

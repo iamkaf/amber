@@ -3,6 +3,7 @@ import com.iamkaf.amber.platform.services.IKeybindRegister;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
+import com.iamkaf.amber.platform.services.ICreativeModeTabService;
 import com.iamkaf.amber.platform.services.INetworkingService;
 import com.iamkaf.amber.platform.services.IPlatformHelper;
 import com.iamkaf.amber.platform.services.IRegistrarManager;
@@ -53,6 +54,12 @@ public class Services {
      * <p><strong>⚠️ INTERNAL API:</strong> Use public networking APIs instead.</p>
      */
     public static final INetworkingService NETWORKING = load(INetworkingService.class);
+
+    /**
+     * Creative mode tab service for internal use.
+     * <p><strong>⚠️ INTERNAL API:</strong> Use public creative tab APIs instead.</p>
+     */
+    public static final ICreativeModeTabService CREATIVE_MODE_TABS = load(ICreativeModeTabService.class);
 
     /**
      * Loads a platform-specific service implementation using Java's ServiceLoader.

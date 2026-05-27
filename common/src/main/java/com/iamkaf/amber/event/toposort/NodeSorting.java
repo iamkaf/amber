@@ -9,8 +9,13 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import com.google.common.annotations.VisibleForTesting;
+//? if <=1.16.5 {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+//?} else {
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//?}
 
 /**
  * Contains a topological sort implementation, with tie breaking using a {@link Comparator}.
@@ -26,7 +31,11 @@ import org.slf4j.LoggerFactory;
  * </ol>
  */
 public class NodeSorting {
+    //? if <=1.16.5 {
+    private static final Logger LOGGER = LogManager.getLogger("fabric-api-base");
+    //?} else {
     private static final Logger LOGGER = LoggerFactory.getLogger("fabric-api-base");
+    //?}
 
     @VisibleForTesting
     public static boolean ENABLE_CYCLE_WARNING = true;

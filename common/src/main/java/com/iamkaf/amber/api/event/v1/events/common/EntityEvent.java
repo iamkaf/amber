@@ -194,8 +194,7 @@ public class EntityEvent {
             ShearSource source
     ) implements ShearingContext {
         public SimpleShearingContext {
-            shears = shears.copy();
-            drops = drops.stream().map(ItemStack::copy).toList();
+            drops = List.copyOf(drops);
         }
 
         @Override
@@ -205,7 +204,7 @@ public class EntityEvent {
 
         @Override
         public ItemStack getShears() {
-            return this.shears.copy();
+            return this.shears;
         }
 
         @Override
@@ -225,7 +224,7 @@ public class EntityEvent {
 
         @Override
         public List<ItemStack> getDrops() {
-            return this.drops.stream().map(ItemStack::copy).toList();
+            return this.drops;
         }
 
         @Override

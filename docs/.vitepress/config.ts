@@ -23,6 +23,9 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/v9/guide/getting-started' },
       { text: 'API', link: '/v9/api/core' },
+      { text: 'Support', link: '/support-policy' },
+      { text: 'Matrix', link: '/support-matrix' },
+      { text: 'Parity', link: '/parity-checks' },
       {
         text: 'Versions',
         items: [

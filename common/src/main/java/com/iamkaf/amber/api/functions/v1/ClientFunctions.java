@@ -1,6 +1,6 @@
 package com.iamkaf.amber.api.functions.v1;
 
-import com.iamkaf.amber.Constants;
+import com.iamkaf.amber.compat.ClientCompat;
 //? if <1.20 && >=1.15
 /*import com.mojang.blaze3d.vertex.PoseStack;*/
 import net.minecraft.client.KeyMapping;
@@ -11,12 +11,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 //? if <26.1 && >=1.20
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.Screen;
-//? if >=1.21.6
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-//? if >=1.19.3
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-//? if >=1.20.5
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -52,20 +46,7 @@ public final class ClientFunctions {
      * @return true if the HUD should be rendered, false otherwise.
      */
     public static boolean shouldRenderHud() {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) {
-            return false;
-        }
-        try {
-            //? if >=1.20.2
-            return !(mc.getDebugOverlay().showDebugScreen() || mc.options.hideGui || mc.level == null || mc.player == null);
-            //? if <1.20.2
-            /*return !(mc.options.renderDebug || mc.options.hideGui || mc.level == null || mc.player == null);*/
-        } catch (Exception e) {
-            // Handle any exceptions that may occur
-            Constants.LOG.error("An error occurred while checking if the HUD should be rendered: {}", e.getMessage());
-            return false; // If an error occurs, do not render the HUD
-        }
+        return ClientCompat.shouldRenderHud();
     }
 
     /**
@@ -80,19 +61,19 @@ public final class ClientFunctions {
      */
     //? if >=26.1 {
     public static void renderText(GuiGraphicsExtractor context, Font font, Component message, int x, int y, int color) {
-        context.text(font, message, x, y, color);
+        ClientCompat.renderText(context, font, message, x, y, color);
     //?} else if >=1.20 {
     /*public static void renderText(GuiGraphics context, Font font, Component message, int x, int y, int color) {
-        context.drawString(font, message, x, y, color);*/
+        ClientCompat.renderText(context, font, message, x, y, color);*/
     //?} else if >=1.16 {
     /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
-        font.draw(context, message, x, y, color);*/
+        ClientCompat.renderText(context, font, message, x, y, color);*/
     //?} else if >=1.15 {
     /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
-        font.draw(message.getString(), x, y, color);*/
+        ClientCompat.renderText(context, font, message, x, y, color);*/
     //?} else {
     /*public static void renderText(Object context, Font font, Component message, int x, int y, int color) {
-        font.draw(message.getString(), x, y, color);*/
+        ClientCompat.renderText(font, message, x, y, color);*/
     //?}
     }
 
@@ -112,57 +93,14 @@ public final class ClientFunctions {
     /*public static void renderTooltip(PoseStack guiGraphics, ItemStack stack, int x, int y) {*/
     //? if <1.15
     /*public static void renderTooltip(Object guiGraphics, ItemStack stack, int x, int y) {*/
-        Minecraft mc = Minecraft.getInstance();
-
-        if (mc == null) {
+        if (stack == null || ClientCompat.isEmpty(stack)) {
             return;
         }
 
-        if (stack == null || stack.isEmpty()) {
-            return;
-        }
-
-        //? if <1.20
-        /*if (mc.screen == null) {
-            return;
-        }*/
-
-        //? if <1.20 && >=1.16.2
-        /*mc.screen.renderComponentTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
-        //? if <1.16.2 && >=1.16
-        /*mc.screen.renderTooltip(guiGraphics, mc.screen.getTooltipFromItem(stack), x, y);*/
-        //? if <1.16
-        /*mc.screen.renderTooltip(mc.screen.getTooltipFromItem(stack), x, y);*/
-
-        //? if >=1.21.6 {
-        // converts a list of components to a list of ClientTooltipComponents
-        List<ClientTooltipComponent> tooltipComponents = Screen.getTooltipFromItem(mc, stack)
-                .stream()
-                .map(Component::getVisualOrderText)
-                .map(ClientTooltipComponent::create)
-                .toList();
-
-        //? if >=26.1 {
-        guiGraphics.tooltip(
-                mc.font,
-                tooltipComponents,
-                x,
-                y,
-                DefaultTooltipPositioner.INSTANCE,
-                stack.get(DataComponents.TOOLTIP_STYLE)
-        );
-        //?} else {
-        /*guiGraphics.renderTooltip(
-                mc.font,
-                tooltipComponents,
-                x,
-                y,
-                DefaultTooltipPositioner.INSTANCE,
-                stack.get(DataComponents.TOOLTIP_STYLE)
-        );*/
-        //?}
-        //?} else if >=1.20
-        /*guiGraphics.renderTooltip(mc.font, stack, x, y);*/
+        //? if >=1.15
+        ClientCompat.renderTooltip(guiGraphics, stack, x, y);
+        //? if <1.15
+        /*ClientCompat.renderTooltip(stack, x, y);*/
     }
 
     // ==================== SMART TOOLTIP OPERATIONS ====================

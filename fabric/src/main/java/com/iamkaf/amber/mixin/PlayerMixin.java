@@ -3,6 +3,7 @@ package com.iamkaf.amber.mixin;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? if >=1.21.5
 @Mixin(LivingEntity.class)
 //? if <1.21.5
-/*@Mixin(Player.class)*/
+/*@Mixin(ServerPlayer.class)*/
 public abstract class PlayerMixin {
 
     // Target the 3-parameter drop method used by Player item tosses.

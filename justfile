@@ -32,6 +32,11 @@ build-all:
 publish-version version *args:
   @tasks=(":common:{{version}}:publishAllPublicationsToKafMavenRepository"); for loader in $(just list-loaders "{{version}}"); do tasks+=(":$loader:{{version}}:publishAllPublicationsToKafMavenRepository"); done; ./gradlew --configure-on-demand "${tasks[@]}" {{args}} --console=plain
 
+publish-all *args:
+  @test -n "$MAVEN_PUBLISH_USERNAME" || (echo "MAVEN_PUBLISH_USERNAME is required" >&2; exit 1)
+  @test -n "$MAVEN_PUBLISH_PASSWORD" || (echo "MAVEN_PUBLISH_PASSWORD is required" >&2; exit 1)
+  @for version in $(just list-versions); do echo "==> publish $version"; just publish-version "$version" {{args}}; done
+
 compile-all:
   @tasks=(); for version in $(just list-versions); do tasks+=(":common:$version:compileJava"); for loader in $(just list-loaders "$version"); do tasks+=(":$loader:$version:compileJava"); done; done; ./gradlew --configure-on-demand "${tasks[@]}" --console=plain
 

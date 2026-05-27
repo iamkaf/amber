@@ -13,19 +13,30 @@
     "BoneMealItemMixin",
     //? if >=1.20.5
     "BuiltInRegistriesMixin",
+    "CraftedItemMixin",
     "CraftingPlayerMixin",
+    //? if <1.19.3
+    "CreativeModeTabMixin",
     "CropBlockMixin",
+    "FarmlandBlockMixin",
+    "FishingHookMixin",
     //? if >=1.20.5
     "ItemAccessor",
     "ItemEntityMixin",
+    //? if >=1.16 && <1.16.2
+    "SmithingMenuMixin",
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
     "PlayerMixin",
+    "PlayerListRespawnMixin",
     "ServerPlayerDeathMixin",
     "ServerLevelMixin",
+    "SheepMixin",
     "TamableAnimalMixin"
   ],
   "client": [
+    //? if <1.15
+    "GuiMixin",
     "LevelRendererMixin",
     "MouseHandlerMixin"
   ],

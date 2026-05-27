@@ -24,6 +24,7 @@ public abstract class AnimalMixin {
             target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"
             //? if <1.16.2
             /*target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"*/
+            , ordinal = 0
     ), locals = LocalCapture.CAPTURE_FAILSOFT)
     //? if >=1.17
     private void onAnimalBreed(ServerLevel level, Animal partner, CallbackInfo ci, AgeableMob baby) {
