@@ -5,10 +5,15 @@
   "compatibilityLevel": "${mixin_compat_neoforge}",
   "mixins": [
     "BoneMealItemMixin",
+    "CraftedItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
+    "FarmlandBlockMixin",
     "LivingEntityAfterDamageMixin",
-    "NeoForgeShearsDispenseItemBehaviorMixin"
+    //? if <1.21.2
+    "NeoForgeLegacySheepMixin",
+    "NeoForgeShearsDispenseItemBehaviorMixin",
+    "NeoForgeShearsItemMixin"
   ],
   "client": [
     "LevelRendererMixin",

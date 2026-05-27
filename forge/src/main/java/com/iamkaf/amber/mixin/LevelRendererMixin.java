@@ -70,23 +70,25 @@ public class LevelRendererMixin {
             MultiBufferSource.BufferSource bufferSource,
             PoseStack poseStack,
             boolean translucentPass,
+            //? if <1.21.9
+            float partialTick,
             //? if >=1.21.9
             LevelRenderState levelRenderState,
             //?}
             CallbackInfo ci
     ) {
         //? if <1.21.2 {
-        /*if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        /*if (!(hitResult(this.minecraft) instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
-        if (blockHitResult.getType() == HitResult.Type.MISS) {
+        if (hitResultType(blockHitResult) == HitResult.Type.MISS) {
             return;
         }
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                this.minecraft.gameRenderer.getMainCamera(),
-                this.minecraft.renderBuffers().bufferSource(),
+                mainCamera(this.minecraft),
+                bufferSource(this.minecraft),
                 poseStack,
                 blockHitResult,
                 outlinePos,
@@ -148,6 +150,24 @@ public class LevelRendererMixin {
         }
         //?}
     }
+
+    //? if <1.21.2 {
+    /*private static Camera mainCamera(Minecraft minecraft) {
+        return minecraft.gameRenderer.getMainCamera();
+    }
+
+    private static MultiBufferSource bufferSource(Minecraft minecraft) {
+        return minecraft.renderBuffers().bufferSource();
+    }
+
+    private static HitResult hitResult(Minecraft minecraft) {
+        return minecraft.hitResult;
+    }
+
+    private static HitResult.Type hitResultType(HitResult hitResult) {
+        return hitResult.getType();
+    }
+    *///?}
 
     static {
         AmberMod.AMBER_MIXINS.add("LevelRendererMixin");

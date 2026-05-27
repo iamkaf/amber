@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.0.0
+
+### Added
+
+- Added `FishingEvents.MODIFY_CATCH`, which lets mods inspect and mutate fishing drops when a player reels in a catch.
+- Added `WorldFunctions.isInsideStructure` on Minecraft 1.19+ for checking whether a server position is inside a generated structure piece.
+- Added Forge builds to the 26.1.x line.
+
+### Changed
+
+- Expanded Amber's release matrix through Stonecutter-backed Minecraft version builds.
+
+### Fixed
+
+- Fixed event callback delivery preserving vanilla `ItemStack` identity instead of cloning stacks before consumer callbacks.
+- Fixed `CompoundEventResult` being an empty public API shell by adding pass and interrupt result contracts.
+- Fixed Fabric custom creative tab registration and content callbacks across legacy and modern creative tab APIs.
+- Fixed Fabric `ClientCommandEvents.EVENT` registering callbacks against a throwaway dispatcher, making consumer client commands unavailable in-game.
+- Fixed NeoForge `NetworkChannel.sendToAllPlayers` not broadcasting clientbound packets.
+- Fixed Forge 26.1.2 loading the legacy shield-block mixin injection on modern damage methods.
+
 ## 10.0.2
 
 ### Fixed

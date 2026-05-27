@@ -10,9 +10,15 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
+//? if <1.19.3
+/*import java.lang.reflect.Field;*/
 import java.util.ArrayList;
+//? if <1.19.3
+/*import java.util.Arrays;*/
 import java.util.List;
 import java.util.function.Supplier;
+//? if <1.19.3
+/*import sun.misc.Unsafe;*/
 
 /**
  * Builder for creating custom creative mode tabs.
@@ -52,7 +58,7 @@ public class TabBuilder {
 
     private static Component emptyTitle() {
         //? if >=1.19
-        return Component.empty();
+        return Component.literal("");
         //? if <1.19
         /*return new TextComponent("");*/
     }
@@ -249,14 +255,14 @@ public class TabBuilder {
      *
      * @return The built creative mode tab
      */
-    CreativeModeTab build() {
+    public CreativeModeTab build() {
         //? if >=1.19.3 {
         CreativeModeTab.Builder builder = CreativeModeTab.builder(row, column);
 
         builder.title(title);
         builder.icon(icon);
-        // Note: displayItems is not used here because CreativeModeTab.Output is protected in 26.x
-        // Items are added via the MODIFY_ENTRIES event in platform-specific implementations
+        //? if <26.1
+        /*// Items are added via MODIFY_ENTRIES in platform-specific implementations.*/
 
         if (alignedRight) {
             builder.alignedRight();
@@ -267,12 +273,9 @@ public class TabBuilder {
         if (!canScroll) {
             builder.noScrollBar();
         }
-        // Note: backgroundTexture and type methods are protected in Minecraft,
-        // but they can be accessed through reflection in platform-specific implementations if needed
-
         return builder.build();
         //?} else {
-        /*return new CreativeModeTab(CreativeModeTab.TABS.length, id.getNamespace() + "." + id.getPath()) {
+        /*return new CreativeModeTab(nextLegacyTabIndex(), legacyTabName(id)) {
             @Override
             public ItemStack makeIcon() {
                 return icon.get();
@@ -283,10 +286,71 @@ public class TabBuilder {
                 for (Supplier<ItemLike> item : items) {
                     stacks.add(new ItemStack(item.get()));
                 }
+                com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
+                        .modifyEntries(
+                                CreativeTabHelper.creativeModeTabKey(id),
+                                new com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput() {
+                                    @Override
+                                    public void accept(ItemStack stack, com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput.TabVisibility visibility) {
+                                        stacks.add(stack);
+                                    }
+                                }
+                        );
             }
         };*/
         //?}
     }
+
+    //? if <1.19.3 {
+    /*@SuppressWarnings("deprecation")*/
+    private static int nextLegacyTabIndex() {
+        //? if <1.19.3 {
+        /*CreativeModeTab[] tabs = legacyTabs();
+        int index = tabs.length;
+        setLegacyTabs(Arrays.copyOf(tabs, index + 1));
+        return index;*/
+        //?}
+        //? if >=1.19.3
+        return 0;
+    }
+
+    //? if <1.19.3 {
+    /*private static CreativeModeTab[] legacyTabs() {
+        return legacyTabsReflectively();
+    }
+
+    private static void setLegacyTabs(CreativeModeTab[] tabs) {
+        setLegacyTabsReflectively(tabs);
+    }
+
+    private static CreativeModeTab[] legacyTabsReflectively() {
+        try {
+            Field field = CreativeModeTab.class.getDeclaredField("TABS");
+            field.setAccessible(true);
+            return (CreativeModeTab[]) field.get(null);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to read legacy creative tabs", exception);
+        }
+    }
+
+    private static void setLegacyTabsReflectively(CreativeModeTab[] tabs) {
+        try {
+            Field field = CreativeModeTab.class.getDeclaredField("TABS");
+            field.setAccessible(true);
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            Unsafe unsafe = (Unsafe) unsafeField.get(null);
+            unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), tabs);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Unable to resize legacy creative tabs", exception);
+        }
+    }*/
+    //?}
+
+    private static String legacyTabName(Identifier id) {
+        return id.toString().replace(':', '.');
+    }
+    //?}
 
     /**
      * Gets the ID of this tab.
@@ -295,6 +359,40 @@ public class TabBuilder {
      */
     public Identifier getId() {
         return id;
+    }
+
+    public Component getTitle() {
+        return title;
+    }
+
+    public Supplier<ItemStack> getIcon() {
+        return icon;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    //? if >=1.19.3 {
+    public CreativeModeTab.Row getRow() {
+        return row;
+    }
+
+    public CreativeModeTab.Type getType() {
+        return type;
+    }
+    //?}
+
+    public boolean canScroll() {
+        return canScroll;
+    }
+
+    public boolean shouldShowTitle() {
+        return showTitle;
+    }
+
+    public boolean isAlignedRight() {
+        return alignedRight;
     }
 
     /**

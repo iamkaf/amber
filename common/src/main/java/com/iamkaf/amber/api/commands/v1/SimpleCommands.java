@@ -5,7 +5,6 @@ import com.iamkaf.amber.api.platform.v1.Platform;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 //? if >=1.19
 import net.minecraft.network.chat.MutableComponent;
@@ -14,7 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 
 public class SimpleCommands {
     public static LiteralArgumentBuilder<CommandSourceStack> createBaseCommand(String modId) {
-        return Commands.literal(modId).executes(commandContext -> {
+        return LiteralArgumentBuilder.<CommandSourceStack>literal(modId).executes(commandContext -> {
             ModInfo modInfo = Platform.getModInfo(modId);
 
             // wat??

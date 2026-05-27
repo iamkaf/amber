@@ -14,7 +14,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 //? if >=1.19
 import net.minecraft.network.chat.MutableComponent;
@@ -24,7 +23,7 @@ import net.minecraft.network.chat.MutableComponent;
 public class AmberCommands {
 
     private static final LiteralArgumentBuilder<CommandSourceStack> DOCTOR_COMMAND =
-            Commands.literal("doctor").executes(commandContext -> {
+            LiteralArgumentBuilder.<CommandSourceStack>literal("doctor").executes(commandContext -> {
                 ModInfo modInfo = Platform.getModInfo(Constants.MOD_ID);
 
                 // wat??

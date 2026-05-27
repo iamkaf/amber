@@ -36,11 +36,15 @@ import java.util.function.Supplier;
 public final class CreativeTabHelper {
     private CreativeTabHelper() {}
 
-    private static ResourceKey<Registry<CreativeModeTab>> creativeModeTabRegistryKey() {
+    static ResourceKey<Registry<CreativeModeTab>> creativeModeTabRegistryKey() {
         //? if >=1.20
         return Registries.CREATIVE_MODE_TAB;
         //? if <1.20
         /*return ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab"));*/
+    }
+
+    static ResourceKey<CreativeModeTab> creativeModeTabKey(Identifier tabId) {
+        return ResourceKey.create(creativeModeTabRegistryKey(), tabId);
     }
 
     /**
@@ -119,7 +123,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, Supplier<ItemLike>... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
+        ResourceKey<CreativeModeTab> tabKey = creativeModeTabKey(tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (Supplier<ItemLike> item : items) {
@@ -139,7 +143,7 @@ public final class CreativeTabHelper {
      * @param items The items to add
      */
     public static void addItemsToTab(Identifier tabId, ItemLike... items) {
-        ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(creativeModeTabRegistryKey(), tabId);
+        ResourceKey<CreativeModeTab> tabKey = creativeModeTabKey(tabId);
         CreativeModeTabEvents.MODIFY_ENTRIES.register((key, output) -> {
             if (key.equals(tabKey)) {
                 for (ItemLike item : items) {
@@ -148,4 +152,5 @@ public final class CreativeTabHelper {
             }
         });
     }
+
 }

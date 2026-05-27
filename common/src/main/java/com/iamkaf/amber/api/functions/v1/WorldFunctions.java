@@ -2,12 +2,15 @@ package com.iamkaf.amber.api.functions.v1;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import com.iamkaf.amber.compat.WorldCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
+import net.minecraft.core.Vec3i;
+//? if >=1.19
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 //? if >=1.16
@@ -27,6 +30,10 @@ import net.minecraft.world.level.ServerLevelAccessor;
 //? if <1.16
 /*import net.minecraft.world.level.dimension.DimensionType;*/
 import net.minecraft.world.level.biome.Biome;
+//? if >=1.17
+import net.minecraft.world.level.entity.EntityTypeTest;
+//? if >=1.19
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -66,7 +73,7 @@ public final class WorldFunctions {
         if (level == null) return;
 
         // Get the current game time from the level.
-        long gameTime = level.getGameTime();
+        long gameTime = gameTime(level);
 
         // Check if the current game time is evenly divisible by the specified number of ticks.
         // If true, execute the provided function with the game time as an argument.
@@ -118,12 +125,12 @@ public final class WorldFunctions {
     public static void dropItem(Level level, ItemStack stack, Vec3 pos, Vec3 delta) {
         if (level == null) return;
         //? if >=1.17
-        var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack, delta.x(), delta.y(), delta.z());
+        var itemEntity = new ItemEntity(level, vecX(pos), vecY(pos), vecZ(pos), stack, vecX(delta), vecY(delta), vecZ(delta));
         //? if <1.17 {
         /*var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack);
         itemEntity.setDeltaMovement(delta);*/
         //?}
-        level.addFreshEntity(itemEntity);
+        addFreshEntity(level, itemEntity);
     }
 
     /**
@@ -152,16 +159,20 @@ public final class WorldFunctions {
      */
     public static @NotNull BlockHitResult raytrace(Level level, Player player) {
         //? if >=1.17
-        Vec3 eyePosition = player.getEyePosition();
+        Vec3 eyePosition = playerEyePosition(player);
         //? if <1.17
         /*Vec3 eyePosition = player.getEyePosition(1.0F);*/
-        Vec3 rotation = player.getViewVector(1);
+        Vec3 rotation = playerViewVector(player, 1.0f);
         //? if >=1.20.5
         double reach = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);
         //? if <1.20.5
         /*double reach = 4.5;*/
-        Vec3 combined = eyePosition.add(rotation.x * reach, rotation.y * reach, rotation.z * reach);
-        return level.clip(new ClipContext(eyePosition, combined, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+        Vec3 combined = new Vec3(
+                vecX(eyePosition) + vecX(rotation) * reach,
+                vecY(eyePosition) + vecY(rotation) * reach,
+                vecZ(eyePosition) + vecZ(rotation) * reach
+        );
+        return clip(level, new ClipContext(eyePosition, combined, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
     // ==================== LEVEL-BASED SOUND OPERATIONS ====================
@@ -179,7 +190,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound*/
     ) {
-        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), SoundSource.BLOCKS, 1.0f, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     /**
@@ -196,7 +207,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source) {
-        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, 1.0f, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, 1.0f, 1.0f);
     }
 
     /**
@@ -214,7 +225,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume) {
-        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, 1.0f);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, volume, 1.0f);
     }
 
     /**
@@ -233,7 +244,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume, float pitch) {
-        level.playSound(null, position.x(), position.y(), position.z(), soundEvent(sound), source, volume, pitch);
+        playLevelSound(level, null, vecX(position), vecY(position), vecZ(position), sound, source, volume, pitch);
     }
 
     /**
@@ -250,7 +261,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source) {
-        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, 1.0f, 1.0f);
+        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, sound, source, 1.0f, 1.0f);
     }
 
     /**
@@ -269,19 +280,7 @@ public final class WorldFunctions {
             //? if <1.18.2
             /*SoundEvent sound,*/
             SoundSource source, float volume, float pitch) {
-        level.playSound(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, soundEvent(sound), source, volume, pitch);
-    }
-
-    private static SoundEvent soundEvent(
-            //? if >=1.18.2
-            Holder<SoundEvent> sound
-            //? if <1.18.2
-            /*SoundEvent sound*/
-    ) {
-        //? if >=1.18.2
-        return sound.value();
-        //? if <1.18.2
-        /*return sound;*/
+        playLevelSound(level, null, blockX(position) + 0.5, blockY(position) + 0.5, blockZ(position) + 0.5, sound, source, volume, pitch);
     }
 
     // ==================== DIMENSION UTILITIES ====================
@@ -294,7 +293,7 @@ public final class WorldFunctions {
      */
     public static boolean isOverworld(Level level) {
         //? if >=1.16
-        return level.dimension() == Level.OVERWORLD;
+        return dimensionPath(level).equals("overworld");
         //? if <1.16
         /*return level.dimension.getType() == DimensionType.OVERWORLD;*/
     }
@@ -307,7 +306,7 @@ public final class WorldFunctions {
      */
     public static boolean isNether(Level level) {
         //? if >=1.16
-        return level.dimension() == Level.NETHER;
+        return dimensionPath(level).equals("the_nether");
         //? if <1.16
         /*return level.dimension.getType() == DimensionType.NETHER;*/
     }
@@ -320,7 +319,7 @@ public final class WorldFunctions {
      */
     public static boolean isEnd(Level level) {
         //? if >=1.16
-        return level.dimension() == Level.END;
+        return dimensionPath(level).equals("the_end");
         //? if <1.16
         /*return level.dimension.getType() == DimensionType.THE_END;*/
     }
@@ -335,7 +334,7 @@ public final class WorldFunctions {
      * @return The Euclidean distance between the positions.
      */
     public static double distanceBetween(Vec3 pos1, Vec3 pos2) {
-        return pos1.distanceTo(pos2);
+        return Math.sqrt(distanceSquaredBetween(pos1, pos2));
     }
 
     /**
@@ -346,7 +345,7 @@ public final class WorldFunctions {
      * @return The Euclidean distance between the block positions.
      */
     public static double distanceBetween(BlockPos pos1, BlockPos pos2) {
-        return Math.sqrt(pos1.distSqr(pos2));
+        return Math.sqrt(distanceSquaredBetween(pos1, pos2));
     }
 
     /**
@@ -368,7 +367,10 @@ public final class WorldFunctions {
      * @return The squared distance between the positions.
      */
     public static double distanceSquaredBetween(Vec3 pos1, Vec3 pos2) {
-        return pos1.distanceToSqr(pos2);
+        double dx = vecX(pos1) - vecX(pos2);
+        double dy = vecY(pos1) - vecY(pos2);
+        double dz = vecZ(pos1) - vecZ(pos2);
+        return dx * dx + dy * dy + dz * dz;
     }
 
     /**
@@ -379,7 +381,10 @@ public final class WorldFunctions {
      * @return The squared distance between the block positions.
      */
     public static double distanceSquaredBetween(BlockPos pos1, BlockPos pos2) {
-        return pos1.distSqr(pos2);
+        double dx = blockX(pos1) - blockX(pos2);
+        double dy = blockY(pos1) - blockY(pos2);
+        double dz = blockZ(pos1) - blockZ(pos2);
+        return dx * dx + dy * dy + dz * dz;
     }
 
     /**
@@ -390,8 +395,8 @@ public final class WorldFunctions {
      * @return The horizontal distance between the positions.
      */
     public static double horizontalDistanceBetween(Vec3 pos1, Vec3 pos2) {
-        double dx = pos1.x() - pos2.x();
-        double dz = pos1.z() - pos2.z();
+        double dx = vecX(pos1) - vecX(pos2);
+        double dz = vecZ(pos1) - vecZ(pos2);
         return Math.sqrt(dx * dx + dz * dz);
     }
 
@@ -405,9 +410,9 @@ public final class WorldFunctions {
      */
     public static long getTimeOfDay(Level level) {
         //? if >=26.1
-        return level.getOverworldClockTime() % 24000L;
+        return dayTime(level) % 24000L;
         //? if <26.1
-        /*return level.getDayTime() % 24000L;*/
+        /*return dayTime(level) % 24000L;*/
     }
 
     /**
@@ -449,9 +454,9 @@ public final class WorldFunctions {
      */
     public static int getMoonPhase(Level level) {
         //? if >=26.1
-        return (int) ((level.getOverworldClockTime() / 24000L) % 8L);
+        return (int) ((dayTime(level) / 24000L) % 8L);
         //? if <26.1
-        /*return (int) ((level.getDayTime() / 24000L) % 8L);*/
+        /*return (int) ((dayTime(level) / 24000L) % 8L);*/
     }
 
     /**
@@ -462,9 +467,9 @@ public final class WorldFunctions {
      */
     public static long getDayCount(Level level) {
         //? if >=26.1
-        return level.getOverworldClockTime() / 24000L;
+        return dayTime(level) / 24000L;
         //? if <26.1
-        /*return level.getDayTime() / 24000L;*/
+        /*return dayTime(level) / 24000L;*/
     }
 
     /**
@@ -474,7 +479,7 @@ public final class WorldFunctions {
      * @return The total game time in ticks.
      */
     public static long getTotalGameTime(Level level) {
-        return level.getGameTime();
+        return gameTime(level);
     }
 
     // ==================== DIFFICULTY UTILITIES ====================
@@ -492,7 +497,7 @@ public final class WorldFunctions {
             //? if <1.16.2
             /*LevelAccessor level,*/
             BlockPos position) {
-        return level.getCurrentDifficultyAt(position);
+        return currentDifficulty(level, position);
     }
 
     /**
@@ -509,9 +514,9 @@ public final class WorldFunctions {
             /*LevelAccessor level,*/
             Vec3 position) {
         //? if >=1.19.4
-        return level.getCurrentDifficultyAt(BlockPos.containing(position));
+        return currentDifficulty(level, BlockPos.containing(position));
         //? if <1.19.4
-        /*return level.getCurrentDifficultyAt(new BlockPos(position));*/
+        /*return currentDifficulty(level, new BlockPos(position));*/
     }
 
     /**
@@ -528,7 +533,7 @@ public final class WorldFunctions {
             /*LevelAccessor level,*/
             BlockPos position) {
         //? if >=1.17
-        return getCurrentDifficulty(level, position).isHard();
+        return isDifficultyHard(getCurrentDifficulty(level, position));
         //? if <1.17
         /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
@@ -547,7 +552,7 @@ public final class WorldFunctions {
             /*LevelAccessor level,*/
             Vec3 position) {
         //? if >=1.17
-        return getCurrentDifficulty(level, position).isHard();
+        return isDifficultyHard(getCurrentDifficulty(level, position));
         //? if <1.17
         /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
@@ -562,12 +567,12 @@ public final class WorldFunctions {
      */
     public static List<Player> getPlayers(Level level) {
         if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            return new ArrayList<>(serverLevel.players());
+            return players(serverLevel);
         //? if >=1.15
         } else if (level instanceof net.minecraft.client.multiplayer.ClientLevel clientLevel) {
         //? if <1.15
         /*} else if (level instanceof net.minecraft.client.multiplayer.MultiPlayerLevel clientLevel) {*/
-            return new ArrayList<>(clientLevel.players());
+            return players(clientLevel);
         }
         return new ArrayList<>();
     }
@@ -582,10 +587,10 @@ public final class WorldFunctions {
      */
     public static List<Entity> getEntitiesInRadius(Level level, Vec3 center, double radius) {
         AABB boundingBox = new AABB(
-                center.x() - radius, center.y() - radius, center.z() - radius,
-                center.x() + radius, center.y() + radius, center.z() + radius
+                vecX(center) - radius, vecY(center) - radius, vecZ(center) - radius,
+                vecX(center) + radius, vecY(center) + radius, vecZ(center) + radius
         );
-        return level.getEntities((Entity) null, boundingBox, entity -> true);
+        return entities(level, null, boundingBox, entity -> true);
     }
 
     /**
@@ -600,11 +605,11 @@ public final class WorldFunctions {
      */
     public static <T extends Entity> List<T> getEntitiesInRadius(Level level, Vec3 center, double radius, EntityType<T> entityType) {
         AABB boundingBox = new AABB(
-                center.x() - radius, center.y() - radius, center.z() - radius,
-                center.x() + radius, center.y() + radius, center.z() + radius
+                vecX(center) - radius, vecY(center) - radius, vecZ(center) - radius,
+                vecX(center) + radius, vecY(center) + radius, vecZ(center) + radius
         );
         //? if >=1.15
-        return level.getEntities(entityType, boundingBox, entity -> true);
+        return typedEntities(level, entityType, boundingBox, entity -> true);
         //? if <1.15
         /*return (List<T>) (List<?>) level.getEntities(entityType, boundingBox, entity -> true);*/
     }
@@ -620,10 +625,10 @@ public final class WorldFunctions {
      */
     public static List<Entity> getEntitiesInRadius(Level level, Vec3 center, double radius, java.util.function.Predicate<Entity> predicate) {
         AABB boundingBox = new AABB(
-                center.x() - radius, center.y() - radius, center.z() - radius,
-                center.x() + radius, center.y() + radius, center.z() + radius
+                vecX(center) - radius, vecY(center) - radius, vecZ(center) - radius,
+                vecX(center) + radius, vecY(center) + radius, vecZ(center) + radius
         );
-        return level.getEntities((Entity) null, boundingBox, predicate);
+        return entities(level, null, boundingBox, predicate);
     }
 
     /**
@@ -636,9 +641,9 @@ public final class WorldFunctions {
      */
     public static List<Entity> getEntitiesInRadius(Level level, BlockPos center, double radius) {
         //? if >=1.16
-        return getEntitiesInRadius(level, Vec3.atCenterOf(center), radius);
+        return getEntitiesInRadius(level, blockCenter(center), radius);
         //? if <1.16
-        /*return getEntitiesInRadius(level, new Vec3(center.getX() + 0.5D, center.getY() + 0.5D, center.getZ() + 0.5D), radius);*/
+        /*return getEntitiesInRadius(level, blockCenter(center), radius);*/
     }
 
     /**
@@ -653,9 +658,9 @@ public final class WorldFunctions {
      */
     public static <T extends Entity> List<T> getEntitiesInRadius(Level level, BlockPos center, double radius, EntityType<T> entityType) {
         //? if >=1.16
-        return getEntitiesInRadius(level, Vec3.atCenterOf(center), radius, entityType);
+        return getEntitiesInRadius(level, blockCenter(center), radius, entityType);
         //? if <1.16
-        /*return getEntitiesInRadius(level, new Vec3(center.getX() + 0.5D, center.getY() + 0.5D, center.getZ() + 0.5D), radius, entityType);*/
+        /*return getEntitiesInRadius(level, blockCenter(center), radius, entityType);*/
     }
 
     /**
@@ -670,7 +675,7 @@ public final class WorldFunctions {
     public static Entity getNearestEntity(Level level, Vec3 center, double radius) {
         List<Entity> entities = getEntitiesInRadius(level, center, radius);
         return entities.stream()
-                .min(Comparator.comparingDouble(entity -> entity.position().distanceToSqr(center)))
+                .min(Comparator.comparingDouble(entity -> distanceSquaredBetween(entityPosition(entity), center)))
                 .orElse(null);
     }
 
@@ -687,7 +692,7 @@ public final class WorldFunctions {
     public static Holder<Biome> getBiomeAtPosition(Level level, BlockPos position) {
     //? if <1.18.2
     /*public static Biome getBiomeAtPosition(Level level, BlockPos position) {*/
-        return level.getBiome(position);
+        return biome(level, position);
     }
 
     /**
@@ -704,7 +709,7 @@ public final class WorldFunctions {
         //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position));
         //? if <1.19.4 && >=1.18.2
-        /*return level.getBiome(new BlockPos(position));*/
+        /*return biome(level, new BlockPos(position));*/
         //? if <1.18.2
         /*return level.getBiome(new BlockPos(position));*/
     }
@@ -718,7 +723,7 @@ public final class WorldFunctions {
      */
     public static Biome getBiomeValueAtPosition(Level level, BlockPos position) {
         //? if >=1.18.2
-        return level.getBiome(position).value();
+        return holderValue(biome(level, position));
         //? if <1.18.2
         /*return level.getBiome(position);*/
     }
@@ -734,10 +739,34 @@ public final class WorldFunctions {
         //? if >=1.19.4
         return level.getBiome(BlockPos.containing(position)).value();
         //? if <1.19.4 && >=1.18.2
-        /*return level.getBiome(new BlockPos(position)).value();*/
+        /*return holderValue(biome(level, new BlockPos(position)));*/
         //? if <1.18.2
         /*return level.getBiome(new BlockPos(position));*/
     }
+
+    //? if >=1.19 {
+    /**
+     * Checks whether a position is inside a generated structure.
+     *
+     * @param level The level to check.
+     * @param position The position to test.
+     * @param structure The structure key to match.
+     * @return true when the position is inside a valid matching structure piece.
+     */
+    public static boolean isInsideStructure(Level level, BlockPos position, ResourceKey<Structure> structure) {
+        if (!(level instanceof ServerLevel serverLevel) || !serverLevel.isLoaded(position)) {
+            return false;
+        }
+
+        //? if >=1.20.5 {
+        return serverLevel.structureManager()
+                .getStructureWithPieceAt(position, holder -> holder.is(structure))
+                .isValid();
+        //?} else {
+        /*return serverLevel.structureManager().getStructureWithPieceAt(position, structure).isValid();*/
+        //?}
+    }
+    //?}
 
     /**
      * Checks if the position is in a specific precipitation type.
@@ -749,11 +778,11 @@ public final class WorldFunctions {
      */
     public static boolean hasPrecipitation(Level level, BlockPos position, Biome.Precipitation precipitation) {
         //? if >=1.21.2
-        return level.getBiome(position).value().getPrecipitationAt(position, level.getSeaLevel()) == precipitation;
+        return holderValue(biome(level, position)).getPrecipitationAt(position, seaLevel(level)) == precipitation;
         //? if <1.21.2 && >=1.19.4
         /*return level.getBiome(position).value().getPrecipitationAt(position) == precipitation;*/
         //? if <1.19.4 && >=1.18.2
-        /*return level.getBiome(position).value().getPrecipitation() == precipitation;*/
+        /*return precipitation(holderValue(biome(level, position))) == precipitation;*/
         //? if <1.18.2
         /*return level.getBiome(position).getPrecipitation() == precipitation;*/
     }
@@ -787,19 +816,19 @@ public final class WorldFunctions {
         BoundingBoxMerger boxMerger = new BoundingBoxMerger();
 
         positions.stream()
-                .map(pos -> pos.subtract(referencePoint))
+                .map(pos -> relativeBlockPos(pos, referencePoint))
                 .sorted()
                 .map(AABB::new)
                 .forEachOrdered(box -> {
                     // Reset current bounds if we encounter a new x or y coordinate
-                    if (boxMerger.xCoordTracker != box.minX || boxMerger.yCoordTracker != box.minY) {
+                    if (boxMerger.xCoordTracker != aabbMinX(box) || boxMerger.yCoordTracker != aabbMinY(box)) {
                         boxMerger.currentBounds = null;
                     }
 
-                    boxMerger.xCoordTracker = box.minX;
-                    boxMerger.yCoordTracker = box.minY;
+                    boxMerger.xCoordTracker = aabbMinX(box);
+                    boxMerger.yCoordTracker = aabbMinY(box);
 
-                    Vec3 center = box.getCenter();
+                    Vec3 center = aabbCenter(box);
                     boxMerger.currentCenter = center;
 
                     // Attempt to combine with the current bounds or adjacent boxes
@@ -824,22 +853,238 @@ public final class WorldFunctions {
         return boxMerger.boxToPosition.keySet();
     }
 
+    private static long gameTime(Level level) {
+        return WorldCompat.gameTime(level);
+    }
+
+    private static double vecX(Vec3 vector) {
+        return WorldCompat.vecX(vector);
+    }
+
+    private static int blockX(BlockPos position) {
+        return WorldCompat.blockX(position);
+    }
+
+    private static int blockY(BlockPos position) {
+        return WorldCompat.blockY(position);
+    }
+
+    private static int blockZ(BlockPos position) {
+        return WorldCompat.blockZ(position);
+    }
+
+    private static double vecY(Vec3 vector) {
+        return WorldCompat.vecY(vector);
+    }
+
+    private static double vecZ(Vec3 vector) {
+        return WorldCompat.vecZ(vector);
+    }
+
+    private static Vec3 blockCenter(BlockPos position) {
+        return new Vec3(blockX(position) + 0.5D, blockY(position) + 0.5D, blockZ(position) + 0.5D);
+    }
+
+    private static BlockPos relativeBlockPos(BlockPos position, BlockPos referencePoint) {
+        return new BlockPos(
+                blockX(position) - blockX(referencePoint),
+                blockY(position) - blockY(referencePoint),
+                blockZ(position) - blockZ(referencePoint)
+        );
+    }
+
+    private static Vec3 entityPosition(Entity entity) {
+        return WorldCompat.entityPosition(entity);
+    }
+
+    private static long dayTime(Level level) {
+        return WorldCompat.dayTime(level);
+    }
+
+    private static void addFreshEntity(Level level, Entity entity) {
+        WorldCompat.addFreshEntity(level, entity);
+    }
+
+    private static Vec3 playerEyePosition(Player player) {
+        return WorldCompat.playerEyePosition(player);
+    }
+
+    private static Vec3 playerViewVector(Player player, float partialTick) {
+        return WorldCompat.playerViewVector(player, partialTick);
+    }
+
+    private static BlockHitResult clip(Level level, ClipContext context) {
+        return WorldCompat.clip(level, context);
+    }
+
+    private static void playLevelSound(Level level, Player player, double x, double y, double z,
+            //? if >=1.18.2
+            Holder<SoundEvent> sound,
+            //? if <1.18.2
+            /*SoundEvent sound,*/
+                                       SoundSource source, float volume, float pitch) {
+        WorldCompat.playLevelSound(level, player, x, y, z, sound, source, volume, pitch);
+    }
+
+    private static DifficultyInstance currentDifficulty(
+            //? if >=1.16.2
+            ServerLevelAccessor level,
+            //? if <1.16.2
+            /*LevelAccessor level,*/
+            BlockPos position) {
+        return WorldCompat.currentDifficulty(level, position);
+    }
+
+    private static boolean isDifficultyHard(DifficultyInstance difficulty) {
+        return WorldCompat.isDifficultyHard(difficulty);
+    }
+
+    private static Biome.Precipitation precipitation(Biome biome) {
+        return WorldCompat.precipitation(biome);
+    }
+
+    private static List<Player> players(Level level) {
+        return WorldCompat.players(level);
+    }
+
+    //? if >=1.18.2 {
+    private static <T> T holderValue(Holder<T> holder) {
+        return WorldCompat.holderValue(holder);
+    }
+    //?}
+
+    private static String dimensionPath(Level level) {
+        return WorldCompat.dimensionPath(level);
+    }
+
+    private static int seaLevel(Level level) {
+        return WorldCompat.seaLevel(level);
+    }
+
+    private static List<Entity> entities(Level level, Entity except, AABB bounds, java.util.function.Predicate<Entity> predicate) {
+        return WorldCompat.entities(level, except, bounds, predicate);
+    }
+
+    private static <T extends Entity> List<T> typedEntities(Level level, EntityType<T> type, AABB bounds, java.util.function.Predicate<Entity> predicate) {
+        return WorldCompat.typedEntities(level, type, bounds, predicate);
+    }
+
+    //? if >=1.18.2
+    private static Holder<Biome> biome(Level level, BlockPos position) {
+    //? if <1.18.2
+    /*private static Biome biome(Level level, BlockPos position) {*/
+        return WorldCompat.biome(level, position);
+    }
+
+    private static Vec3 aabbCenter(AABB box) {
+        return new Vec3(
+                (aabbMinX(box) + aabbMaxX(box)) / 2.0D,
+                (aabbMinY(box) + aabbMaxY(box)) / 2.0D,
+                (aabbMinZ(box) + aabbMaxZ(box)) / 2.0D
+        );
+    }
+
+    private static Vec3 subtractVectors(Vec3 first, Vec3 second) {
+        return new Vec3(vecX(first) - vecX(second), vecY(first) - vecY(second), vecZ(first) - vecZ(second));
+    }
+
+    private static Vec3 addVectors(Vec3 first, Vec3 second) {
+        return new Vec3(vecX(first) + vecX(second), vecY(first) + vecY(second), vecZ(first) + vecZ(second));
+    }
+
+    private static AABB mergeAabbs(AABB first, AABB second) {
+        return new AABB(
+                Math.min(aabbMinX(first), aabbMinX(second)),
+                Math.min(aabbMinY(first), aabbMinY(second)),
+                Math.min(aabbMinZ(first), aabbMinZ(second)),
+                Math.max(aabbMaxX(first), aabbMaxX(second)),
+                Math.max(aabbMaxY(first), aabbMaxY(second)),
+                Math.max(aabbMaxZ(first), aabbMaxZ(second))
+        );
+    }
+
+    private static double aabbMinX(AABB box) {
+        return WorldCompat.aabbMinX(box);
+    }
+
+    private static double aabbMinY(AABB box) {
+        return WorldCompat.aabbMinY(box);
+    }
+
+    private static double aabbMinZ(AABB box) {
+        return WorldCompat.aabbMinZ(box);
+    }
+
+    private static double aabbMaxX(AABB box) {
+        return WorldCompat.aabbMaxX(box);
+    }
+
+    private static double aabbMaxY(AABB box) {
+        return WorldCompat.aabbMaxY(box);
+    }
+
+    private static double aabbMaxZ(AABB box) {
+        return WorldCompat.aabbMaxZ(box);
+    }
+
+    private static String vectorKey(Vec3 vector) {
+        return vectorKey((int) vecX(vector), (int) vecY(vector), (int) vecZ(vector));
+    }
+
+    private static String vectorKey(Vec3i vector) {
+        return vectorKey(vec3iX(vector), vec3iY(vector), vec3iZ(vector));
+    }
+
+    private static String vectorKey(int x, int y, int z) {
+        return x + "," + y + "," + z;
+    }
+
+    private static Vec3 directionVector(Direction direction) {
+        Vec3i normal = directionNormal(direction);
+        return new Vec3(vec3iX(normal), vec3iY(normal), vec3iZ(normal));
+    }
+
+    private static int vec3iX(Vec3i vector) {
+        return WorldCompat.vec3iX(vector);
+    }
+
+    private static int vec3iY(Vec3i vector) {
+        return WorldCompat.vec3iY(vector);
+    }
+
+    private static int vec3iZ(Vec3i vector) {
+        return WorldCompat.vec3iZ(vector);
+    }
+
+    private static Vec3i directionNormal(Direction direction) {
+        return WorldCompat.directionNormal(direction);
+    }
+
+    private static Direction directionOpposite(Direction direction) {
+        return WorldCompat.directionOpposite(direction);
+    }
+
+    private static Direction.Axis directionAxis(Direction direction) {
+        return WorldCompat.directionAxis(direction);
+    }
+
+    private static Direction.AxisDirection directionAxisDirection(Direction direction) {
+        return WorldCompat.directionAxisDirection(direction);
+    }
+
     // ==================== INTERNAL BOUNDING BOX MERGER CLASS ====================
 
     /**
      * Internal helper class for merging bounding boxes efficiently.
      */
     private static final class BoundingBoxMerger {
-        private static final Long2ObjectMap<Direction> DIRECTION_LOOKUP = Arrays.stream(Direction.values())
-                //? if >=1.21.2
-                .collect(Collectors.toMap(dir -> new BlockPos(dir.getUnitVec3i()).asLong(),
-                //? if <1.21.2
-                /*.collect(Collectors.toMap(dir -> new BlockPos(dir.getNormal()).asLong(),*/
+        private static final Map<String, Direction> DIRECTION_LOOKUP = Arrays.stream(Direction.values())
+                .collect(Collectors.toMap(dir -> vectorKey(directionNormal(dir)),
                         dir -> dir,
                         (a, b) -> {
                             throw new IllegalStateException("Duplicate direction detected.");
                         },
-                        Long2ObjectOpenHashMap::new
+                        HashMap::new
                 ));
 
         private final Map<Vec3, AABB> positionToBox = new HashMap<>();
@@ -855,9 +1100,9 @@ public final class WorldFunctions {
         private static boolean isAligned(AABB first, AABB second, Direction direction) {
             return getAxisValue(first, direction) == getAxisValue(
                     second,
-                    direction.getOpposite()
+                    directionOpposite(direction)
             ) && Arrays.stream(Direction.values())
-                    .filter(d -> d.getAxis() != direction.getAxis())
+                    .filter(d -> directionAxis(d) != directionAxis(direction))
                     .allMatch(d -> getAxisValue(first, d) == getAxisValue(second, d));
         }
 
@@ -865,23 +1110,28 @@ public final class WorldFunctions {
          * Retrieves the value of a bounding box along a specified direction.
          */
         private static double getAxisValue(AABB box, Direction direction) {
-            return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ?
-                    box.max(direction.getAxis()) : box.min(
-                    direction.getAxis());
+            Direction.Axis axis = directionAxis(direction);
+            boolean positive = directionAxisDirection(direction) == Direction.AxisDirection.POSITIVE;
+            return switch (axis) {
+                case X -> positive ? aabbMaxX(box) : aabbMinX(box);
+                case Y -> positive ? aabbMaxY(box) : aabbMinY(box);
+                case Z -> positive ? aabbMaxZ(box) : aabbMinZ(box);
+                default -> throw new IllegalStateException("Unknown direction axis: " + axis);
+            };
         }
 
         /**
          * Converts a vector into a direction based on its coordinates.
          */
         private static Direction directionFromVector(Vec3 vector) {
-            return DIRECTION_LOOKUP.get(BlockPos.asLong((int) vector.x, (int) vector.y, (int) vector.z));
+            return DIRECTION_LOOKUP.get(vectorKey((int) vecX(vector), (int) vecY(vector), (int) vecZ(vector)));
         }
 
         /**
          * Attempts to merge the current bounding box with its neighboring bounding box.
          */
         private boolean canCombine(AABB current, AABB neighbor, Vec3 center) {
-            Direction direction = directionFromVector(center.subtract(current.getCenter()));
+            Direction direction = directionFromVector(subtractVectors(center, aabbCenter(current)));
             return direction != null && isAligned(current, neighbor, direction) && mergeBoxes(
                     current,
                     neighbor,
@@ -894,12 +1144,7 @@ public final class WorldFunctions {
          */
         private boolean tryCombineAdjacent(Vec3 center, AABB box) {
             for (Direction direction : Direction.values()) {
-                //? if >=1.21.2
-                Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getUnitVec3i()));
-                //? if <1.21.2 && >=1.16
-                /*Vec3 adjacentCenter = center.add(Vec3.atLowerCornerOf(direction.getNormal()));*/
-                //? if <1.16
-                /*Vec3 adjacentCenter = center.add(new Vec3(direction.getNormal().getX(), direction.getNormal().getY(), direction.getNormal().getZ()));*/
+                Vec3 adjacentCenter = addVectors(center, directionVector(direction));
                 AABB adjacentBox = positionToBox.get(adjacentCenter);
 
                 if (adjacentBox != null && isAligned(box, adjacentBox, direction)) {
@@ -913,7 +1158,7 @@ public final class WorldFunctions {
          * Merges two bounding boxes and updates the necessary mappings.
          */
         private boolean mergeBoxes(AABB source, AABB target, Vec3 center) {
-            AABB expanded = source.minmax(target);
+            AABB expanded = mergeAabbs(source, target);
 
             Set<Vec3> mergedPositions = new HashSet<>(boxToPosition.removeAll(source));
             mergedPositions.forEach(v -> positionToBox.put(v, expanded));

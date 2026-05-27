@@ -29,6 +29,7 @@ if (minecraftVersion == '1.16.5') {
                     'net.minecraft.resources.ResourceKey'                   : 'net.minecraft.util.RegistryKey',
                     'net.minecraft.resources.ResourceLocation'              : 'net.minecraft.util.ResourceLocation',
                     'net.minecraft.network.FriendlyByteBuf'                 : 'net.minecraft.network.PacketBuffer',
+                    'net.minecraft.network.protocol.Packet'                 : 'net.minecraft.network.IPacket',
                     'net.minecraft.server.level.ServerLevel'                : 'net.minecraft.world.server.ServerWorld',
                     'net.minecraft.server.level.ServerPlayer'               : 'net.minecraft.entity.player.ServerPlayerEntity',
                     'net.minecraft.world.entity.player.Player'              : 'net.minecraft.entity.player.PlayerEntity',
@@ -87,6 +88,7 @@ if (minecraftVersion == '1.16.5') {
                     'net.minecraft.client.gui.screens.LevelLoadingScreen'   : 'net.minecraft.client.gui.screen.DownloadTerrainScreen',
                     'net.minecraft.client.MouseHandler'                     : 'net.minecraft.client.MouseHelper',
                     'net.minecraft.core.GlobalPos'                          : 'net.minecraft.util.math.GlobalPos',
+                    'net.minecraft.core.Vec3i'                              : 'net.minecraft.util.math.vector.Vector3i',
                     'net.minecraft.world.inventory.CraftingContainer'       : 'net.minecraft.inventory.CraftingInventory',
                     'net.minecraft.world.inventory.ResultSlot'              : 'net.minecraft.inventory.container.CraftingResultSlot',
                     'net.minecraft.world.phys.HitResult'                    : 'net.minecraft.util.math.RayTraceResult',
@@ -97,6 +99,7 @@ if (minecraftVersion == '1.16.5') {
                     'net.minecraft.world.entity.player.Inventory'           : 'net.minecraft.entity.player.PlayerInventory',
                     'net.minecraft.world.entity.LightningBolt'              : 'net.minecraft.entity.effect.LightningBoltEntity',
                     'net.minecraft.world.item.ArmorItem'                    : 'net.minecraft.item.ArmorItem',
+                    'net.minecraft.world.item.ShieldItem'                   : 'net.minecraft.item.ShieldItem',
                     'net.minecraft.world.item.enchantment.Enchantment'      : 'net.minecraft.enchantment.Enchantment',
                     'net.minecraft.world.item.crafting.Ingredient'          : 'net.minecraft.item.crafting.Ingredient',
                     'net.minecraft.world.level.block.entity.BlockEntity'    : 'net.minecraft.tileentity.TileEntity',
@@ -111,6 +114,8 @@ if (minecraftVersion == '1.16.5') {
                     .replaceAll('\\bMutableComponent\\b', 'IFormattableTextComponent')
                     .replaceAll('\\bTextComponent\\b', 'StringTextComponent')
                     .replaceAll('\\bComponent\\b', 'ITextComponent')
+                    .replaceAll('\\bCompoundTag\\b', 'CompoundNBT')
+                    .replaceAll('\\bListTag\\b', 'ListNBT')
                     .replaceAll('\\bChatFormatting\\b', 'TextFormatting')
                     .replaceAll('\\bCommandSourceStack\\b', 'CommandSource')
                     .replaceAll('\\bFriendlyByteBuf\\b', 'PacketBuffer')
@@ -126,6 +131,7 @@ if (minecraftVersion == '1.16.5') {
                     .replaceAll('\\bLevel\\b', 'World')
                     .replaceAll('\\bBlockHitResult\\b', 'BlockRayTraceResult')
                     .replaceAll('\\bClipContext\\b', 'RayTraceContext')
+                    .replaceAll('\\bVec3i\\b', 'Vector3i')
                     .replaceAll('\\bVec3\\b', 'Vector3d')
                     .replaceAll('\\bAABB\\b', 'AxisAlignedBB')
                     .replaceAll('\\bSoundSource\\b', 'SoundCategory')
@@ -163,6 +169,7 @@ if (minecraftVersion == '1.16.5') {
                     .replace('Biome.Precipitation', 'Biome.RainType')
                     .replace('Commands.CommandSelection', 'Commands.EnvironmentType')
                     .replace('event.getWorld().getServer()', '((net.minecraft.world.World) event.getWorld()).getServer()')
+                    .replace('sendPacket(ServerPlayerEntity player, Packet<?> packet)', 'sendPacket(ServerPlayerEntity player, IPacket<?> packet)')
                     .replace('net.minecraft.nbt.CompoundTag', 'net.minecraft.nbt.CompoundNBT')
                     .replace('net.minecraft.world.item.TieredItem', 'net.minecraft.item.TieredItem')
                     .replaceAll('\\bClientboundSetTitlesPacket\\b', 'STitlePacket')
@@ -235,19 +242,76 @@ if (useLegacy1165ForgeRunHack) {
             "caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}_mapped_official_${minecraftVersion}"
         )
     }
+    def legacyForgeMavenizedDir = providers.provider {
+        rootProject.layout.projectDirectory.dir(
+            ".gradle/mavenizer/repo/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}"
+        ).asFile
+    }
+    def legacyForgeMavenizerCacheDir = providers.provider {
+        new File(
+            gradle.gradleUserHomeDir,
+            "caches/minecraftforge/forgegradle/mavenizer/caches/maven/forge/net/minecraftforge/forge/${legacyForgeArtifactVersion.get()}"
+        )
+    }
     def legacyForgeUserdevJar = providers.provider {
         def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-recomp.jar' }.files
-        if (matches.size() != 1) {
-            throw new GradleException("Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()}")
+        if (matches.size() == 1) {
+            return matches.first()
         }
-        matches.first()
+
+        def mavenizedJar = new File(
+            legacyForgeMavenizedDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}.jar"
+        )
+        if (mavenizedJar.isFile()) {
+            return mavenizedJar
+        }
+
+        throw new GradleException(
+            "Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()} " +
+                "or Mavenizer jar at ${mavenizedJar}"
+        )
     }
     def legacyForgeLauncherJar = providers.provider {
         def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-launcher.jar' }.files
-        if (matches.size() != 1) {
-            throw new GradleException("Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()}")
+        if (matches.size() == 1) {
+            return matches.first()
         }
-        matches.first()
+
+        def mavenizedLauncherJar = new File(
+            legacyForgeMavenizedDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}-launcher.jar"
+        )
+        if (mavenizedLauncherJar.isFile()) {
+            return mavenizedLauncherJar
+        }
+
+        throw new GradleException(
+            "Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()} " +
+                "or Mavenizer launcher jar at ${mavenizedLauncherJar}"
+        )
+    }
+    def legacyForgeRawUserdevJar = providers.provider {
+        def userdevJar = new File(
+            legacyForgeMavenizerCacheDir.get(),
+            "forge-${legacyForgeArtifactVersion.get()}-userdev.jar"
+        )
+        if (userdevJar.isFile()) {
+            return userdevJar
+        }
+
+        throw new GradleException("Missing legacy Forge userdev jar at ${userdevJar}")
+    }
+    def legacyForgeUserdevInjectJar = tasks.register('legacyForgeUserdevInjectJar', Jar) {
+        archiveClassifier.set('legacy-forge-userdev-inject')
+        from({
+            zipTree(legacyForgeRawUserdevJar.get()).matching { include 'inject/**' }
+        }) {
+            eachFile { details ->
+                details.path = details.path.replaceFirst('^inject/', '')
+            }
+            includeEmptyDirs = false
+        }
     }
 
     dependencies {
@@ -255,6 +319,7 @@ if (useLegacy1165ForgeRunHack) {
         compileOnly(files(legacyForgeLauncherJar))
         runtimeOnly(files(legacyForgeUserdevJar))
         runtimeOnly(files(legacyForgeLauncherJar))
+        runtimeOnly(files(legacyForgeUserdevInjectJar))
         runtimeOnly 'net.jodah:typetools:0.6.3'
     }
 
@@ -274,6 +339,12 @@ if (useLegacy1165ForgeRunHack) {
         }
         eachFile { details -> details.path = details.name }
         includeEmptyDirs = false
+    }
+    def prepareLegacyForgeAssets = tasks.register('prepareLegacyForgeAssets') {
+        outputs.dir(assetsDir)
+        doLast {
+            assetsDir.get().mkdirs()
+        }
     }
     def stageTeaKitLegacyForgeMod = tasks.register('stageTeaKitLegacyForgeMod') {
         onlyIf { useTeaKit && teaKitVersion != null && teaKitVersion != 'null' }
@@ -339,6 +410,7 @@ if (useLegacy1165ForgeRunHack) {
         }
         if (task.name in ['runClient', 'runData']) {
             task.dependsOn(stageLegacyForgeNatives)
+            task.dependsOn(prepareLegacyForgeAssets)
         }
         if (task.name == 'runClient') {
             task.dependsOn(stageTeaKitLegacyForgeMod)

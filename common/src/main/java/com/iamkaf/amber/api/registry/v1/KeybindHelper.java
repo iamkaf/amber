@@ -28,7 +28,8 @@ public class KeybindHelper {
         if (!Platform.getEnvironment().equals(Env.CLIENT)) {
             return null;
         }
-        if (forgeEventAlreadyFired) {
+        boolean registerImmediately = forgeEventAlreadyFired;
+        if (registerImmediately) {
             Constants.LOG.error(
                     "Attempted to register a keybind after the Forge event has already fired. This is not allowed.");
             Constants.LOG.error("Please ensure that all keybinds are registered before the Forge event is fired.");
@@ -37,7 +38,7 @@ public class KeybindHelper {
 
         KEYBINDINGS.add(keybind);
 
-        if (Platform.getPlatformName().equals("Fabric")) {
+        if (Platform.getPlatformName().equals("Fabric") || registerImmediately) {
             Services.KEYBIND_REGISTER.register(keybind);
         }
 
