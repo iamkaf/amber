@@ -4,6 +4,8 @@
   "package": "com.iamkaf.amber.mixin",
   "compatibilityLevel": "${mixin_compat_forge}",
   "mixins": [
+    //? if >=1.16
+    "AnimalMixin",
     "BoneMealItemMixin",
     //? if >=1.16
     "CraftedItemMixin",

@@ -4,6 +4,7 @@
   "package": "com.iamkaf.amber.mixin",
   "compatibilityLevel": "${mixin_compat_neoforge}",
   "mixins": [
+    "AnimalMixin",
     "BoneMealItemMixin",
     "CraftedItemMixin",
     "CraftingPlayerMixin",

@@ -124,7 +124,6 @@ final class NeoForgeAmberEventHandlers {
 
     static void registerAnimalEvents() {
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerCommonNeoForge::onAnimalTame);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerCommonNeoForge::onAnimalBreed);
     }
 
     static void registerFishingEvents() {

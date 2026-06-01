@@ -151,7 +151,6 @@ final class ForgeAmberEventHandlers {
 
 
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalTame);
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalBreed);
 
     }
 
