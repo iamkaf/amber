@@ -149,6 +149,7 @@ final class ForgeAmberEventHandlers {
     static void registerAnimalEvents() {
 
         AnimalTameEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalTame);
+        BabyEntitySpawnEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalBreed);
 
 
     }
