@@ -1,6 +1,7 @@
 pluginManagement {
     repositories {
         mavenLocal()
+        maven("https://maven.kaf.sh") { name = "Kaf Maven" }
         maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
         gradlePluginPortal()
         mavenCentral()
