@@ -553,43 +553,29 @@ final class ForgeAmberEventHandlers {
         }
 
 
-        public static void onWorldLoad(
+        public static void onWorldLoad(WorldEvent.Load event) {
+            net.minecraft.server.MinecraftServer server = legacyServer(event.getWorld());
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, event.getWorld());
+        }
 
+        public static void onWorldUnload(WorldEvent.Unload event) {
+            net.minecraft.server.MinecraftServer server = legacyServer(event.getWorld());
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, event.getWorld());
+        }
 
-                WorldEvent.Load event
-        ) {
-
-
-	            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
-
-
-	                    legacyServer(event.getWorld()), event.getWorld()
-	            );
-	        }
-
-        public static void onWorldUnload(
-
-
-                WorldEvent.Unload event
-        ) {
-	            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(
-
-
-	                    legacyServer(event.getWorld()), event.getWorld()
-	            );
-	        }
-
-        public static void onWorldSave(
-
-
-                WorldEvent.Save event
-        ) {
-	            WorldEvents.WORLD_SAVE.invoker().onWorldSave(
-
-
-	                    legacyServer(event.getWorld()), event.getWorld()
-	            );
-	        }
+        public static void onWorldSave(WorldEvent.Save event) {
+            net.minecraft.server.MinecraftServer server = legacyServer(event.getWorld());
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_SAVE.invoker().onWorldSave(server, event.getWorld());
+        }
 
 
 	        private static net.minecraft.server.MinecraftServer legacyServer(Object level) {
