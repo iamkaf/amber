@@ -82,4 +82,13 @@ jobs:
         env:
           MAVEN_PUBLISH_USERNAME: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
-        run: just publish-version "${{ matrix.version }}"
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just publish-version "${{ matrix.version }}" && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done

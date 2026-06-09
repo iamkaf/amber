@@ -94,7 +94,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build ${{ matrix.node }}
-        run: just build ${{ matrix.node }}
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just build "${{ matrix.node }}" && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -131,7 +140,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Compile all changed nodes
-        run: just compile-all
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just compile-all && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done
 
   summary:
     needs: [build, test]
