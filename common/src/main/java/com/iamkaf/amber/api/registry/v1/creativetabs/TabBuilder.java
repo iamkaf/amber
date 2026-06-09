@@ -275,20 +275,31 @@ public class TabBuilder {
         }
         return builder.build();
         //?} else {
-        /*return new CreativeModeTab(nextLegacyTabIndex(), legacyTabName(id)) {
+        /*class LegacyCreativeModeTab extends CreativeModeTab {
+            private final Identifier tabId;
+            private final Supplier<ItemStack> tabIcon;
+            private final List<Supplier<ItemLike>> tabItems;
+
+            private LegacyCreativeModeTab(int index, String name, Identifier tabId, Supplier<ItemStack> tabIcon, List<Supplier<ItemLike>> tabItems) {
+                super(index, name);
+                this.tabId = tabId;
+                this.tabIcon = tabIcon;
+                this.tabItems = tabItems;
+            }
+
             @Override
             public ItemStack makeIcon() {
-                return icon.get();
+                return tabIcon.get();
             }
 
             @Override
             public void fillItemList(NonNullList<ItemStack> stacks) {
-                for (Supplier<ItemLike> item : items) {
+                for (Supplier<ItemLike> item : tabItems) {
                     stacks.add(new ItemStack(item.get()));
                 }
                 com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
                         .modifyEntries(
-                                CreativeTabHelper.creativeModeTabKey(id),
+                                CreativeTabHelper.creativeModeTabKey(tabId),
                                 new com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput() {
                                     @Override
                                     public void accept(ItemStack stack, com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput.TabVisibility visibility) {
@@ -297,7 +308,8 @@ public class TabBuilder {
                                 }
                         );
             }
-        };*/
+        }
+        return new LegacyCreativeModeTab(nextLegacyTabIndex(), legacyTabName(id), id, icon, items);*/
         //?}
     }
 
