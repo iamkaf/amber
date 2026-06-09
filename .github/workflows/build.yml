@@ -40,7 +40,7 @@ jobs:
             versions="$all_versions"
           else
             changed_versions=$(printf '%s\n' "$changed_files" | sed -nE 's|^versions/([^/]+)/.*|\1|p' | sort -u)
-            versions=$(comm -12 <(printf '%s\n' "$all_versions") <(printf '%s\n' "$changed_versions"))
+            versions=$(grep -Fxf <(printf '%s\n' "$changed_versions") <(printf '%s\n' "$all_versions") || true)
           fi
 
           versions_json=$(printf '%s\n' "$versions" | jq -R -s -c 'split("\n") | map(select(length > 0))')
