@@ -21,6 +21,15 @@ def minecraftVersionAtLeast = { String targetVersion ->
     return true
 }
 
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'com.terraformersmc' && details.requested.name == 'modmenu') {
+            details.useTarget "maven.modrinth:mOgUt4GM:${details.requested.version}"
+            details.because 'Modrinth Maven is more reliable from GitHub Actions for Mod Menu'
+        }
+    }
+}
+
 tasks.named('stageMergedJavaSources').configure {
     if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion.startsWith('1.15.')) {
         from rootProject.file('common/src/legacy-pre116/java')
