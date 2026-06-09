@@ -22,10 +22,12 @@ def minecraftVersionAtLeast = { String targetVersion ->
 }
 
 configurations.configureEach {
-    resolutionStrategy.eachDependency { details ->
-        if (details.requested.group == 'com.terraformersmc' && details.requested.name == 'modmenu') {
-            details.useTarget "maven.modrinth:mOgUt4GM:${details.requested.version}"
-            details.because 'Modrinth Maven is more reliable from GitHub Actions for Mod Menu'
+    resolutionStrategy.dependencySubstitution {
+        all { dependency ->
+            def requested = dependency.requested
+            if (requested instanceof org.gradle.api.artifacts.component.ModuleComponentSelector && requested.group == 'com.terraformersmc' && requested.module == 'modmenu') {
+                dependency.useTarget "maven.modrinth:mOgUt4GM:${requested.version}"
+            }
         }
     }
 }
