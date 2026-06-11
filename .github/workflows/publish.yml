@@ -58,27 +58,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect Java version
-        id: java
-        shell: bash
-        run: |
-          set -euo pipefail
-          props="versions/${{ matrix.version }}/gradle.properties"
-          v=$(sed -nE 's/^project\.build-java=([0-9]+).*/\1/p' "$props" | head -n1)
-          if [ -z "$v" ]; then
-            v=$(sed -nE 's/^project\.java=([0-9]+).*/\1/p' "$props" | head -n1)
-          fi
-          if [ -z "$v" ]; then
-            echo "project.build-java/project.java not found in $props" >&2
-            exit 1
-          fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ steps.java.outputs.version }}
+          java-version: |
+            16
+            17
+            25
+            21
           cache: gradle
 
       - name: Setup Gradle
@@ -94,4 +82,13 @@ jobs:
         env:
           MAVEN_PUBLISH_USERNAME: ${{ secrets.MAVEN_PUBLISH_USERNAME }}
           MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_PUBLISH_PASSWORD }}
-        run: just publish-version "${{ matrix.version }}"
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just publish-version "${{ matrix.version }}" && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done

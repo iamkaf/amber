@@ -535,49 +535,29 @@ final class ForgeAmberEventHandlers {
         }
 
 
-        public static void onWorldLoad(
+        public static void onWorldLoad(LevelEvent.Load event) {
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, event.getLevel());
+        }
 
-                LevelEvent.Load event
+        public static void onWorldUnload(LevelEvent.Unload event) {
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, event.getLevel());
+        }
 
-
-        ) {
-
-
-	            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(
-
-	                    event.getLevel().getServer(), event.getLevel()
-
-
-	            );
-	        }
-
-        public static void onWorldUnload(
-
-                LevelEvent.Unload event
-
-
-        ) {
-	            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(
-
-	                    event.getLevel().getServer(), event.getLevel()
-
-
-	            );
-	        }
-
-        public static void onWorldSave(
-
-                LevelEvent.Save event
-
-
-        ) {
-	            WorldEvents.WORLD_SAVE.invoker().onWorldSave(
-
-	                    event.getLevel().getServer(), event.getLevel()
-
-
-	            );
-	        }
+        public static void onWorldSave(LevelEvent.Save event) {
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_SAVE.invoker().onWorldSave(server, event.getLevel());
+        }
 
 
         public static boolean onLightningStrike(EntityStruckByLightningEvent event) {

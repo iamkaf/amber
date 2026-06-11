@@ -21,6 +21,17 @@ def minecraftVersionAtLeast = { String targetVersion ->
     return true
 }
 
+configurations.configureEach {
+    withDependencies { dependencies ->
+        dependencies.findAll { dependency ->
+            dependency.group == 'com.terraformersmc' && dependency.name == 'modmenu'
+        }.toList().each { dependency ->
+            dependencies.remove(dependency)
+            dependencies.add(project.dependencies.create("maven.modrinth:mOgUt4GM:${dependency.version}"))
+        }
+    }
+}
+
 tasks.named('stageMergedJavaSources').configure {
     if (minecraftVersion == '1.14.4' || minecraftVersion == '1.15' || minecraftVersion.startsWith('1.15.')) {
         from rootProject.file('common/src/legacy-pre116/java')
