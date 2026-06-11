@@ -32,9 +32,13 @@ build-all:
 publish-version version *args:
   @tasks=(":common:{{version}}:publishAllPublicationsToKafMavenRepository"); for loader in $(just list-loaders "{{version}}"); do tasks+=(":$loader:{{version}}:publishAllPublicationsToKafMavenRepository"); done; ./gradlew --configure-on-demand "${tasks[@]}" {{args}} --console=plain
 
+publish-mod-version version *args:
+  @if [ ! -f "versions/{{version}}/gradle.properties" ]; then echo "Unknown version: {{version}}"; exit 1; fi
+  @tasks=(); for loader in $(just list-loaders "{{version}}"); do suffix=$(printf '%s-%s\n' "{{version}}" "$loader" | sed -E 's/[^A-Za-z0-9]+/ /g' | awk '{ out=""; for (i=1; i<=NF; i++) out = out toupper(substr($i,1,1)) substr($i,2); print out }'); tasks+=("publishCurseforge$suffix" "publishModrinth$suffix"); done; ./gradlew "${tasks[@]}" {{args}} --console=plain
+
 publish-all *args:
-  @test -n "$MAVEN_PUBLISH_USERNAME" || (echo "MAVEN_PUBLISH_USERNAME is required" >&2; exit 1)
-  @test -n "$MAVEN_PUBLISH_PASSWORD" || (echo "MAVEN_PUBLISH_PASSWORD is required" >&2; exit 1)
+  @test -n "${MAVEN_PUBLISH_USERNAME:-}" || (echo "MAVEN_PUBLISH_USERNAME is required" >&2; exit 1)
+  @test -n "${MAVEN_PUBLISH_PASSWORD:-}" || (echo "MAVEN_PUBLISH_PASSWORD is required" >&2; exit 1)
   @for version in $(just list-versions); do echo "==> publish $version"; just publish-version "$version" {{args}}; done
 
 compile-all:
