@@ -40,7 +40,7 @@ jobs:
             versions="$all_versions"
           else
             changed_versions=$(printf '%s\n' "$changed_files" | sed -nE 's|^versions/([^/]+)/.*|\1|p' | sort -u)
-            versions=$(comm -12 <(printf '%s\n' "$all_versions") <(printf '%s\n' "$changed_versions"))
+            versions=$(grep -Fxf <(printf '%s\n' "$changed_versions") <(printf '%s\n' "$all_versions") || true)
           fi
 
           versions_json=$(printf '%s\n' "$versions" | jq -R -s -c 'split("\n") | map(select(length > 0))')
@@ -74,27 +74,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Detect Java version
-        id: java
-        shell: bash
-        run: |
-          set -euo pipefail
-          props="versions/${{ matrix.version }}/gradle.properties"
-          v=$(sed -nE 's/^project\.build-java=([0-9]+).*/\1/p' "$props" | head -n1)
-          if [ -z "$v" ]; then
-            v=$(sed -nE 's/^project\.java=([0-9]+).*/\1/p' "$props" | head -n1)
-          fi
-          if [ -z "$v" ]; then
-            echo "project.build-java/project.java not found in $props" >&2
-            exit 1
-          fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ steps.java.outputs.version }}
+          java-version: |
+            16
+            17
+            25
+            21
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -106,7 +94,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build ${{ matrix.node }}
-        run: just build ${{ matrix.node }}
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just build "${{ matrix.node }}" && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -123,24 +120,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Detect Java version
-        id: java
-        shell: bash
-        run: |
-          set -euo pipefail
-          first_version=$(printf '%s\n' '${{ needs.detect-changes.outputs.versions }}' | jq -r '.[0]')
-          props="versions/$first_version/gradle.properties"
-          v=$(sed -nE 's/^project\.build-java=([0-9]+).*/\1/p' "$props" | head -n1)
-          if [ -z "$v" ]; then
-            v=$(sed -nE 's/^project\.java=([0-9]+).*/\1/p' "$props" | head -n1)
-          fi
-          echo "version=$v" >> "$GITHUB_OUTPUT"
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: ${{ steps.java.outputs.version }}
+          java-version: |
+            16
+            17
+            25
+            21
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -152,7 +140,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Compile all changed nodes
-        run: just compile-all
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            just compile-all && exit 0
+            status=$?
+            if [ "$attempt" -eq 3 ]; then
+              exit "$status"
+            fi
+            sleep $((attempt * 20))
+          done
 
   summary:
     needs: [build, test]

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.0.1
+
+### Fixed
+
+- Fixed Forge world lifecycle callbacks forwarding client-only level load events without a server.
+
 ## 11.0.0
 
 ### Added
