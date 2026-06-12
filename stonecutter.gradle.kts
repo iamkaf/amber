@@ -1,11 +1,11 @@
 plugins {
     id("dev.kikugie.stonecutter")
     id("com.iamkaf.multiloader.root")
-    id("fabric-loom") version "1.15.5" apply false
+    id("fabric-loom") version "1.17-SNAPSHOT" apply false
     id("net.neoforged.moddev") version "2.0.141" apply false
 }
 
-stonecutter active "26.1.2"
+stonecutter active "26.2-rc-1"
 
 stonecutter handlers {
     inherit("json5", "json")
