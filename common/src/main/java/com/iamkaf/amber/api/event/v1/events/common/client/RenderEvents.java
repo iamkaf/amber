@@ -3,9 +3,9 @@ package com.iamkaf.amber.api.event.v1.events.common.client;
 import com.iamkaf.amber.api.event.v1.Event;
 import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.client.Camera;
-//? if >=26.2-rc-1
+//? if >=26.2-rc-2
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//? if >=1.15 && <26.2-rc-1
+//? if >=1.15 && <26.2-rc-2
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -55,9 +55,9 @@ public class RenderEvents {
          * @return an {@link InteractionResult} indicating whether the outline should be rendered or cancelled
          */
         InteractionResult onBlockOutlineRender(Camera camera,
-                                             //? if >=26.2-rc-1
+                                             //? if >=26.2-rc-2
                                              SubmitNodeCollector bufferSource,
-                                             //? if >=1.15 && <26.2-rc-1
+                                             //? if >=1.15 && <26.2-rc-2
                                              MultiBufferSource bufferSource,
                                              //? if <1.15
                                              /*Object bufferSource,*/

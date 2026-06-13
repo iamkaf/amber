@@ -10,9 +10,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-//? if >=26.2-rc-1
+//? if >=26.2-rc-2
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//? if >=1.15 && <26.2-rc-1
+//? if >=1.15 && <26.2-rc-2
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
@@ -34,9 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class LevelRendererMixin {
 
     @Inject(
-        //? if >=26.2-rc-1
+        //? if >=26.2-rc-2
         method = "submitBlockOutline",
-        //? if >=1.21.2 && <26.2-rc-1
+        //? if >=1.21.2 && <26.2-rc-2
         method = "renderBlockOutline",
         //? if <1.21.2
         /*method = "renderHitOutline",*/
@@ -62,7 +62,7 @@ public class LevelRendererMixin {
             double cameraZ,
             BlockPos outlinePos,
             BlockState outlineState,
-            *///?} else if >=26.2-rc-1 {
+            *///?} else if >=26.2-rc-2 {
             PoseStack poseStack,
             SubmitNodeCollector bufferSource,
             LevelRenderState levelRenderState,
@@ -103,7 +103,7 @@ public class LevelRendererMixin {
         }
         //?}
         *///?} else {
-        //? if >=26.2-rc-1 {
+        //? if >=26.2-rc-2 {
         if (levelRenderState.blockOutlineRenderState == null) {
             return;
         }
@@ -113,7 +113,7 @@ public class LevelRendererMixin {
         }
         //?}
 
-        //? if >=26.1 && <26.2-rc-1 {
+        //? if >=26.1 && <26.2-rc-2 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
@@ -139,9 +139,9 @@ public class LevelRendererMixin {
         BlockState state = minecraft.level.getBlockState(pos);
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                //? if >=26.2-rc-1
+                //? if >=26.2-rc-2
                 minecraft.gameRenderer.mainCamera(),
-                //? if >=1.21.9 && <26.2-rc-1
+                //? if >=1.21.9 && <26.2-rc-2
                 /*minecraft.gameRenderer.getMainCamera(),*/
                 //? if <1.21.9
                 /*camera,*/
