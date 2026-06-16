@@ -5,7 +5,7 @@ plugins {
     id("net.neoforged.moddev") version "2.0.141" apply false
 }
 
-stonecutter active "26.2-rc-2"
+stonecutter active "26.2"
 
 stonecutter handlers {
     inherit("json5", "json")
