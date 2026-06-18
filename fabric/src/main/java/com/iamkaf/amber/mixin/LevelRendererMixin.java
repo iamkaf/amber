@@ -10,7 +10,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-//? if >=1.15
+//? if >=26.2
+import net.minecraft.client.renderer.SubmitNodeCollector;
+//? if >=1.15 && <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
@@ -23,9 +25,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -33,12 +33,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
 
-    @Shadow
-    @Final
-    private Minecraft minecraft;
-
     @Inject(
-        //? if >=1.21.2
+        //? if >=26.2
+        method = "submitBlockOutline",
+        //? if >=1.21.2 && <26.2
         method = "renderBlockOutline",
         //? if <1.21.2
         /*method = "renderHitOutline",*/
@@ -64,7 +62,11 @@ public class LevelRendererMixin {
             double cameraZ,
             BlockPos outlinePos,
             BlockState outlineState,
-            *///?} else {
+            *///?} else if >=26.2 {
+            PoseStack poseStack,
+            SubmitNodeCollector bufferSource,
+            LevelRenderState levelRenderState,
+            //?} else {
             //? if <1.21.9
             /*Camera camera,*/
             MultiBufferSource.BufferSource bufferSource,
@@ -75,9 +77,11 @@ public class LevelRendererMixin {
             //?}
             CallbackInfo ci
     ) {
+        Minecraft minecraft = Minecraft.getInstance();
+
         //? if <1.21.2 {
         /*//? if >=1.15 {
-        if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
@@ -86,8 +90,8 @@ public class LevelRendererMixin {
         }
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                this.minecraft.gameRenderer.getMainCamera(),
-                this.minecraft.renderBuffers().bufferSource(),
+                minecraft.gameRenderer.getMainCamera(),
+                minecraft.renderBuffers().bufferSource(),
                 (PoseStack) poseStack,
                 blockHitResult,
                 outlinePos,
@@ -99,23 +103,28 @@ public class LevelRendererMixin {
         }
         //?}
         *///?} else {
-        //? if >=1.21.9 {
+        //? if >=26.2 {
+        if (levelRenderState.blockOutlineRenderState == null) {
+            return;
+        }
+        //?} else if >=1.21.9 {
         if (levelRenderState.blockOutlineRenderState == null) {
             return;
         }
         //?}
 
-        //? if >=26.1 {
+        //? if >=26.1 && <26.2 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
-        //?} else {
+        //?}
+        //? if <26.1 {
         /*if (translucentPass) {
             return;
         }
         *///?}
 
-        if (!(this.minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
@@ -127,11 +136,13 @@ public class LevelRendererMixin {
         BlockPos pos = levelRenderState.blockOutlineRenderState.pos();
         //? if <1.21.9
         /*BlockPos pos = blockHitResult.getBlockPos();*/
-        BlockState state = this.minecraft.level.getBlockState(pos);
+        BlockState state = minecraft.level.getBlockState(pos);
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
-                //? if >=1.21.9
-                this.minecraft.gameRenderer.getMainCamera(),
+                //? if >=26.2
+                minecraft.gameRenderer.mainCamera(),
+                //? if >=1.21.9 && <26.2
+                /*minecraft.gameRenderer.getMainCamera(),*/
                 //? if <1.21.9
                 /*camera,*/
                 bufferSource,

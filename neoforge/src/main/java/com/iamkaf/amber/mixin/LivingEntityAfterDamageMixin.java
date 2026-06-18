@@ -79,10 +79,10 @@ public abstract class LivingEntityAfterDamageMixin {
             CallbackInfoReturnable<Boolean> cir
             //? if >=1.21.9 {
             ,
+            float originalDamage,
             ItemStack itemInUse,
             float damageBlocked,
-            boolean blocked,
-            boolean tookFullDamage
+            boolean blocked
             //?}
     ) {
         //? if >=1.21.9
@@ -116,10 +116,10 @@ public abstract class LivingEntityAfterDamageMixin {
             CallbackInfoReturnable<Boolean> cir
             //? if >=1.21.9 {
             ,
+            float originalDamage,
             ItemStack itemInUse,
             float damageBlocked,
-            boolean blocked,
-            boolean tookFullDamage
+            boolean blocked
             //?}
     ) {
         //? if >=1.21.9
