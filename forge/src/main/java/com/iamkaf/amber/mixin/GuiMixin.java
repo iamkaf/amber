@@ -13,12 +13,16 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 //? if <26.1 && >=1.20
 /*import net.minecraft.client.gui.GuiGraphics;*/
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
+//? if >=26.2
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//? if >=26.2
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(Gui.class)
 public class GuiMixin {
@@ -37,11 +41,24 @@ public class GuiMixin {
      * @param deltaTracker  the HUD tick counter
      * @param ci            the callback info
      */
-    //? if >=26.1
+    //? if >=26.2 {
+    @Inject(
+            method = "extractRenderState",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
+                    shift = At.Shift.AFTER
+            ),
+            locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    //?} else if >=26.1
     @Inject(method = "extractRenderState", at = @At("RETURN"))
     //? if <26.1
     /*@Inject(method = "render", at = @At("RETURN"), remap = false)*/
-    //? if >=26.1
+    //? if >=26.2 {
+    public void amber$render(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci,
+                             ProfilerFiller profiler, int xMouse, int yMouse, GuiGraphicsExtractor guiGraphics) {
+    //?} else if >=26.1
     public void amber$render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
     //? if <26.1 && >=1.21
     /*public void amber$render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {*/
@@ -50,7 +67,11 @@ public class GuiMixin {
     //? if <1.20
     /*public void amber$render(PoseStack guiGraphics, float deltaTracker, CallbackInfo ci) {*/
         // this check mirrors the vanilla check
-        if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {
+        //? if >=26.2 {
+        if (this.minecraft.gui.screen() == null || !(this.minecraft.gui.screen() instanceof LevelLoadingScreen)) {
+        //?} else {
+        /*if (this.minecraft.screen == null || !(this.minecraft.screen instanceof LevelLoadingScreen)) {*/
+        //?}
             HudEvents.RENDER_HUD.invoker().onHudRender(guiGraphics, deltaTracker);
         }
     }

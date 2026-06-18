@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.1.0
+
+### Changed
+
+- Ported to Minecraft 26.2.
+
 ## 11.0.1
 
 ### Fixed
