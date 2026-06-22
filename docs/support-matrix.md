@@ -48,6 +48,7 @@ Amber's supported loader matrix is defined by `versions/*/gradle.properties` and
 | `26.1` | Modern Supported | Fabric, Forge, NeoForge |
 | `26.1.1` | Modern Supported | Fabric, Forge, NeoForge |
 | `26.1.2` | Modern Supported | Fabric, Forge, NeoForge |
+| `26.2` | Modern Supported | Fabric, Forge, NeoForge |
 
 ## Coordinates
 

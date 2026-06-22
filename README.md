@@ -33,13 +33,13 @@ amber/
 ├── fabric/           # Fabric implementation
 ├── forge/            # Forge implementation
 ├── neoforge/         # NeoForge implementation
-├── versions/26.1.2/  # active Minecraft line metadata and overlays
+├── versions/26.2/    # active Minecraft line metadata and overlays
 └── docs/             # documentation site
 ```
 
 ## Supported Versions
 
-- 26.1.2: Fabric, Forge, NeoForge
+- 26.2: Fabric, Forge, NeoForge
 
 ## 🛠️ Building
 
