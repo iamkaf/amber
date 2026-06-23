@@ -267,10 +267,7 @@ if (useLegacy1165ForgeRunHack) {
             return mavenizedJar
         }
 
-        throw new GradleException(
-            "Expected exactly one legacy Forge recomp jar in ${legacyForgeUserdevDir.get()} " +
-                "or Mavenizer jar at ${mavenizedJar}"
-        )
+        return mavenizedJar
     }
     def legacyForgeLauncherJar = providers.provider {
         def matches = fileTree(legacyForgeUserdevDir.get()) { include '*-launcher.jar' }.files
@@ -286,10 +283,7 @@ if (useLegacy1165ForgeRunHack) {
             return mavenizedLauncherJar
         }
 
-        throw new GradleException(
-            "Expected exactly one legacy Forge launcher jar in ${legacyForgeUserdevDir.get()} " +
-                "or Mavenizer launcher jar at ${mavenizedLauncherJar}"
-        )
+        return mavenizedLauncherJar
     }
     def legacyForgeRawUserdevJar = providers.provider {
         def userdevJar = new File(
@@ -300,7 +294,7 @@ if (useLegacy1165ForgeRunHack) {
             return userdevJar
         }
 
-        throw new GradleException("Missing legacy Forge userdev jar at ${userdevJar}")
+        return userdevJar
     }
     def legacyForgeUserdevInjectJar = tasks.register('legacyForgeUserdevInjectJar', Jar) {
         archiveClassifier.set('legacy-forge-userdev-inject')
