@@ -30,7 +30,7 @@ configurations.configureEach {
             dependency.group == "com.terraformersmc" && dependency.name == "modmenu"
         }.toList().forEach { dependency ->
             remove(dependency)
-            add(project.dependencies.create("maven.modrinth:mOgUt4GM:${dependency.version}"))
+            add(project.dependencies.create("maven.modrinth:modmenu:${dependency.version}"))
         }
     }
 }
