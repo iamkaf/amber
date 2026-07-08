@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.1.2
+
+### Fixed
+
+- Fixed Forge startup on Minecraft 26.2 with Forge 65.0.1.
+
 ## 11.1.1
 
 ### Fixed
