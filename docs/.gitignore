@@ -1,9 +1,0 @@
-# VitePress
-.vitepress/cache
-.vitepress/dist
-
-# Node
-node_modules
-
-# Internal scratch
-_internal
