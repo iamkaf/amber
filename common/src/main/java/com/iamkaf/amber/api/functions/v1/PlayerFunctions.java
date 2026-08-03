@@ -1,5 +1,7 @@
 package com.iamkaf.amber.api.functions.v1;
 
+import com.iamkaf.amber.api.platform.v1.Platform;
+import com.iamkaf.amber.compat.PlayerCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 //? if >=1.18.2
@@ -19,7 +21,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import com.iamkaf.amber.compat.PlayerCompat;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Abilities;
@@ -723,8 +724,11 @@ public final class PlayerFunctions {
      * @param player The player to respawn. Must be a LocalPlayer instance.
      */
     public static void respawn(Player player) {
-        if (player instanceof LocalPlayer) {
-            ((LocalPlayer) player).respawn();
+        if (!Platform.isClient()) {
+            return;
+        }
+        if (player instanceof LocalPlayer localPlayer) {
+            localPlayer.respawn();
         }
     }
 

@@ -12,6 +12,7 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Fixed
 
 - Fixed dedicated server crashes when mods use `WorldFunctions`.
+- Fixed dedicated server crashes when mods call `PlayerFunctions.respawn`.
 
 ## 11.1.2
 
