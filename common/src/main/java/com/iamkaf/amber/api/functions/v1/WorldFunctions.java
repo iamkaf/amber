@@ -566,15 +566,7 @@ public final class WorldFunctions {
      * @return A list of all players in the level.
      */
     public static List<Player> getPlayers(Level level) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            return players(serverLevel);
-        //? if >=1.15
-        } else if (level instanceof net.minecraft.client.multiplayer.ClientLevel clientLevel) {
-        //? if <1.15
-        /*} else if (level instanceof net.minecraft.client.multiplayer.MultiPlayerLevel clientLevel) {*/
-            return players(clientLevel);
-        }
-        return new ArrayList<>();
+        return players(level);
     }
 
     /**
