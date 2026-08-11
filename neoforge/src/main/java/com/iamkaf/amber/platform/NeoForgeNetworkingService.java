@@ -15,11 +15,15 @@ import java.util.List;
 public class NeoForgeNetworkingService implements INetworkingService {
     
     private final List<NeoForgeNetworkChannelImpl> channels = new ArrayList<>();
+    private PayloadRegistrar payloadRegistrar;
     
     @Override
-    public PlatformNetworkChannel createChannel(Identifier channelId) {
+    public synchronized PlatformNetworkChannel createChannel(Identifier channelId) {
         NeoForgeNetworkChannelImpl channel = new NeoForgeNetworkChannelImpl(channelId);
         channels.add(channel);
+        if (payloadRegistrar != null) {
+            channel.setPayloadRegistrar(payloadRegistrar);
+        }
         return channel;
     }
     
@@ -27,7 +31,8 @@ public class NeoForgeNetworkingService implements INetworkingService {
      * Sets the payload registrar for all created channels.
      * Called during the RegisterPayloadHandlersEvent.
      */
-    public void setPayloadRegistrar(PayloadRegistrar registrar) {
+    public synchronized void setPayloadRegistrar(PayloadRegistrar registrar) {
+        payloadRegistrar = registrar;
         for (NeoForgeNetworkChannelImpl channel : channels) {
             channel.setPayloadRegistrar(registrar);
         }
