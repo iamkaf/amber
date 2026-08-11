@@ -7,9 +7,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
+import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -18,35 +19,31 @@ import java.util.concurrent.ConcurrentMap;
  * Uses NeoForge's CustomPacketPayload system with PayloadRegistrar.
  */
 public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
-    
+    private static final Set<PayloadIds> REGISTERED_PAYLOADS = ConcurrentHashMap.newKeySet();
+
     private final Identifier channelId;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     private final ConcurrentMap<Class<?>, PayloadTypePair<?>> packetToPayloadTypes = new ConcurrentHashMap<>();
     private PayloadRegistrar registrar;
-    private boolean initialized = false;
-    private static final ConcurrentMap<Identifier, Boolean> registeredPayloads = new ConcurrentHashMap<>();
-    
+
     public NeoForgeNetworkChannelImpl(Identifier channelId) {
         this.channelId = channelId;
-        // Note: PayloadRegistrar will be set later during RegisterPayloadHandlersEvent
     }
-    
+
     /**
      * Sets the payload registrar for packet registration.
      * Called during the RegisterPayloadHandlersEvent.
      */
-    public void setPayloadRegistrar(PayloadRegistrar registrar) {
+    public synchronized void setPayloadRegistrar(PayloadRegistrar registrar) {
         this.registrar = registrar;
-        this.initialized = true;
-        
-        // Register any pending packets
+
         for (var entry : registrations.entrySet()) {
             registerPendingPacket(entry.getKey(), entry.getValue());
         }
     }
     
     @Override
-    public <T extends Packet<T>> void register(
+    public synchronized <T extends Packet<T>> void register(
             Class<T> packetClass,
             PacketEncoder<T> encoder,
             PacketDecoder<T> decoder,
@@ -54,31 +51,26 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     ) {
         PacketRegistration<T> registration = new PacketRegistration<>(encoder, decoder, handler);
         registrations.put(packetClass, registration);
-        
-        // Don't register immediately - wait for setPayloadRegistrar to be called
-        // This prevents duplicate registration issues
+
+        if (registrar != null) {
+            registerPendingPacket(packetClass, registration);
+        }
     }
     
     @SuppressWarnings("unchecked")
     private <T extends Packet<T>> void registerPendingPacket(Class<?> packetClass, PacketRegistration<?> registration) {
         PacketRegistration<T> typedRegistration = (PacketRegistration<T>) registration;
-        @SuppressWarnings("unchecked")
-        Class<T> typedPacketClass = (Class<T>) packetClass;
-        
-        // Create separate packet types for each direction
+
         Identifier c2sPacketId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
-            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_c2s"
+            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase(Locale.ROOT) + "_c2s"
         );
         Identifier s2cPacketId = Identifier.fromNamespaceAndPath(
             channelId.getNamespace(), 
-            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase() + "_s2c"
+            channelId.getPath() + "/" + packetClass.getSimpleName().toLowerCase(Locale.ROOT) + "_s2c"
         );
-        
-        // Check if these payloads have already been registered
-        if (registeredPayloads.putIfAbsent(c2sPacketId, true) != null || 
-            registeredPayloads.putIfAbsent(s2cPacketId, true) != null) {
-            // Already registered, skip
+
+        if (!REGISTERED_PAYLOADS.add(new PayloadIds(c2sPacketId, s2cPacketId))) {
             return;
         }
         
@@ -87,7 +79,6 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         CustomPacketPayload.Type<NeoForgePacketWrapper<T>> s2cPayloadType = 
             new CustomPacketPayload.Type<>(s2cPacketId);
         
-        // Create stream codec
         StreamCodec<FriendlyByteBuf, NeoForgePacketWrapper<T>> c2sStreamCodec = 
             StreamCodec.of(
                 (buffer, wrapper) -> typedRegistration.encoder.encode(wrapper.packet, buffer),
@@ -99,7 +90,6 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
                 buffer -> new NeoForgePacketWrapper<>(typedRegistration.decoder.decode(buffer), s2cPayloadType)
             );
         
-        // Register client-to-server communication
         registrar.playToServer(
             c2sPayloadType,
             c2sStreamCodec,
@@ -109,7 +99,6 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             }
         );
         
-        // Register server-to-client communication
         registrar.playToClient(
             s2cPayloadType,
             s2cStreamCodec,
@@ -119,7 +108,6 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             }
         );
         
-        // Store both payload types for later use in sending
         packetToPayloadTypes.put(packetClass, new PayloadTypePair<>(c2sPayloadType, s2cPayloadType));
     }
     
@@ -129,22 +117,9 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalStateException("sendToServer can only be called from client side");
         }
         
-        @SuppressWarnings("unchecked")
-        PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
-        if (registration == null) {
-            throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
-        }
-        
-        @SuppressWarnings("unchecked")
-        PayloadTypePair<T> payloadTypes = (PayloadTypePair<T>) packetToPayloadTypes.get(packet.getClass());
-        if (payloadTypes == null) {
-            throw new IllegalArgumentException("Payload types not found for packet: " + packet.getClass().getName());
-        }
-        
-        // Use the client-to-server payload type
+        PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.c2sType);
-        
-        // Send to server using client connection
+
         //? if >=1.21.9
         if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
         //? if <1.21.9
@@ -157,73 +132,41 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     @Override
     public <T extends Packet<T>> void sendToPlayer(T packet, ServerPlayer player) {
-        @SuppressWarnings("unchecked")
-        PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
-        if (registration == null) {
-            throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
-        }
-        
-        @SuppressWarnings("unchecked")
-        PayloadTypePair<T> payloadTypes = (PayloadTypePair<T>) packetToPayloadTypes.get(packet.getClass());
-        if (payloadTypes == null) {
-            throw new IllegalArgumentException("Payload types not found for packet: " + packet.getClass().getName());
-        }
-        
-        // Use the server-to-client payload type
+        PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
-        
-        // Send to specific player using their connection
         player.connection.send(wrapper);
     }
     
     @Override
     public <T extends Packet<T>> void sendToAllPlayers(T packet) {
-        @SuppressWarnings("unchecked")
-        PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
-        if (registration == null) {
-            throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
-        }
-        
-        @SuppressWarnings("unchecked")
-        PayloadTypePair<T> payloadTypes = (PayloadTypePair<T>) packetToPayloadTypes.get(packet.getClass());
-        if (payloadTypes == null) {
-            throw new IllegalArgumentException("Payload types not found for packet: " + packet.getClass().getName());
-        }
-        
-        // Use the server-to-client payload type
+        PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
-        
         PacketDistributor.sendToAllPlayers(wrapper);
     }
     
     @Override
     public <T extends Packet<T>> void sendToAllPlayersExcept(T packet, ServerPlayer except) {
-        @SuppressWarnings("unchecked")
-        PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
-        if (registration == null) {
-            throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
-        }
-        
-        @SuppressWarnings("unchecked")
-        PayloadTypePair<T> payloadTypes = (PayloadTypePair<T>) packetToPayloadTypes.get(packet.getClass());
-        if (payloadTypes == null) {
-            throw new IllegalArgumentException("Payload types not found for packet: " + packet.getClass().getName());
-        }
-        
-        // Use the server-to-client payload type
+        PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
-        
-        // Send to all players on the server, excluding the specified player
+
         if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                 if (!player.equals(except)) {
-                    // Send to specific player using their connection
                     player.connection.send(wrapper);
                 }
             }
         }
     }
-    
+
+    @SuppressWarnings("unchecked")
+    private <T extends Packet<T>> PayloadTypePair<T> payloadTypes(T packet) {
+        PayloadTypePair<T> payloadTypes = (PayloadTypePair<T>) packetToPayloadTypes.get(packet.getClass());
+        if (payloadTypes == null) {
+            throw new IllegalArgumentException("Packet is not registered: " + packet.getClass().getName());
+        }
+        return payloadTypes;
+    }
+
     private boolean isClientSide() {
         try {
             //? if >=1.21.9
@@ -280,5 +223,8 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             this.c2sType = c2sType;
             this.s2cType = s2cType;
         }
+    }
+
+    private record PayloadIds(Identifier clientToServer, Identifier serverToClient) {
     }
 }

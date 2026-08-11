@@ -32,7 +32,7 @@ public class NeoForgeNetworkingService implements INetworkingService {
      * Called during the RegisterPayloadHandlersEvent.
      */
     public synchronized void setPayloadRegistrar(PayloadRegistrar registrar) {
-        payloadRegistrar = registrar;
+        this.payloadRegistrar = registrar;
         for (NeoForgeNetworkChannelImpl channel : channels) {
             channel.setPayloadRegistrar(registrar);
         }
