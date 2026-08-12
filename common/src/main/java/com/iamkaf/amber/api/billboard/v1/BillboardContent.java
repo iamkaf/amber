@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * The visual content of an in-world {@link Billboard}.
  */
-public sealed interface BillboardContent permits BillboardContent.Texture, BillboardContent.Item, BillboardContent.Text {
+public sealed interface BillboardContent permits BillboardContent.Texture, BillboardContent.Item, BillboardContent.Text, BillboardContent.ItemObject, BillboardContent.BlockObject {
     /**
      * A textured quad backed by a resource-pack PNG.
      *
@@ -34,6 +34,22 @@ public sealed interface BillboardContent permits BillboardContent.Texture, Billb
     record Item(Identifier item, float scale) implements BillboardContent {
         public Item {
             Objects.requireNonNull(item, "item");
+            requirePositiveFinite(scale, "scale");
+        }
+    }
+
+    /** A world-oriented item model, rendered with the ground transform used by dropped items. */
+    record ItemObject(Identifier item, float scale) implements BillboardContent {
+        public ItemObject {
+            Objects.requireNonNull(item, "item");
+            requirePositiveFinite(scale, "scale");
+        }
+    }
+
+    /** A world-oriented block item model. */
+    record BlockObject(Identifier block, float scale) implements BillboardContent {
+        public BlockObject {
+            Objects.requireNonNull(block, "block");
             requirePositiveFinite(scale, "scale");
         }
     }

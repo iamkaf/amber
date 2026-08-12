@@ -1,10 +1,13 @@
 //? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.client.billboard;
 
+import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.billboard.v1.Billboard;
 import com.iamkaf.amber.api.billboard.v1.BillboardAnchor;
 import com.iamkaf.amber.api.billboard.v1.BillboardContent;
+import com.iamkaf.amber.api.billboard.v1.BillboardDepthMode;
 import com.iamkaf.amber.api.billboard.v1.BillboardTransition;
+import com.iamkaf.amber.api.billboard.v1.Billboards;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -20,11 +23,14 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 /*import net.minecraft.client.renderer.state.CameraRenderState;*/
 //?}
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 import java.util.UUID;
@@ -37,8 +43,21 @@ public final class ClientBillboards {
     private static final Map<UUID, ActiveBillboard> ACTIVE = new ConcurrentHashMap<>();
     private static ClientLevel trackedLevel;
     private static Player trackedViewer;
+    private static boolean activeCountWarningLogged;
+    private static boolean capacityWarningLogged;
 
     private ClientBillboards() {
+    }
+
+    /** Returns the number of billboards retained for the current client world and player. */
+    public static int activeCount() {
+        return ACTIVE.size();
+    }
+
+    /** Returns the retained billboard for diagnostic tooling, or {@code null} when absent. */
+    public static @Nullable Billboard activeBillboard(UUID billboardId) {
+        ActiveBillboard active = ACTIVE.get(billboardId);
+        return active == null ? null : active.billboard();
     }
 
     public static void show(Player viewer, Billboard billboard) {
@@ -48,15 +67,19 @@ public final class ClientBillboards {
             return;
         }
         if (level != trackedLevel || viewer != trackedViewer) {
-            ACTIVE.clear();
+            clear();
             trackedLevel = level;
             trackedViewer = viewer;
         }
         double startsAt = animationTime();
+        if (!ACTIVE.containsKey(billboard.id()) && !reserveCapacity(startsAt)) {
+            return;
+        }
         double expiresAt = billboard.durationTicks() == Billboard.PERSISTENT
                 ? Double.POSITIVE_INFINITY
                 : startsAt + billboard.durationTicks();
         ACTIVE.put(billboard.id(), new ActiveBillboard(billboard, startsAt, expiresAt, billboard.anchor()));
+        warnAboutActiveCount();
     }
 
     public static void hide(Player viewer, UUID billboardId) {
@@ -65,6 +88,7 @@ public final class ClientBillboards {
             return;
         }
         ACTIVE.remove(billboardId);
+        resetCapacityWarningsIfRecovered();
     }
 
     public static void move(
@@ -123,7 +147,7 @@ public final class ClientBillboards {
             return;
         }
         if (level != trackedLevel || viewer != trackedViewer) {
-            ACTIVE.clear();
+            clear();
             trackedLevel = level;
             trackedViewer = viewer;
             return;
@@ -131,6 +155,7 @@ public final class ClientBillboards {
 
         double renderTime = animationTime();
         ACTIVE.values().removeIf(active -> active.expiresAt() <= renderTime);
+        resetCapacityWarningsIfRecovered();
         for (ActiveBillboard active : ACTIVE.values()) {
             submit(active, level, renderTime, poseStack, output, camera);
         }
@@ -148,6 +173,62 @@ public final class ClientBillboards {
         ACTIVE.clear();
         trackedLevel = null;
         trackedViewer = null;
+        activeCountWarningLogged = false;
+        capacityWarningLogged = false;
+    }
+
+    private static boolean reserveCapacity(double now) {
+        if (ACTIVE.size() < Billboards.MAX_ACTIVE_BILLBOARDS) {
+            return true;
+        }
+        if (capacityWarningLogged) {
+            return false;
+        }
+
+        ACTIVE.values().removeIf(active -> active.expiresAt() <= now);
+        resetCapacityWarningsIfRecovered();
+        if (ACTIVE.size() < Billboards.MAX_ACTIVE_BILLBOARDS) {
+            return true;
+        }
+
+        if (!capacityWarningLogged) {
+            logCapacityWarning();
+            capacityWarningLogged = true;
+        }
+        return false;
+    }
+
+    private static void warnAboutActiveCount() {
+        int activeCount = ACTIVE.size();
+        if (!activeCountWarningLogged && activeCount >= Billboards.ACTIVE_BILLBOARD_WARNING_THRESHOLD) {
+            logActiveCountWarning(activeCount);
+            activeCountWarningLogged = true;
+        }
+    }
+
+    private static void logActiveCountWarning(int activeCount) {
+        Constants.LOG.warn(
+                "Amber is tracking {} active billboards on the client. Performance may degrade as the count approaches the limit of {}.",
+                activeCount,
+                Billboards.MAX_ACTIVE_BILLBOARDS
+        );
+    }
+
+    private static void logCapacityWarning() {
+        Constants.LOG.warn(
+                "Amber reached the client limit of {} active billboards. Skipping additional distinct billboards until capacity becomes available.",
+                Billboards.MAX_ACTIVE_BILLBOARDS
+        );
+    }
+
+    private static void resetCapacityWarningsIfRecovered() {
+        int activeCount = ACTIVE.size();
+        if (activeCount < Billboards.ACTIVE_BILLBOARD_WARNING_THRESHOLD) {
+            activeCountWarningLogged = false;
+        }
+        if (activeCount < Billboards.MAX_ACTIVE_BILLBOARDS) {
+            capacityWarningLogged = false;
+        }
     }
 
     private static void submit(ActiveBillboard active, ClientLevel level, double renderTime, PoseStack poseStack, SubmitNodeCollector output, CameraRenderState camera) {
@@ -161,6 +242,9 @@ public final class ClientBillboards {
         }
         Vec3 position = anchoredPosition.add(billboard.animation().offsetAt(progress));
         Vec3 scale = multiply(active.resolveScale(renderTime), billboard.animation().scaleAt(progress));
+        Vec3 rotation = billboard.rotation().add(billboard.animation().rotationAt(progress));
+        float opacity = (float) Math.max(0.0D, Math.min(1.0D, billboard.opacity() * billboard.animation().opacityAt(progress)));
+        boolean throughWalls = billboard.depthMode() == BillboardDepthMode.THROUGH_WALLS;
         Vec3 cameraPosition = camera.pos;
         poseStack.pushPose();
         poseStack.translate(
@@ -168,7 +252,12 @@ public final class ClientBillboards {
                 position.y - cameraPosition.y,
                 position.z - cameraPosition.z
         );
-        poseStack.mulPose(camera.orientation);
+        if (isCameraFacing(billboard.content())) {
+            poseStack.mulPose(camera.orientation);
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees((float) rotation.x));
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) rotation.y));
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) rotation.z));
         poseStack.scale(
                 (float) Math.max(1.0E-6D, scale.x),
                 (float) Math.max(1.0E-6D, scale.y),
@@ -176,11 +265,22 @@ public final class ClientBillboards {
         );
         try {
             switch (billboard.content()) {
-                case BillboardContent.Texture texture -> submitTexture(texture, poseStack, output);
-                case BillboardContent.Item item -> submitItem(item, poseStack, output);
+                case BillboardContent.Texture texture -> submitTexture(texture, opacity, throughWalls, poseStack, output);
+                case BillboardContent.Item item -> submitItemModel(item.item(), item.scale(), ItemDisplayContext.FIXED, opacity, throughWalls, poseStack, output);
+                case BillboardContent.ItemObject item -> submitItemModel(item.item(), item.scale(), ItemDisplayContext.GROUND, opacity, throughWalls, poseStack, output);
+                case BillboardContent.BlockObject block -> {
+                    net.minecraft.world.level.block.Block resolved = BuiltInRegistries.BLOCK.getValue(block.block());
+                    if (resolved != null) {
+                        Identifier itemId = BuiltInRegistries.ITEM.getKey(resolved.asItem());
+                        if (itemId != null) {
+                            submitItemModel(itemId, block.scale(), ItemDisplayContext.GROUND, opacity, throughWalls, poseStack, output);
+                        }
+                    }
+                }
                 case BillboardContent.Text text -> submitText(
                         text,
-                        billboard.animation().textColorAt(text.color(), progress),
+                        ARGB.multiplyAlpha(billboard.animation().textColorAt(text.color(), progress), opacity),
+                        throughWalls,
                         poseStack,
                         output
                 );
@@ -190,24 +290,34 @@ public final class ClientBillboards {
         }
     }
 
-    private static void submitTexture(BillboardContent.Texture texture, PoseStack poseStack, SubmitNodeCollector output) {
+    private static void submitTexture(BillboardContent.Texture texture, float opacity, boolean throughWalls, PoseStack poseStack, SubmitNodeCollector output) {
         float halfWidth = texture.width() / 2.0F;
         float halfHeight = texture.height() / 2.0F;
-        output.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture.texture(), false), (pose, vertices) -> {
-            vertices.addVertex(pose, -halfWidth, -halfHeight, 0.0F).setColor(-1).setUv(0.0F, 1.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            vertices.addVertex(pose, halfWidth, -halfHeight, 0.0F).setColor(-1).setUv(1.0F, 1.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            vertices.addVertex(pose, halfWidth, halfHeight, 0.0F).setColor(-1).setUv(1.0F, 0.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-            vertices.addVertex(pose, -halfWidth, halfHeight, 0.0F).setColor(-1).setUv(0.0F, 0.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
-        });
+        int color = ARGB.white(opacity);
+        if (throughWalls) {
+            output.submitCustomGeometry(poseStack, RenderTypes.textSeeThrough(texture.texture()), (pose, vertices) -> {
+                vertices.addVertex(pose, -halfWidth, -halfHeight, 0.0F).setColor(color).setUv(0.0F, 1.0F).setLight(FULL_BRIGHT);
+                vertices.addVertex(pose, halfWidth, -halfHeight, 0.0F).setColor(color).setUv(1.0F, 1.0F).setLight(FULL_BRIGHT);
+                vertices.addVertex(pose, halfWidth, halfHeight, 0.0F).setColor(color).setUv(1.0F, 0.0F).setLight(FULL_BRIGHT);
+                vertices.addVertex(pose, -halfWidth, halfHeight, 0.0F).setColor(color).setUv(0.0F, 0.0F).setLight(FULL_BRIGHT);
+            });
+        } else {
+            output.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture.texture(), false), (pose, vertices) -> {
+                vertices.addVertex(pose, -halfWidth, -halfHeight, 0.0F).setColor(color).setUv(0.0F, 1.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                vertices.addVertex(pose, halfWidth, -halfHeight, 0.0F).setColor(color).setUv(1.0F, 1.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                vertices.addVertex(pose, halfWidth, halfHeight, 0.0F).setColor(color).setUv(1.0F, 0.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+                vertices.addVertex(pose, -halfWidth, halfHeight, 0.0F).setColor(color).setUv(0.0F, 0.0F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_BRIGHT).setNormal(pose, 0.0F, 0.0F, 1.0F);
+            });
+        }
     }
 
-    private static void submitItem(BillboardContent.Item item, PoseStack poseStack, SubmitNodeCollector output) {
+    private static void submitItemModel(Identifier itemId, float itemScale, ItemDisplayContext displayContext, float opacity, boolean throughWalls, PoseStack poseStack, SubmitNodeCollector output) {
         Minecraft minecraft = Minecraft.getInstance();
         Player viewer = minecraft.player;
         if (viewer == null) {
             return;
         }
-        net.minecraft.world.item.Item resolved = BuiltInRegistries.ITEM.getValue(item.item());
+        net.minecraft.world.item.Item resolved = BuiltInRegistries.ITEM.getValue(itemId);
         if (resolved == null) {
             return;
         }
@@ -215,15 +325,23 @@ public final class ClientBillboards {
         minecraft.getItemModelResolver().updateForNonLiving(
                 state,
                 new ItemStack(resolved),
-                ItemDisplayContext.FIXED,
+                displayContext,
                 viewer
         );
-        poseStack.scale(item.scale(), item.scale(), item.scale());
-        poseStack.mulPose(Axis.YP.rotation((float) Math.PI));
-        state.submit(poseStack, output, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        poseStack.scale(itemScale, itemScale, itemScale);
+        if (displayContext == ItemDisplayContext.FIXED) {
+            poseStack.mulPose(Axis.YP.rotation((float) Math.PI));
+        }
+        BillboardItemSubmitter.submit(state, poseStack, output, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, throughWalls, opacity);
     }
 
-    private static void submitText(BillboardContent.Text text, int color, PoseStack poseStack, SubmitNodeCollector output) {
+    private static boolean isCameraFacing(BillboardContent content) {
+        return content instanceof BillboardContent.Texture
+                || content instanceof BillboardContent.Item
+                || content instanceof BillboardContent.Text;
+    }
+
+    private static void submitText(BillboardContent.Text text, int color, boolean throughWalls, PoseStack poseStack, SubmitNodeCollector output) {
         Font font = Minecraft.getInstance().font;
         poseStack.scale(text.scale(), -text.scale(), text.scale());
         float x = -font.width(text.text()) / 2.0F;
@@ -233,7 +351,7 @@ public final class ClientBillboards {
                 -font.lineHeight / 2.0F,
                 text.text().getVisualOrderText(),
                 true,
-                Font.DisplayMode.POLYGON_OFFSET,
+                throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.POLYGON_OFFSET,
                 FULL_BRIGHT,
                 color,
                 0,

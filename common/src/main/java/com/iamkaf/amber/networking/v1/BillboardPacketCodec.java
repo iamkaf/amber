@@ -5,6 +5,7 @@ import com.iamkaf.amber.api.billboard.v1.Billboard;
 import com.iamkaf.amber.api.billboard.v1.BillboardAnimation;
 import com.iamkaf.amber.api.billboard.v1.BillboardAnchor;
 import com.iamkaf.amber.api.billboard.v1.BillboardContent;
+import com.iamkaf.amber.api.billboard.v1.BillboardDepthMode;
 import com.iamkaf.amber.api.billboard.v1.BillboardTransition;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,8 @@ final class BillboardPacketCodec {
     private static final int TEXTURE = 0;
     private static final int ITEM = 1;
     private static final int TEXT = 2;
+    private static final int ITEM_OBJECT = 3;
+    private static final int BLOCK_OBJECT = 4;
     private static final int ANCHOR_WORLD = 0;
     private static final int ANCHOR_ENTITY = 1;
     private static final int ANIMATION_NONE = 0;
@@ -27,6 +30,8 @@ final class BillboardPacketCodec {
     private static final int TRACK_TEXT_COLOR = 1 << 1;
     private static final int TRACK_TEXT_OPACITY = 1 << 2;
     private static final int TRACK_SCALE = 1 << 3;
+    private static final int TRACK_OPACITY = 1 << 4;
+    private static final int TRACK_ROTATION = 1 << 5;
     private static final int EASING_LINEAR = 0;
     private static final int EASING_EASE_OUT_CUBIC = 1;
     private static final int EASING_EASE_IN_SINE = 2;
@@ -53,7 +58,13 @@ final class BillboardPacketCodec {
     static void encode(Billboard billboard, FriendlyByteBuf buffer) {
         buffer.writeUUID(billboard.id());
         encodeAnchor(billboard.anchor(), buffer);
+        writeVec3(buffer, billboard.rotation());
         writeVec3(buffer, billboard.scale());
+        buffer.writeFloat(billboard.opacity());
+        buffer.writeVarInt(switch (billboard.depthMode()) {
+            case DEPTH_TESTED -> 0;
+            case THROUGH_WALLS -> 1;
+        });
         buffer.writeVarInt(billboard.durationTicks());
 
         BillboardAnimation animation = billboard.animation();
@@ -74,6 +85,12 @@ final class BillboardPacketCodec {
             if (animation.scale() != null) {
                 tracks |= TRACK_SCALE;
             }
+            if (animation.opacity() != null) {
+                tracks |= TRACK_OPACITY;
+            }
+            if (animation.rotation() != null) {
+                tracks |= TRACK_ROTATION;
+            }
             buffer.writeVarInt(tracks);
             if (animation.translation() != null) {
                 writeTranslation(buffer, animation.translation());
@@ -90,6 +107,16 @@ final class BillboardPacketCodec {
                 writeVec3(buffer, animation.scale().from());
                 writeVec3(buffer, animation.scale().to());
                 buffer.writeVarInt(encodeEasing(animation.scale().easing()));
+            }
+            if (animation.opacity() != null) {
+                buffer.writeFloat(animation.opacity().from());
+                buffer.writeFloat(animation.opacity().to());
+                buffer.writeVarInt(encodeEasing(animation.opacity().easing()));
+            }
+            if (animation.rotation() != null) {
+                writeVec3(buffer, animation.rotation().from());
+                writeVec3(buffer, animation.rotation().to());
+                buffer.writeVarInt(encodeEasing(animation.rotation().easing()));
             }
         }
 
@@ -111,13 +138,30 @@ final class BillboardPacketCodec {
                 buffer.writeFloat(text.scale());
                 buffer.writeInt(text.color());
             }
+            case BillboardContent.ItemObject item -> {
+                buffer.writeVarInt(ITEM_OBJECT);
+                buffer.writeIdentifier(item.item());
+                buffer.writeFloat(item.scale());
+            }
+            case BillboardContent.BlockObject block -> {
+                buffer.writeVarInt(BLOCK_OBJECT);
+                buffer.writeIdentifier(block.block());
+                buffer.writeFloat(block.scale());
+            }
         }
     }
 
     static Billboard decode(FriendlyByteBuf buffer) {
         UUID id = buffer.readUUID();
         BillboardAnchor anchor = decodeAnchor(buffer);
+        Vec3 rotation = readVec3(buffer);
         Vec3 scale = readVec3(buffer);
+        float opacity = buffer.readFloat();
+        BillboardDepthMode depthMode = switch (buffer.readVarInt()) {
+            case 0 -> BillboardDepthMode.DEPTH_TESTED;
+            case 1 -> BillboardDepthMode.THROUGH_WALLS;
+            default -> throw new IllegalArgumentException("Unknown billboard depth mode");
+        };
         int durationTicks = buffer.readVarInt();
         BillboardAnimation animation = switch (buffer.readVarInt()) {
             case ANIMATION_NONE -> BillboardAnimation.NONE;
@@ -135,9 +179,11 @@ final class BillboardPacketCodec {
                 Component component = ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.decode(buffer);
                 yield new BillboardContent.Text(component, buffer.readFloat(), buffer.readInt());
             }
+            case ITEM_OBJECT -> new BillboardContent.ItemObject(buffer.readIdentifier(), buffer.readFloat());
+            case BLOCK_OBJECT -> new BillboardContent.BlockObject(buffer.readIdentifier(), buffer.readFloat());
             default -> throw new IllegalArgumentException("Unknown billboard content type");
         };
-        return new Billboard(id, anchor, content, scale, durationTicks, animation);
+        return new Billboard(id, anchor, content, rotation, scale, opacity, depthMode, durationTicks, animation);
     }
 
     static void encodeAnchor(BillboardAnchor anchor, FriendlyByteBuf buffer) {
@@ -182,22 +228,20 @@ final class BillboardPacketCodec {
     }
 
     private static void writeTranslation(FriendlyByteBuf buffer, BillboardAnimation.Translation translation) {
-        buffer.writeDouble(translation.offset().x);
-        buffer.writeDouble(translation.offset().y);
-        buffer.writeDouble(translation.offset().z);
+        writeVec3(buffer, translation.from());
+        writeVec3(buffer, translation.to());
         buffer.writeVarInt(encodeEasing(translation.easing()));
     }
 
     private static BillboardAnimation decodeAnimationTracks(FriendlyByteBuf buffer) {
         int tracks = buffer.readVarInt();
-        int knownTracks = TRACK_TRANSLATION | TRACK_TEXT_COLOR | TRACK_TEXT_OPACITY | TRACK_SCALE;
+        int knownTracks = TRACK_TRANSLATION | TRACK_TEXT_COLOR | TRACK_TEXT_OPACITY | TRACK_SCALE | TRACK_OPACITY | TRACK_ROTATION;
         if (tracks == 0 || (tracks & ~knownTracks) != 0) {
             throw new IllegalArgumentException("Unknown or empty billboard animation tracks");
         }
         BillboardAnimation animation = BillboardAnimation.NONE;
         if ((tracks & TRACK_TRANSLATION) != 0) {
-            Vec3 offset = new Vec3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble());
-            animation = animation.withTranslation(offset, decodeEasing(buffer.readVarInt()));
+            animation = animation.withTranslation(readVec3(buffer), readVec3(buffer), decodeEasing(buffer.readVarInt()));
         }
         if ((tracks & TRACK_TEXT_COLOR) != 0) {
             animation = animation.withTextColor(buffer.readInt(), decodeEasing(buffer.readVarInt()));
@@ -207,6 +251,12 @@ final class BillboardPacketCodec {
         }
         if ((tracks & TRACK_SCALE) != 0) {
             animation = animation.withScale(readVec3(buffer), readVec3(buffer), decodeEasing(buffer.readVarInt()));
+        }
+        if ((tracks & TRACK_OPACITY) != 0) {
+            animation = animation.withOpacity(buffer.readFloat(), buffer.readFloat(), decodeEasing(buffer.readVarInt()));
+        }
+        if ((tracks & TRACK_ROTATION) != 0) {
+            animation = animation.withRotation(readVec3(buffer), readVec3(buffer), decodeEasing(buffer.readVarInt()));
         }
         return animation;
     }

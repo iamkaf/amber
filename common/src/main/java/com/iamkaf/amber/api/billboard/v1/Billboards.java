@@ -25,6 +25,14 @@ import java.util.UUID;
  * channel.</p>
  */
 public final class Billboards {
+    /** Distinct active billboard count at which the receiving client logs a performance warning. */
+    public static final int ACTIVE_BILLBOARD_WARNING_THRESHOLD = 12_288;
+    /**
+     * Maximum number of distinct billboards retained by one receiving client. Existing identities
+     * may still be replaced at the limit; additional identities are skipped until capacity returns.
+     */
+    public static final int MAX_ACTIVE_BILLBOARDS = 16_384;
+
     private Billboards() {
     }
 

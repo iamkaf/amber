@@ -9,43 +9,67 @@ import java.util.Objects;
 /**
  * Composable, serializable animation tracks sampled over a billboard's finite lifetime.
  *
- * <p>Translation, local-axis scale, text color, and text opacity tracks can run concurrently and
+ * <p>Translation, local-axis scale, billboard opacity, text color, and text opacity tracks can run concurrently and
  * may use different timing curves.</p>
  */
 public record BillboardAnimation(
         @Nullable Translation translation,
+        @Nullable Rotation rotation,
         @Nullable Scale scale,
         @Nullable TextColor textColor,
-        @Nullable TextOpacity textOpacity
+        @Nullable TextOpacity textOpacity,
+        @Nullable Opacity opacity
 ) {
-    public static final BillboardAnimation NONE = new BillboardAnimation(null, null, null, null);
+    public static final BillboardAnimation NONE = new BillboardAnimation(null, null, null, null, null, null);
+
+    /** Source-compatible constructor for the original animation-track value shape. */
+    public BillboardAnimation(
+            @Nullable Translation translation,
+            @Nullable Scale scale,
+            @Nullable TextColor textColor,
+            @Nullable TextOpacity textOpacity
+    ) {
+        this(translation, null, scale, textColor, textOpacity, null);
+    }
 
     public static BillboardAnimation translate(Vec3 offset) {
         return translate(offset, Easing.LINEAR);
     }
 
     public static BillboardAnimation translate(Vec3 offset, Easing easing) {
-        return NONE.withTranslation(offset, easing);
+        return NONE.withTranslation(Vec3.ZERO, offset, easing);
     }
 
     public boolean isNone() {
-        return translation == null && scale == null && textColor == null && textOpacity == null;
+        return translation == null && rotation == null && scale == null && textColor == null && textOpacity == null && opacity == null;
     }
 
     public BillboardAnimation withTranslation(Vec3 offset, Easing easing) {
-        return new BillboardAnimation(new Translation(offset, easing), scale, textColor, textOpacity);
+        return withTranslation(Vec3.ZERO, offset, easing);
+    }
+
+    public BillboardAnimation withTranslation(Vec3 from, Vec3 to, Easing easing) {
+        return new BillboardAnimation(new Translation(from, to, easing), rotation, scale, textColor, textOpacity, opacity);
+    }
+
+    public BillboardAnimation withRotation(Vec3 from, Vec3 to, Easing easing) {
+        return new BillboardAnimation(translation, new Rotation(from, to, easing), scale, textColor, textOpacity, opacity);
     }
 
     public BillboardAnimation withScale(Vec3 from, Vec3 to, Easing easing) {
-        return new BillboardAnimation(translation, new Scale(from, to, easing), textColor, textOpacity);
+        return new BillboardAnimation(translation, rotation, new Scale(from, to, easing), textColor, textOpacity, opacity);
     }
 
     public BillboardAnimation withTextColor(int targetColor, Easing easing) {
-        return new BillboardAnimation(translation, scale, new TextColor(targetColor, easing), textOpacity);
+        return new BillboardAnimation(translation, rotation, scale, new TextColor(targetColor, easing), textOpacity, opacity);
     }
 
     public BillboardAnimation withTextOpacity(float targetOpacity, Easing easing) {
-        return new BillboardAnimation(translation, scale, textColor, new TextOpacity(targetOpacity, easing));
+        return new BillboardAnimation(translation, rotation, scale, textColor, new TextOpacity(targetOpacity, easing), opacity);
+    }
+
+    public BillboardAnimation withOpacity(float from, float to, Easing easing) {
+        return new BillboardAnimation(translation, rotation, scale, textColor, textOpacity, new Opacity(from, to, easing));
     }
 
     /** Returns the world-space offset at normalized lifetime progress. */
@@ -53,9 +77,19 @@ public record BillboardAnimation(
         return translation == null ? Vec3.ZERO : translation.offsetAt(progress);
     }
 
+    /** Returns the local-axis animated rotation in degrees at normalized lifetime progress. */
+    public Vec3 rotationAt(double progress) {
+        return rotation == null ? Vec3.ZERO : rotation.rotationAt(progress);
+    }
+
     /** Returns the local-axis scale multiplier at normalized lifetime progress. */
     public Vec3 scaleAt(double progress) {
         return scale == null ? new Vec3(1.0D, 1.0D, 1.0D) : scale.scaleAt(progress);
+    }
+
+    /** Returns the billboard-wide opacity multiplier at normalized lifetime progress. */
+    public double opacityAt(double progress) {
+        return opacity == null ? 1.0D : opacity.opacityAt(progress);
     }
 
     /**
@@ -83,17 +117,37 @@ public record BillboardAnimation(
     }
 
     /** A world-space translation from the billboard's original position. */
-    public record Translation(Vec3 offset, Easing easing) {
+    public record Translation(Vec3 from, Vec3 to, Easing easing) {
+        public Translation(Vec3 offset, Easing easing) {
+            this(Vec3.ZERO, offset, easing);
+        }
+
         public Translation {
-            Objects.requireNonNull(offset, "offset");
+            requireFinite(from, "from");
+            requireFinite(to, "to");
             Objects.requireNonNull(easing, "easing");
-            if (!Double.isFinite(offset.x) || !Double.isFinite(offset.y) || !Double.isFinite(offset.z)) {
-                throw new IllegalArgumentException("offset must be finite");
-            }
         }
 
         public Vec3 offsetAt(double progress) {
-            return offset.scale(easing.apply(progress));
+            return from.lerp(to, easing.apply(progress));
+        }
+
+        /** Backwards-compatible shorthand for zero-to-target translation callers. */
+        public Vec3 offset() {
+            return to;
+        }
+    }
+
+    /** A local-axis rotation transition in degrees. */
+    public record Rotation(Vec3 from, Vec3 to, Easing easing) {
+        public Rotation {
+            requireFinite(from, "from");
+            requireFinite(to, "to");
+            Objects.requireNonNull(easing, "easing");
+        }
+
+        public Vec3 rotationAt(double progress) {
+            return from.lerp(to, easing.apply(progress));
         }
     }
 
@@ -150,6 +204,33 @@ public record BillboardAnimation(
 
         public double opacityAt(double progress) {
             return 1.0D + (targetOpacity - 1.0D) * easing.apply(progress);
+        }
+    }
+
+    /** A billboard-wide opacity transition that applies to every content type. */
+    public record Opacity(float from, float to, Easing easing) {
+        public Opacity {
+            requireOpacity(from, "from");
+            requireOpacity(to, "to");
+            Objects.requireNonNull(easing, "easing");
+        }
+
+        public double opacityAt(double progress) {
+            double value = from + (to - from) * easing.apply(progress);
+            return Math.max(0.0D, Math.min(1.0D, value));
+        }
+
+        private static void requireOpacity(float value, String name) {
+            if (!Float.isFinite(value) || value < 0.0F || value > 1.0F) {
+                throw new IllegalArgumentException(name + " opacity must be finite and between 0 and 1");
+            }
+        }
+    }
+
+    private static void requireFinite(Vec3 value, String name) {
+        Objects.requireNonNull(value, name);
+        if (!Double.isFinite(value.x) || !Double.isFinite(value.y) || !Double.isFinite(value.z)) {
+            throw new IllegalArgumentException(name + " must be finite");
         }
     }
 

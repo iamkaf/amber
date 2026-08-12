@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.2.0
+
+### Added
+
+- Added the `api.billboard.v1` API on Minecraft 1.21.11 and 26.x for rendering in-world text, PNG textures, item icons, and world-oriented item and block objects.
+- Added world-positioned and entity-bound anchors with customizable offsets, instant movement, eased travel, and live squash-and-stretch scaling.
+- Added composable translation, rotation, scale, opacity, and text-color animations with a range of easing curves.
+- Added depth-tested and through-walls rendering with transparency support.
+- Added side-safe billboard commands that update local clients immediately or dispatch clientbound packets from servers.
+- Added client performance warnings and a limit of 16,384 active billboards per client.
+
+### Fixed
+
+- Fixed NeoForge network channels created after payload registration failing to register their packets.
+
 ## 11.1.3
 
 ### Fixed
