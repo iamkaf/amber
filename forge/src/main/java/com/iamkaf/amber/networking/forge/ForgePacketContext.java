@@ -24,6 +24,9 @@ public class ForgePacketContext implements PacketContext {
     
     @Override
     public Player getPlayer() {
+        if (isClientSide && player == null && net.minecraftforge.fml.loading.FMLLoader.getDist().isClient()) {
+            return net.minecraft.client.Minecraft.getInstance().player;
+        }
         return player;
     }
     

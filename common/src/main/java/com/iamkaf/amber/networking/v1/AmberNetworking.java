@@ -58,6 +58,33 @@ public class AmberNetworking {
                 PongPacket.DECODER,
                 PongPacket.HANDLER
             );
+
+            //? if >=1.21.11 || >=26.1 {
+            CHANNEL.register(
+                ShowBillboardPacket.class,
+                ShowBillboardPacket.ENCODER,
+                ShowBillboardPacket.DECODER,
+                ShowBillboardPacket.HANDLER
+            );
+            CHANNEL.register(
+                HideBillboardPacket.class,
+                HideBillboardPacket.ENCODER,
+                HideBillboardPacket.DECODER,
+                HideBillboardPacket.HANDLER
+            );
+            CHANNEL.register(
+                MoveBillboardPacket.class,
+                MoveBillboardPacket.ENCODER,
+                MoveBillboardPacket.DECODER,
+                MoveBillboardPacket.HANDLER
+            );
+            CHANNEL.register(
+                ScaleBillboardPacket.class,
+                ScaleBillboardPacket.ENCODER,
+                ScaleBillboardPacket.DECODER,
+                ScaleBillboardPacket.HANDLER
+            );
+            //?}
             
             initialized = true;
             Constants.LOG.info("Amber internal networking initialized");

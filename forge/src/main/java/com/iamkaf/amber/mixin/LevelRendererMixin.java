@@ -2,6 +2,8 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
+//? if >=1.21.11 || >=26.1
+import com.iamkaf.amber.client.billboard.ClientBillboards;
 //? if <1.21.2
 /*import com.mojang.blaze3d.vertex.VertexConsumer;*/
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -9,7 +11,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-//? if >=26.2
+//? if >=1.21.11 || >=26.1
 import net.minecraft.client.renderer.SubmitNodeCollector;
 //? if >=1.15 && <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -172,6 +174,19 @@ public class LevelRendererMixin {
         }
         //?}
     }
+
+    //? if >=1.21.11 || >=26.1 {
+    @Inject(method = "submitEntities", at = @At("TAIL"))
+    private void amber$submitBillboards(
+            PoseStack poseStack,
+            LevelRenderState levelRenderState,
+            SubmitNodeCollector output,
+            CallbackInfo ci
+    ) {
+        ClientBillboards.render(poseStack, output, levelRenderState.cameraRenderState);
+    }
+
+    //?}
 
     //? if <1.21.2 {
     /*private static Camera mainCamera(Minecraft minecraft) {
