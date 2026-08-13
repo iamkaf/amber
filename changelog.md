@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.2.0
+
+### Added
+
+- Added the `api.billboard.v1` API for displaying text, textures, item icons, and 3D item or block models in the world on Minecraft 1.21.11 and 26.x.
+- Billboards can stay at a world position or follow an entity, render normally or through walls, and animate their movement, rotation, scale, opacity, and text color.
+- Mods can show, move, resize, or hide a billboard from common code for a local or server player.
+
+### Fixed
+
+- Fixed NeoForge network channels created after payload registration failing to register their packets.
+
 ## 11.1.3
 
 ### Fixed
