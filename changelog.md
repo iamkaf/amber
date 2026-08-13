@@ -11,12 +11,9 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
-- Added the `api.billboard.v1` API on Minecraft 1.21.11 and 26.x for rendering in-world text, PNG textures, item icons, and world-oriented item and block objects.
-- Added world-positioned and entity-bound anchors with customizable offsets, instant movement, eased travel, and live squash-and-stretch scaling.
-- Added composable translation, rotation, scale, opacity, and text-color animations with a range of easing curves.
-- Added depth-tested and through-walls rendering with transparency support.
-- Added side-safe billboard commands that update local clients immediately or dispatch clientbound packets from servers.
-- Added client performance warnings and a limit of 16,384 active billboards per client.
+- Added the `api.billboard.v1` API for displaying text, textures, item icons, and 3D item or block models in the world on Minecraft 1.21.11 and 26.x.
+- Billboards can stay at a world position or follow an entity, render normally or through walls, and animate their movement, rotation, scale, opacity, and text color.
+- Mods can show, move, resize, or hide a billboard from common code for a local or server player.
 
 ### Fixed
 
