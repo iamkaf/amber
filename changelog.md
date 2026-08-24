@@ -12,6 +12,11 @@ See the full changelog at https://github.com/iamkaf/amber
 ### Fixed
 
 - Fixed `EntityEvent.AFTER_DAMAGE` skipping callbacks when damage kills the entity.
+- Preserved third-party item attribute modifiers when another modifier uses the same identifier for a different attribute.
+
+### Added
+
+- Added `ItemFunctions.restoreDefaultAttributeModifiers` for safely reconciling stack-specific modifiers with an item's defaults.
 
 ## 11.2.0
 

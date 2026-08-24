@@ -33,9 +33,7 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -331,32 +329,9 @@ public final class ItemFunctions {
         //? if <1.16
         /*stack.addAttributeModifier(attribute.getName(), modifier, slotGroup);*/
         //?} else {
-        ItemAttributeModifiers extraModifiers = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
-        assert extraModifiers != null;
-        var attributeBuilder = ItemAttributeModifiers.builder();
-        var defaultModifiers = getDefaultAttributeModifiers(stack);
-        Set<String> added = new HashSet<>();
-        for (var mod : defaultModifiers.modifiers()) {
-            String modifierId = modifierIdentity(mod.modifier());
-            if (!added.contains(modifierId)) {
-                attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(modifierId);
-            }
-        }
-        for (var mod : extraModifiers.modifiers()) {
-            String modifierId = modifierIdentity(mod.modifier());
-            if (modifierId.equals(modifierIdentity(modifier))) {
-                // skipping so it can be overwritten
-                continue;
-            }
-            // prevents duplicates
-            if (!added.contains(modifierId)) {
-                attributeBuilder.add(mod.attribute(), mod.modifier(), mod.slot());
-                added.add(modifierId);
-            }
-        }
-        attributeBuilder.add(attribute, modifier, slotGroup);
-        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeBuilder.build());
+        var modifiers = restoreDefaultAttributeModifiers(stack);
+        var replacement = new ItemAttributeModifiers.Entry(attribute, modifier, slotGroup);
+        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, replaceAttributeModifier(modifiers, replacement));
         //?}
     }
 
@@ -405,6 +380,41 @@ public final class ItemFunctions {
         ItemStack defaultInstance = item.getDefaultInstance();
 
         return defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+    }
+
+    /**
+     * Restores the stack's current item defaults without discarding stack-specific modifiers that happen to use the
+     * same modifier id for a different attribute.
+     *
+     * @param stack The stack whose attribute modifiers should be reconciled with its item defaults.
+     * @return The reconciled attribute modifiers stored on the stack.
+     */
+    public static ItemAttributeModifiers restoreDefaultAttributeModifiers(ItemStack stack) {
+        var modifiers = stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        for (var defaultModifier : getDefaultAttributeModifiers(stack).modifiers()) {
+            modifiers = replaceAttributeModifier(modifiers, defaultModifier);
+        }
+        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+        return modifiers;
+    }
+
+    private static ItemAttributeModifiers replaceAttributeModifier(
+            ItemAttributeModifiers modifiers,
+            ItemAttributeModifiers.Entry replacement
+    ) {
+        var builder = ItemAttributeModifiers.builder();
+        for (var modifier : modifiers.modifiers()) {
+            if (!modifier.matches(replacement.attribute(), replacement.modifier().id())) {
+                builder.add(modifier.attribute(), modifier.modifier(), modifier.slot(), modifier.display());
+            }
+        }
+        builder.add(
+                replacement.attribute(),
+                replacement.modifier(),
+                replacement.slot(),
+                replacement.display()
+        );
+        return builder.build();
     }
     //?}
 
@@ -670,10 +680,6 @@ public final class ItemFunctions {
      */
     public static Supplier<Ingredient> createRepairIngredient(Supplier<Item> item) {
         return () -> Ingredient.of(item.get());
-    }
-
-    private static String modifierIdentity(AttributeModifier modifier) {
-        return ItemCompat.modifierIdentity(modifier);
     }
 
     // ==================== ARMOR TIER ENUMS ====================
