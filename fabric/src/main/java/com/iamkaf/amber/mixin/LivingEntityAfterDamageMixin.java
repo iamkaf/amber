@@ -26,10 +26,6 @@ public abstract class LivingEntityAfterDamageMixin {
     @Shadow
     protected float lastHurt;
 
-    //? if >=1.16
-    @Shadow
-    public abstract boolean isDeadOrDying();
-
     @Unique
     private boolean amber$afterDamagePending;
 
@@ -242,10 +238,6 @@ public abstract class LivingEntityAfterDamageMixin {
             float damage,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        if (this.amber$isDeadOrDying()) {
-            return;
-        }
-
         LivingEntity entity = (LivingEntity) (Object) this;
         if (this.amber$afterDamagePending && cir.getReturnValueZ()) {
             EntityEvent.AFTER_DAMAGE.invoker().afterDamage(
@@ -271,14 +263,6 @@ public abstract class LivingEntityAfterDamageMixin {
         this.amber$baseDamageTaken = baseDamageTaken;
         this.amber$damageTaken = damageTaken;
         this.amber$blocked = blocked;
-    }
-
-    @Unique
-    private boolean amber$isDeadOrDying() {
-        //? if >=1.16
-        return this.isDeadOrDying();
-        //? if <1.16
-        /*return !((LivingEntity) (Object) this).isAlive();*/
     }
 
     @Unique

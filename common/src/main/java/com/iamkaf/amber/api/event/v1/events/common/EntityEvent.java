@@ -126,8 +126,9 @@ public class EntityEvent {
     @FunctionalInterface
     public interface AfterDamage {
         /**
-         * Called after a living entity took damage, unless they were killed. The base damage taken is given as damage
-         * taken before armor or enchantments are applied, but after other effects like shields are applied.
+         * Called after a living entity took damage. The callback also runs when that damage kills the entity. The base
+         * damage taken is given as damage taken before armor or enchantments are applied, but after other effects like
+         * shields are applied.
          *
          * @param entity          the entity that was damaged
          * @param source          the source of the damage

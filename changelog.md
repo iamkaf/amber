@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.2.1
+
+### Fixed
+
+- Fixed `EntityEvent.AFTER_DAMAGE` skipping callbacks when damage kills the entity.
+
 ## 11.2.0
 
 ### Added
