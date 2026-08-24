@@ -22,9 +22,6 @@ public abstract class LivingEntityAfterDamageMixin {
     @Shadow
     protected float lastHurt;
 
-    @Shadow
-    public abstract boolean isDeadOrDying();
-
     @Unique
     private boolean amber$afterDamagePending;
 
@@ -177,7 +174,7 @@ public abstract class LivingEntityAfterDamageMixin {
             float damage,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        if (!this.amber$afterDamagePending || !cir.getReturnValueZ() || this.isDeadOrDying()) {
+        if (!this.amber$afterDamagePending || !cir.getReturnValueZ()) {
             return;
         }
 
