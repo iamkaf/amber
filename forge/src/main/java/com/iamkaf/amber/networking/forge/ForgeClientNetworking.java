@@ -4,6 +4,7 @@ import com.iamkaf.amber.api.networking.v1.Packet;
 import com.iamkaf.amber.api.networking.v1.PacketHandler;
 //? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 /**
@@ -11,6 +12,14 @@ import net.minecraftforge.fml.loading.FMLLoader;
  * This class is separated to avoid loading client-only classes on the server.
  */
 public class ForgeClientNetworking {
+
+    static Player getLocalPlayer() {
+        return net.minecraft.client.Minecraft.getInstance().player;
+    }
+
+    static void execute(Runnable task) {
+        net.minecraft.client.Minecraft.getInstance().execute(task);
+    }
     
     /**
      * Register a client-side packet receiver.
