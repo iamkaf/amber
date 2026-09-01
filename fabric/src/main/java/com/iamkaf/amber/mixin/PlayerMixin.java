@@ -4,6 +4,8 @@ import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.event.v1.events.common.ItemEvents;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=26.3
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -21,9 +23,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class PlayerMixin {
 
     // Target the 3-parameter drop method used by Player item tosses.
-    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+    //? if >=26.3
+    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZLnet/minecraft/util/Prediction;)Lnet/minecraft/world/entity/item/ItemEntity;",
+    //? if <26.3
+    /*@Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",*/
             at = @At("RETURN"))
-    private void onItemDrop(ItemStack stack, boolean randomizeMotion, boolean includeThrower, CallbackInfoReturnable<ItemEntity> cir) {
+    private void onItemDrop(ItemStack stack, boolean randomizeMotion,
+                            //? if >=26.3
+                            Prediction prediction,
+                            //? if <26.3
+                            /*boolean includeThrower,*/
+                            CallbackInfoReturnable<ItemEntity> cir) {
         // Only handle drops from players
         if (!((Object) this instanceof Player)) {
             return;

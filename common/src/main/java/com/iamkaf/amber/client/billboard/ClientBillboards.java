@@ -253,11 +253,22 @@ public final class ClientBillboards {
                 position.z - cameraPosition.z
         );
         if (isCameraFacing(billboard.content())) {
-            poseStack.mulPose(camera.orientation);
+            //? if >=26.3
+            poseStack.rotate(camera.orientation);
+            //? if <26.3
+            /*poseStack.mulPose(camera.orientation);*/
         }
+        //? if >=26.3 {
+        poseStack.rotateDegrees(Axis.XP, (float) rotation.x);
+        poseStack.rotateDegrees(Axis.YP, (float) rotation.y);
+        poseStack.rotateDegrees(Axis.ZP, (float) rotation.z);
+        //?} else {
+        /*
         poseStack.mulPose(Axis.XP.rotationDegrees((float) rotation.x));
         poseStack.mulPose(Axis.YP.rotationDegrees((float) rotation.y));
         poseStack.mulPose(Axis.ZP.rotationDegrees((float) rotation.z));
+        */
+        //?}
         poseStack.scale(
                 (float) Math.max(1.0E-6D, scale.x),
                 (float) Math.max(1.0E-6D, scale.y),
@@ -330,7 +341,10 @@ public final class ClientBillboards {
         );
         poseStack.scale(itemScale, itemScale, itemScale);
         if (displayContext == ItemDisplayContext.FIXED) {
-            poseStack.mulPose(Axis.YP.rotation((float) Math.PI));
+            //? if >=26.3
+            poseStack.rotate(Axis.YP, (float) Math.PI);
+            //? if <26.3
+            /*poseStack.mulPose(Axis.YP.rotation((float) Math.PI));*/
         }
         BillboardItemSubmitter.submit(state, poseStack, output, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, throughWalls, opacity);
     }

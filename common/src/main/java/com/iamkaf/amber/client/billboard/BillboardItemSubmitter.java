@@ -27,6 +27,10 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 //?}
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+//? if >=26.3 {
+import net.minecraft.client.renderer.texture.UvMapping;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
+//?}
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.network.chat.Component;
@@ -72,30 +76,39 @@ final class BillboardItemSubmitter implements SubmitNodeCollector {
     }
 
     @Override
-    public void submitItem(PoseStack poseStack, ItemDisplayContext context, int light, int overlay, int outlineColor, int[] tints, List<BakedQuad> quads, ItemStackRenderState.FoilType foilType) {
+    public void submitItem(PoseStack poseStack, ItemDisplayContext context, int light, int overlay, int outlineColor, int[] tints,
+                           //? if >=26.3
+                           ItemQuads quads,
+                           //? if <26.3
+                           /*List<BakedQuad> quads,*/
+                           ItemStackRenderState.FoilType foilType) {
         if (!throughWalls && opacity >= 1.0F) {
             delegate.submitItem(poseStack, context, light, overlay, outlineColor, tints, quads, foilType);
             return;
         }
-        if (quads.isEmpty()) {
+        //? if >=26.3
+        List<BakedQuad> allQuads = quads.all();
+        //? if <26.3
+        /*List<BakedQuad> allQuads = quads;*/
+        if (allQuads.isEmpty()) {
             return;
         }
 
-        Identifier firstAtlas = quads.getFirst().materialInfo().sprite().atlasLocation();
+        Identifier firstAtlas = allQuads.getFirst().materialInfo().sprite().atlasLocation();
         boolean singleAtlas = true;
-        for (int index = 1; index < quads.size(); index++) {
-            if (!firstAtlas.equals(quads.get(index).materialInfo().sprite().atlasLocation())) {
+        for (int index = 1; index < allQuads.size(); index++) {
+            if (!firstAtlas.equals(allQuads.get(index).materialInfo().sprite().atlasLocation())) {
                 singleAtlas = false;
                 break;
             }
         }
         if (singleAtlas) {
-            submitQuads(poseStack, light, tints, firstAtlas, quads);
+            submitQuads(poseStack, light, tints, firstAtlas, allQuads);
             return;
         }
 
         Map<Identifier, List<BakedQuad>> byAtlas = new LinkedHashMap<>();
-        for (BakedQuad quad : quads) {
+        for (BakedQuad quad : allQuads) {
             byAtlas.computeIfAbsent(quad.materialInfo().sprite().atlasLocation(), ignored -> new java.util.ArrayList<>()).add(quad);
         }
         for (Map.Entry<Identifier, List<BakedQuad>> entry : byAtlas.entrySet()) {
@@ -129,9 +142,16 @@ final class BillboardItemSubmitter implements SubmitNodeCollector {
     @Override public void submitNameTag(PoseStack poseStack, @Nullable Vec3 attachment, int offset, Component name, boolean seeThrough, int light, CameraRenderState camera) { delegate.submitNameTag(poseStack, attachment, offset, name, seeThrough, light, camera); }
     //?}
     @Override public void submitText(PoseStack poseStack, float x, float y, FormattedCharSequence text, boolean shadow, Font.DisplayMode mode, int light, int color, int backgroundColor, int outlineColor) { delegate.submitText(poseStack, x, y, text, shadow, mode, light, color, backgroundColor, outlineColor); }
+    //? if >=26.3
+    @Override public void submitTextBackground(PoseStack poseStack, float x0, float y0, float x1, float y1, int color, Font.DisplayMode mode, int light) { delegate.submitTextBackground(poseStack, x0, y0, x1, y1, color, mode, light); }
     @Override public void submitFlame(PoseStack poseStack, EntityRenderState state, Quaternionf rotation) { delegate.submitFlame(poseStack, state, rotation); }
     @Override public void submitLeash(PoseStack poseStack, EntityRenderState.LeashState state) { delegate.submitLeash(poseStack, state); }
-    @Override public <S> void submitModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlay, int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) { delegate.submitModel(model, state, poseStack, renderType, light, overlay, tintedColor, sprite, outlineColor, crumblingOverlay); }
+    //? if >=26.3 {
+    @Override public <S> void submitModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlay, int tintedColor, @Nullable UvMapping uvMapping, int outlineColor) { delegate.submitModel(model, state, poseStack, renderType, light, overlay, tintedColor, uvMapping, outlineColor); }
+    @Override public <S> void submitCrumblingOverlay(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlay, int tintedColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) { delegate.submitCrumblingOverlay(model, state, poseStack, renderType, light, overlay, tintedColor, crumblingOverlay); }
+    //?} else {
+    /*@Override public <S> void submitModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int light, int overlay, int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) { delegate.submitModel(model, state, poseStack, renderType, light, overlay, tintedColor, sprite, outlineColor, crumblingOverlay); }*/
+    //?}
     //? if <26.2 {
     @Override public void submitModelPart(ModelPart modelPart, PoseStack poseStack, RenderType renderType, int light, int overlay, @Nullable TextureAtlasSprite sprite, boolean sheeted, boolean hasFoil, int tintedColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay, int outlineColor) { delegate.submitModelPart(modelPart, poseStack, renderType, light, overlay, sprite, sheeted, hasFoil, tintedColor, crumblingOverlay, outlineColor); }
     @Override public void submitMovingBlock(PoseStack poseStack, MovingBlockRenderState state) { delegate.submitMovingBlock(poseStack, state); }
@@ -141,8 +161,12 @@ final class BillboardItemSubmitter implements SubmitNodeCollector {
     @Override public void submitBlockModel(PoseStack poseStack, RenderType renderType, List<BlockStateModelPart> parts, int[] tintLayers, int light, int overlay, int outlineColor) { delegate.submitBlockModel(poseStack, renderType, parts, tintLayers, light, overlay, outlineColor); }
     //? if <26.2 {
     @Override public void submitBreakingBlockModel(PoseStack poseStack, BlockStateModel model, long seed, int progress) { delegate.submitBreakingBlockModel(poseStack, model, seed, progress); }
-    //?} else {
+    //?} else if <26.3 {
     @Override public void submitBreakingBlockModel(PoseStack poseStack, List<BlockStateModelPart> parts, int progress) { delegate.submitBreakingBlockModel(poseStack, parts, progress); }
+    //?} else {
+    @Override public void submitBreakingBlockModel(PoseStack poseStack, List<BlockStateModelPart> parts, int progress, boolean isBlockTranslucent) { delegate.submitBreakingBlockModel(poseStack, parts, progress, isBlockTranslucent); }
+    //?}
+    //? if >=26.2 {
     @Override public void submitShapeOutline(PoseStack poseStack, VoxelShape shape, RenderType renderType, int color, float width, boolean afterTerrain) { delegate.submitShapeOutline(poseStack, shape, renderType, color, width, afterTerrain); }
     //?}
     @Override public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer renderer) { delegate.submitCustomGeometry(poseStack, renderType, renderer); }
