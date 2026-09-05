@@ -1,6 +1,8 @@
 package com.iamkaf.amber.networking.forge;
 
 import com.iamkaf.amber.api.networking.v1.PacketContext;
+import com.iamkaf.amber.util.Env;
+import com.iamkaf.amber.util.EnvExecutor;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -24,8 +26,8 @@ public class ForgePacketContext implements PacketContext {
     
     @Override
     public Player getPlayer() {
-        if (isClientSide && player == null && net.minecraftforge.fml.loading.FMLLoader.getDist().isClient()) {
-            return net.minecraft.client.Minecraft.getInstance().player;
+        if (isClientSide && player == null) {
+            return EnvExecutor.getInEnv(Env.CLIENT, () -> ForgeClientNetworking::getLocalPlayer).orElse(null);
         }
         return player;
     }
@@ -35,12 +37,7 @@ public class ForgePacketContext implements PacketContext {
         // In Forge, we need to ensure execution on the correct thread
         if (isClientSide) {
             // Client-side execution
-            if (net.minecraftforge.fml.loading.FMLLoader.getDist().isClient()) {
-                net.minecraft.client.Minecraft.getInstance().execute(task);
-            } else {
-                // Fallback
-                task.run();
-            }
+            EnvExecutor.runInEnv(Env.CLIENT, () -> () -> ForgeClientNetworking.execute(task));
         } else {
             // Server-side execution
             //? if >=1.20
