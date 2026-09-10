@@ -11,7 +11,7 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Changed
 
-- Ported to Minecraft 26.3-pre-2.
+- Ported to Minecraft 26.3.
 
 ## 11.2.2
 
