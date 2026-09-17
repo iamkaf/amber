@@ -17,14 +17,14 @@ import java.util.ArrayList;
  */
 public class KeybindHelper {
     private static final ArrayList<KeyMapping> KEYBINDINGS = new ArrayList<>();
-    public static boolean forgeEventAlreadyFired = false;
+    public static volatile boolean forgeEventAlreadyFired = false;
 
     /**
      * Registers a keybind.
      *
      * @param keybind the keybind to register
      */
-    public static KeyMapping register(KeyMapping keybind) {
+    public static synchronized KeyMapping register(KeyMapping keybind) {
         if (!Platform.getEnvironment().equals(Env.CLIENT)) {
             return null;
         }

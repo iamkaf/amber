@@ -22,7 +22,7 @@ public class NeoForgeRegistrarManager implements IRegistrarManager {
     private final Map<String, Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>>> registers = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    private <T> DeferredRegister<T> getRegister(String modId, ResourceKey<Registry<T>> key) {
+    private synchronized <T> DeferredRegister<T> getRegister(String modId, ResourceKey<Registry<T>> key) {
         Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> map =
                 registers.computeIfAbsent(modId, m -> new HashMap<>());
         return (DeferredRegister<T>) map.computeIfAbsent(

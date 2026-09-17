@@ -63,7 +63,11 @@ final class NeoForgeAmberEventHandlers {
         @Override
         @SuppressWarnings({"unchecked", "rawtypes"})
         public void modify(Item item, java.util.function.Consumer<DataComponentMap.Builder> builderConsumer) {
-            event.modify(item, patchBuilder -> {
+            //? if >=26.3 {
+            event.modify(item, (patchBuilder, registries, targetItem) -> {
+            //?} else {
+            /*event.modify(item, patchBuilder -> {*/
+            //?}
                 DataComponentMap.Builder tempBuilder = DataComponentMap.builder();
                 builderConsumer.accept(tempBuilder);
 

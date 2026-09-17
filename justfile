@@ -48,9 +48,20 @@ run-client node:
   @if ! just list-nodes | grep -Fxq "{{node}}"; then echo "Unknown node: {{node}}"; exit 1; fi
   @version="{{node}}"; loader="${version##*-}"; version="${version%-*}"; ./gradlew --configure-on-demand ":$loader:$version:runClient" --console=plain
 
-boot-check node timeout="80":
+boot-check node timeout="120":
   @if ! just list-nodes | grep -Fxq "{{node}}"; then echo "Unknown node: {{node}}"; exit 1; fi
-  @node="{{node}}"; version="${node%-*}"; loader="${node##*-}"; log="/tmp/amber-$node.run.log"; boot_marker='Initializing Everlasting Amber Dreams'; set +e; ./gradlew --configure-on-demand ":$loader:$version:runClient" -Pamber.withTeaKit=true --console=plain > "$log" 2>&1 & gradle_pid=$!; deadline=$(( $(date +%s) + {{timeout}} )); status=124; while [ "$(date +%s)" -lt "$deadline" ]; do if grep -q "$boot_marker" "$log"; then status=124; break; fi; if ! kill -0 "$gradle_pid" 2>/dev/null; then wait "$gradle_pid"; status=$?; break; fi; sleep 1; done; if kill -0 "$gradle_pid" 2>/dev/null; then kill "$gradle_pid" 2>/dev/null || true; wait "$gradle_pid" || true; fi; pkill -f "$PWD/$loader/versions/$version/" 2>/dev/null || true; set -e; if [ "$status" -ne 0 ] && [ "$status" -ne 124 ]; then tail -n 160 "$log"; exit "$status"; fi; grep -q "$boot_marker" "$log"; echo "Boot OK: $node (status=$status)"
+  @node="{{node}}"; version="${node%-*}"; loader="${node##*-}"; \
+    task=":$loader:$version:runClient"; \
+    if [ "$node" = "1.16.5-forge" ]; then task=":forge:1.16.5:runLegacyClient"; fi; \
+    log="/tmp/amber-$node.boot.log"; \
+    status=0; timeout --kill-after=10s "{{timeout}}s" ./gradlew --configure-on-demand --no-daemon "$task" --console=plain \
+      -Damber.withTeaKit=true -Dteakit.autoExitTitle=true -Dteakit.autoExitTitleDelayMs=2500 > "$log" 2>&1 || status=$?; \
+    if [ "$status" -ne 0 ] || ! grep -q 'TeaKit scheduling clean shutdown from title screen' "$log" \
+      || grep -q 'Mods loaded with .* warning' "$log"; then \
+      pkill -f "$PWD/$loader/versions/$version/" 2>/dev/null || true; \
+      tail -n 100 "$log"; echo "Startup failed: $node (status=$status)"; exit 1; \
+    fi; \
+    echo "Title screen and clean shutdown OK: $node"
 
 boot-check-all timeout="80":
   @for node in $(just list-nodes); do echo "==> $node"; just boot-check "$node" "{{timeout}}"; done
