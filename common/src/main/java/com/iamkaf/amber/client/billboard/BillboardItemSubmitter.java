@@ -117,7 +117,10 @@ final class BillboardItemSubmitter implements SubmitNodeCollector {
     }
 
     private void submitQuads(PoseStack poseStack, int light, int[] tints, Identifier atlas, List<BakedQuad> quads) {
-        RenderType renderType = throughWalls ? RenderTypes.textSeeThrough(atlas) : RenderTypes.text(atlas);
+        //? if >=26.3
+        RenderType renderType = throughWalls ? BillboardRenderTypes.seeThrough(atlas) : RenderTypes.text(atlas);
+        //? if <26.3
+        /*RenderType renderType = throughWalls ? RenderTypes.textSeeThrough(atlas) : RenderTypes.text(atlas);*/
         delegate.submitCustomGeometry(poseStack, renderType, (pose, vertices) -> {
             for (BakedQuad quad : quads) {
                 int tintIndex = quad.materialInfo().tintIndex();
