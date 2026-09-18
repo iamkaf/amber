@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.3.1
+
+### Fixed
+
+- Fixed a crash when displaying through-wall texture and item billboards with Improved Transparency enabled.
+
 ## 11.3.0
 
 ### Changed

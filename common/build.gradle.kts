@@ -1,10 +1,17 @@
 import org.gradle.api.tasks.Sync
+import net.neoforged.moddevgradle.dsl.NeoForgeExtension
 
 plugins {
     id("com.iamkaf.multiloader.common")
 }
 
 val minecraftVersion = project.name
+
+if (minecraftVersion == "26.3") {
+    extensions.configure<NeoForgeExtension> {
+        accessTransformers.from(rootProject.file("versions/$minecraftVersion/common/src/main/resources/META-INF/accesstransformer.cfg"))
+    }
+}
 
 tasks.named<Sync>("stageMergedJavaSources").configure {
     if (minecraftVersion == "1.14.4" || minecraftVersion == "1.15" || minecraftVersion.startsWith("1.15.")) {

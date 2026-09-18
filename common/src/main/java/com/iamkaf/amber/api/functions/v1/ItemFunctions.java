@@ -404,16 +404,18 @@ public final class ItemFunctions {
     ) {
         var builder = ItemAttributeModifiers.builder();
         for (var modifier : modifiers.modifiers()) {
-            if (!modifier.matches(replacement.attribute(), replacement.modifier().id())) {
+            if (!modifier.attribute().equals(replacement.attribute())
+                    || !modifier.modifier().id().equals(replacement.modifier().id())) {
+                //? if >=1.21.6
                 builder.add(modifier.attribute(), modifier.modifier(), modifier.slot(), modifier.display());
+                //? if <1.21.6
+                /*builder.add(modifier.attribute(), modifier.modifier(), modifier.slot());*/
             }
         }
-        builder.add(
-                replacement.attribute(),
-                replacement.modifier(),
-                replacement.slot(),
-                replacement.display()
-        );
+        //? if >=1.21.6
+        builder.add(replacement.attribute(), replacement.modifier(), replacement.slot(), replacement.display());
+        //? if <1.21.6
+        /*builder.add(replacement.attribute(), replacement.modifier(), replacement.slot());*/
         return builder.build();
     }
     //?}

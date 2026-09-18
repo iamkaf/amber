@@ -306,7 +306,12 @@ public final class ClientBillboards {
         float halfHeight = texture.height() / 2.0F;
         int color = ARGB.white(opacity);
         if (throughWalls) {
-            output.submitCustomGeometry(poseStack, RenderTypes.textSeeThrough(texture.texture()), (pose, vertices) -> {
+            output.submitCustomGeometry(poseStack,
+                    //? if >=26.3
+                    BillboardRenderTypes.seeThrough(texture.texture()),
+                    //? if <26.3
+                    /*RenderTypes.textSeeThrough(texture.texture()),*/
+                    (pose, vertices) -> {
                 vertices.addVertex(pose, -halfWidth, -halfHeight, 0.0F).setColor(color).setUv(0.0F, 1.0F).setLight(FULL_BRIGHT);
                 vertices.addVertex(pose, halfWidth, -halfHeight, 0.0F).setColor(color).setUv(1.0F, 1.0F).setLight(FULL_BRIGHT);
                 vertices.addVertex(pose, halfWidth, halfHeight, 0.0F).setColor(color).setUv(1.0F, 0.0F).setLight(FULL_BRIGHT);
