@@ -81,10 +81,15 @@ public class AmberCommands {
     }
 
     public static void initialize() {
+        //? if >=1.21.11 {
+        com.iamkaf.amber.doctor.AmberDoctorCommands.initialize();
+        //?} else {
+
         Constants.LOG.info("Registering Amber commands for {}", Services.PLATFORM.getPlatformName());
         CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
             dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID)
                     .then(DOCTOR_COMMAND));
         });
+        //?}
     }
 }

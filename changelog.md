@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.4.0
+
+### Added
+
+- Added local `/amber doctor` diagnostics that work without Amber on the server on Minecraft 1.21.11 and newer.
+- Mods can contribute checks and explanations to Doctor, and use optional network channels to detect remote support before sending packets.
+
 ## 11.3.1
 
 ### Fixed

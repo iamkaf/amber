@@ -14,7 +14,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AmberNetworking {
     
     // Network channel for internal Amber networking
-    public static final NetworkChannel CHANNEL = NetworkChannel.create(
+    //? if >=1.21.11
+    public static final NetworkChannel CHANNEL = NetworkChannel.createOptional(
+    //? if <1.21.11
+    /*public static final NetworkChannel CHANNEL = NetworkChannel.create(*/
         id(Constants.MOD_ID, "internal")
     );
 

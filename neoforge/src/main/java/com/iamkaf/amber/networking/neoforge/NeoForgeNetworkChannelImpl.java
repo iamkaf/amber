@@ -21,13 +21,19 @@ import java.util.concurrent.ConcurrentMap;
 public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     private static final Set<PayloadIds> REGISTERED_PAYLOADS = ConcurrentHashMap.newKeySet();
 
+    private final boolean optional;
     private final Identifier channelId;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     private final ConcurrentMap<Class<?>, PayloadTypePair<?>> packetToPayloadTypes = new ConcurrentHashMap<>();
     private PayloadRegistrar registrar;
 
     public NeoForgeNetworkChannelImpl(Identifier channelId) {
+        this(channelId, false);
+    }
+
+    public NeoForgeNetworkChannelImpl(Identifier channelId, boolean optional) {
         this.channelId = channelId;
+        this.optional = optional;
     }
 
     /**
@@ -35,7 +41,7 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
      * Called during the RegisterPayloadHandlersEvent.
      */
     public synchronized void setPayloadRegistrar(PayloadRegistrar registrar) {
-        this.registrar = registrar;
+        this.registrar = optional ? registrar.optional() : registrar;
 
         for (var entry : registrations.entrySet()) {
             registerPendingPacket(entry.getKey(), entry.getValue());
@@ -117,21 +123,16 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
             throw new IllegalStateException("sendToServer can only be called from client side");
         }
         
+        if (optional && serverAvailability() != PeerAvailability.SUPPORTED) return;
         PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.c2sType);
 
-        //? if >=1.21.9
-        if (net.neoforged.fml.loading.FMLEnvironment.getDist().isClient()) {
-        //? if <1.21.9
-        /*if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {*/
-            net.minecraft.client.Minecraft.getInstance().getConnection().send(wrapper);
-        } else {
-            throw new IllegalStateException("sendToServer can only be called from client side");
-        }
+        NeoForgeClientNetworking.send(wrapper);
     }
     
     @Override
     public <T extends Packet<T>> void sendToPlayer(T packet, ServerPlayer player) {
+        if (optional && playerAvailability(player) != PeerAvailability.SUPPORTED) return;
         PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
         player.connection.send(wrapper);
@@ -141,7 +142,13 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
     public <T extends Packet<T>> void sendToAllPlayers(T packet) {
         PayloadTypePair<T> payloadTypes = payloadTypes(packet);
         NeoForgePacketWrapper<T> wrapper = new NeoForgePacketWrapper<>(packet, payloadTypes.s2cType);
-        PacketDistributor.sendToAllPlayers(wrapper);
+        if (!optional) {
+            PacketDistributor.sendToAllPlayers(wrapper);
+            return;
+        }
+        var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null) throw new IllegalStateException("No active server for broadcast networking");
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) sendToPlayer(packet, player);
     }
     
     @Override
@@ -152,10 +159,30 @@ public class NeoForgeNetworkChannelImpl implements PlatformNetworkChannel {
         if (except.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
                 if (!player.equals(except)) {
-                    player.connection.send(wrapper);
+                    sendToPlayer(packet, player);
                 }
             }
         }
+    }
+
+    @Override
+    public PeerAvailability serverAvailability() {
+        if (!isClientSide() || !NeoForgeClientNetworking.ready() || packetToPayloadTypes.isEmpty()) {
+            return PeerAvailability.PENDING;
+        }
+        for (PayloadTypePair<?> type : packetToPayloadTypes.values()) {
+            if (!NeoForgeClientNetworking.hasChannel(type.c2sType.id())) return PeerAvailability.ABSENT;
+        }
+        return PeerAvailability.SUPPORTED;
+    }
+
+    @Override
+    public PeerAvailability playerAvailability(ServerPlayer player) {
+        if (packetToPayloadTypes.isEmpty()) return PeerAvailability.PENDING;
+        for (PayloadTypePair<?> type : packetToPayloadTypes.values()) {
+            if (!player.connection.hasChannel(type.s2cType.id())) return PeerAvailability.ABSENT;
+        }
+        return PeerAvailability.SUPPORTED;
     }
 
     @SuppressWarnings("unchecked")
