@@ -14,4 +14,9 @@ public class FabricNetworkingService implements INetworkingService {
     public PlatformNetworkChannel createChannel(Identifier channelId) {
         return new FabricNetworkChannelImpl(channelId);
     }
+    @Override
+    public synchronized PlatformNetworkChannel createOptionalChannel(Identifier channelId) {
+        FabricNetworkChannelImpl channel = new FabricNetworkChannelImpl(channelId, true);
+        return channel;
+    }
 }

@@ -15,18 +15,43 @@ class NetworkChannelImpl implements NetworkChannel {
     
     private static final ConcurrentMap<Identifier, NetworkChannelImpl> CHANNELS = new ConcurrentHashMap<>();
     
+    private final boolean optional;
     private final Identifier channelId;
     private final PlatformNetworkChannel platformChannel;
     
-    private NetworkChannelImpl(Identifier channelId) {
+    private NetworkChannelImpl(Identifier channelId, boolean optional) {
+        this.optional = optional;
         this.channelId = channelId;
-        this.platformChannel = Services.NETWORKING.createChannel(channelId);
+        this.platformChannel = optional ? Services.NETWORKING.createOptionalChannel(channelId)
+                : Services.NETWORKING.createChannel(channelId);
     }
     
     static NetworkChannel create(Identifier channelId) {
-        return CHANNELS.computeIfAbsent(channelId, NetworkChannelImpl::new);
+        return create(channelId, false);
     }
     
+    static NetworkChannel createOptional(Identifier channelId) {
+        return create(channelId, true);
+    }
+
+    private static NetworkChannel create(Identifier channelId, boolean optional) {
+        NetworkChannelImpl channel = CHANNELS.computeIfAbsent(channelId, id -> new NetworkChannelImpl(id, optional));
+        if (channel.optional != optional) {
+            throw new IllegalArgumentException("Channel already exists with different optionality: " + channelId);
+        }
+        return channel;
+    }
+
+    @Override
+    public PeerAvailability serverAvailability() {
+        return platformChannel.serverAvailability();
+    }
+
+    @Override
+    public PeerAvailability playerAvailability(ServerPlayer player) {
+        return platformChannel.playerAvailability(player);
+    }
+
     @Override
     public <T extends Packet<T>> void register(
             Class<T> packetClass,

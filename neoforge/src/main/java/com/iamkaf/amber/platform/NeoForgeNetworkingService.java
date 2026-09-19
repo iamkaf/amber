@@ -37,4 +37,11 @@ public class NeoForgeNetworkingService implements INetworkingService {
             channel.setPayloadRegistrar(registrar);
         }
     }
+    @Override
+    public synchronized PlatformNetworkChannel createOptionalChannel(Identifier channelId) {
+        NeoForgeNetworkChannelImpl channel = new NeoForgeNetworkChannelImpl(channelId, true);
+        channels.add(channel);
+        if (payloadRegistrar != null) channel.setPayloadRegistrar(payloadRegistrar);
+        return channel;
+    }
 }

@@ -21,6 +21,8 @@ public final class PlayerCompat {
     public static void displayClientMessage(Player player, Component message, boolean actionBar) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.sendSystemMessage(message, actionBar);
+        } else if (actionBar) {
+            player.sendOverlayMessage(message);
         } else {
             player.sendSystemMessage(message);
         }

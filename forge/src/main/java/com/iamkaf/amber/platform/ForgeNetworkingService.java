@@ -28,4 +28,10 @@ public class ForgeNetworkingService implements INetworkingService {
     public List<ForgeNetworkChannelImpl> getChannels() {
         return new ArrayList<>(channels);
     }
+    @Override
+    public synchronized PlatformNetworkChannel createOptionalChannel(Identifier channelId) {
+        ForgeNetworkChannelImpl channel = new ForgeNetworkChannelImpl(channelId, true);
+        channels.add(channel);
+        return channel;
+    }
 }

@@ -30,4 +30,13 @@ public class FabricClientNetworking {
         ClientPlayNetworking.send(wrapper);
     }
     //?}
+    static boolean ready() {
+        var client = net.minecraft.client.Minecraft.getInstance();
+        return client.getConnection() != null && client.player != null;
+    }
+
+    static boolean canSend(net.minecraft.resources.Identifier id) {
+        return ClientPlayNetworking.canSend(id);
+    }
+
 }
