@@ -23,12 +23,6 @@ import net.minecraft.server.level.ServerPlayer;
 public interface NetworkChannel {
     
     /**
-     * Creates a new network channel with the given identifier.
-     * 
-     * @param channelId unique identifier for this channel
-     * @return a new network channel instance
-     */
-    /**
      * Creates a channel that permits missing peers and filters unsupported sends.
      * Include the wire revision in a new channel ID, such as {@code example:state_v1}.
      * Keep that revision's packet names, registration order, and codecs immutable.
@@ -49,6 +43,12 @@ public interface NetworkChannel {
         return PeerAvailability.PENDING;
     }
 
+    /**
+     * Creates a new network channel with the given identifier.
+     *
+     * @param channelId unique identifier for this channel
+     * @return a new network channel instance
+     */
     static NetworkChannel create(Identifier channelId) {
         return NetworkChannelImpl.create(channelId);
     }

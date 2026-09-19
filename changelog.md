@@ -14,6 +14,11 @@ See the full changelog at https://github.com/iamkaf/amber
 - Added local `/amber doctor` diagnostics that work without Amber on the server on Minecraft 1.21.11 and newer.
 - Mods can contribute checks and explanations to Doctor, and use optional network channels to detect remote support before sending packets.
 
+### Fixed
+
+- Fixed a startup crash on newer Forge versions when registering damage events.
+- Fixed client action-bar messages appearing in chat on Minecraft 26.1 and newer.
+
 ## 11.3.1
 
 ### Fixed
