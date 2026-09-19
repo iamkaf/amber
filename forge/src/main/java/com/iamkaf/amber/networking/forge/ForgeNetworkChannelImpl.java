@@ -159,8 +159,10 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         if (optional) {
             //? if >=1.18
             var server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
-            //? if <1.18
+            //? if >=1.17 && <1.18
             /*var server = net.minecraftforge.fmllegacy.server.ServerLifecycleHooks.getCurrentServer();*/
+            //? if <1.17
+            /*var server = net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer();*/
             if (server == null) throw new IllegalStateException("No active server for broadcast networking");
             for (ServerPlayer player : server.getPlayerList().getPlayers()) sendToPlayer(packet, player);
             return;
