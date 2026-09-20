@@ -16,4 +16,8 @@ public interface INetworkingService {
      * @return a platform-specific network channel implementation
      */
     PlatformNetworkChannel createChannel(Identifier channelId);
+
+    default PlatformNetworkChannel createOptionalChannel(Identifier channelId) {
+        throw new UnsupportedOperationException("This networking adapter does not implement optional channels");
+    }
 }

@@ -7,6 +7,14 @@ import net.minecraft.server.level.ServerPlayer;
  * This is implemented by each mod loader (Fabric, Forge, NeoForge).
  */
 public interface PlatformNetworkChannel {
+    default PeerAvailability serverAvailability() {
+        return PeerAvailability.PENDING;
+    }
+
+    default PeerAvailability playerAvailability(ServerPlayer player) {
+        return PeerAvailability.PENDING;
+    }
+
     
     /**
      * Registers a packet type with the platform's networking system.

@@ -32,24 +32,30 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     private static final int PROTOCOL_VERSION = 1;
     
+    private final boolean optional;
     private final Identifier channelId;
     private final SimpleChannel channel;
     private final ConcurrentMap<Class<?>, PacketRegistration<? extends Packet<?>>> registrations = new ConcurrentHashMap<>();
     
     public ForgeNetworkChannelImpl(Identifier channelId) {
+        this(channelId, false);
+    }
+
+    public ForgeNetworkChannelImpl(Identifier channelId, boolean optional) {
         this.channelId = channelId;
+        this.optional = optional;
         //? if >=1.20.2 {
         this.channel = ChannelBuilder.named(channelId)
             .networkProtocolVersion(PROTOCOL_VERSION)
-            .clientAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
-            .serverAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
+            .clientAcceptedVersions(optional ? Channel.VersionTest.exact(PROTOCOL_VERSION).or(Channel.VersionTest.ACCEPT_MISSING).or(Channel.VersionTest.ACCEPT_VANILLA) : Channel.VersionTest.exact(PROTOCOL_VERSION))
+            .serverAcceptedVersions(optional ? Channel.VersionTest.exact(PROTOCOL_VERSION).or(Channel.VersionTest.ACCEPT_MISSING).or(Channel.VersionTest.ACCEPT_VANILLA) : Channel.VersionTest.exact(PROTOCOL_VERSION))
             .simpleChannel();
         //?} else {
         /*String protocolVersion = Integer.toString(PROTOCOL_VERSION);
         this.channel = NetworkRegistry.ChannelBuilder.named(channelId)
             .networkProtocolVersion(() -> protocolVersion)
-            .clientAcceptedVersions(protocolVersion::equals)
-            .serverAcceptedVersions(protocolVersion::equals)
+            .clientAcceptedVersions(version -> protocolVersion.equals(version) || optional && (NetworkRegistry.ABSENT.equals(version) || NetworkRegistry.ACCEPTVANILLA.equals(version)))
+            .serverAcceptedVersions(version -> protocolVersion.equals(version) || optional && (NetworkRegistry.ABSENT.equals(version) || NetworkRegistry.ACCEPTVANILLA.equals(version)))
             .simpleChannel();*/
         //?}
     }
@@ -110,6 +116,7 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     @Override
     public <T extends Packet<T>> void sendToServer(T packet) {
+        if (optional && serverAvailability() != PeerAvailability.SUPPORTED) return;
         if (!isClientSide()) {
             throw new IllegalStateException("sendToServer can only be called from client side");
         }
@@ -131,6 +138,7 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     @Override
     public <T extends Packet<T>> void sendToPlayer(T packet, ServerPlayer player) {
+        if (optional && playerAvailability(player) != PeerAvailability.SUPPORTED) return;
         @SuppressWarnings("unchecked")
         PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
         if (registration == null) {
@@ -148,6 +156,17 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
     
     @Override
     public <T extends Packet<T>> void sendToAllPlayers(T packet) {
+        if (optional) {
+            //? if >=1.18
+            var server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            //? if >=1.17 && <1.18
+            /*var server = net.minecraftforge.fmllegacy.server.ServerLifecycleHooks.getCurrentServer();*/
+            //? if <1.17
+            /*var server = net.minecraftforge.fml.server.ServerLifecycleHooks.getCurrentServer();*/
+            if (server == null) throw new IllegalStateException("No active server for broadcast networking");
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) sendToPlayer(packet, player);
+            return;
+        }
         @SuppressWarnings("unchecked")
         PacketRegistration<T> registration = (PacketRegistration<T>) registrations.get(packet.getClass());
         if (registration == null) {
@@ -180,7 +199,7 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         //? if <1.20
         /*if (except.level instanceof net.minecraft.server.level.ServerLevel serverLevel) {*/
             for (ServerPlayer player : serverLevel.getServer().getPlayerList().getPlayers()) {
-                if (!player.equals(except)) {
+                if (!player.equals(except) && (!optional || playerAvailability(player) == PeerAvailability.SUPPORTED)) {
                     //? if >=1.20.2
                     channel.send(packet, PacketDistributor.PLAYER.with(player));
                     //? if <1.20.2
@@ -190,6 +209,23 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         }
     }
     
+    @Override
+    public PeerAvailability serverAvailability() {
+        if (!isClientSide()) return PeerAvailability.PENDING;
+        var connection = ForgeClientNetworking.connection();
+        if (connection == null) return PeerAvailability.PENDING;
+        return channel.isRemotePresent(connection) ? PeerAvailability.SUPPORTED : PeerAvailability.ABSENT;
+    }
+
+    @Override
+    public PeerAvailability playerAvailability(ServerPlayer player) {
+        //? if >=1.20.2
+        var connection = player.connection.getConnection();
+        //? if <1.20.2
+        /*var connection = player.connection.connection;*/
+        return channel.isRemotePresent(connection) ? PeerAvailability.SUPPORTED : PeerAvailability.ABSENT;
+    }
+
     private boolean isClientSide() {
         try {
             return net.minecraftforge.fml.loading.FMLLoader.getDist().isClient();

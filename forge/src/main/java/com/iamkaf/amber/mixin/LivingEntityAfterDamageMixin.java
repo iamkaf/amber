@@ -1,5 +1,7 @@
 package com.iamkaf.amber.mixin;
 
+//? if >=1.21.11
+import com.llamalad7.mixinextras.sugar.Local;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.PlayerEvents;
@@ -68,8 +70,8 @@ public abstract class LivingEntityAfterDamageMixin {
                     /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 0
             )
-            //? if >=1.21.9
-            , locals = LocalCapture.CAPTURE_FAILHARD
+            //? if >=1.21.9 && <1.21.11
+            /*, locals = LocalCapture.CAPTURE_FAILHARD*/
     )
     private void amber$captureReducedDamage(
             //? if >=1.21.2
@@ -77,13 +79,10 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir
-            //? if >=1.21.9 {
-            ,
-            //? if >=26.2
-            /*float originalDamage,*/
-            ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
+            //? if >=1.21.11 {
+            , @Local(ordinal = 0) boolean blocked
+            //?} elif >=1.21.9 {
+            /*, ItemStack itemInUse, float damageBlocked, boolean blocked*/
             //?}
     ) {
         //? if >=1.21.9
@@ -106,8 +105,8 @@ public abstract class LivingEntityAfterDamageMixin {
                     /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 1
             )
-            //? if >=1.21.9
-            , locals = LocalCapture.CAPTURE_FAILHARD
+            //? if >=1.21.9 && <1.21.11
+            /*, locals = LocalCapture.CAPTURE_FAILHARD*/
     )
     private void amber$captureFullDamage(
             //? if >=1.21.2
@@ -115,13 +114,10 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir
-            //? if >=1.21.9 {
-            ,
-            //? if >=26.2
-            /*float originalDamage,*/
-            ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
+            //? if >=1.21.11 {
+            , @Local(ordinal = 0) boolean blocked
+            //?} elif >=1.21.9 {
+            /*, ItemStack itemInUse, float damageBlocked, boolean blocked*/
             //?}
     ) {
         //? if >=1.21.9

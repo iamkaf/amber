@@ -13,6 +13,15 @@ import net.minecraftforge.fml.loading.FMLLoader;
  */
 public class ForgeClientNetworking {
 
+    //? if >=1.17
+    static net.minecraft.network.Connection connection() {
+    //? if <1.17
+    /*static net.minecraft.network.NetworkManager connection() {*/
+        var client = net.minecraft.client.Minecraft.getInstance();
+        var listener = client.getConnection();
+        return listener == null || client.player == null ? null : listener.getConnection();
+    }
+
     static Player getLocalPlayer() {
         return net.minecraft.client.Minecraft.getInstance().player;
     }

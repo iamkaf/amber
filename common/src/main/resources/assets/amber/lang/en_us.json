@@ -1,0 +1,16 @@
+{
+  "amber.doctor.title": "Amber Doctor",
+  "amber.doctor.platform": "Loader",
+  "amber.doctor.networking": "Networking",
+  "amber.doctor.initialized": "Initialized",
+  "amber.doctor.not_initialized": "Not initialized",
+  "amber.doctor.mixins": "Mixins",
+  "amber.doctor.mods": "Amber mods",
+  "amber.doctor.contributor": "Diagnostics",
+  "amber.doctor.contributor_failed": "This mod could not provide diagnostics. See the local log for details.",
+  "amber.doctor.server_unavailable": "Server diagnostics are unavailable on this connection.",
+  "amber.doctor.status.ok": "OK",
+  "amber.doctor.status.unknown": "Unknown",
+  "amber.doctor.status.warning": "Warning",
+  "amber.doctor.status.error": "Error"
+}
