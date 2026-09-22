@@ -10,7 +10,7 @@ on:
       max-parallel:
         description: Concurrent build jobs for the CI pilot
         type: number
-        default: 4
+        default: 8
       strict-gradle-cache:
         description: Restore Gradle home only from the same build job
         type: boolean
@@ -27,6 +27,6 @@ jobs:
   build:
     uses: iamkaf/multiloader-conventions/.github/workflows/mod-build.yml@148fe99456670857798c987ac2d1a469e6a9e73f
     with:
-      max-parallel: ${{ inputs.max-parallel || 4 }}
+      max-parallel: ${{ inputs.max-parallel || 8 }}
       strict-gradle-cache: ${{ inputs.strict-gradle-cache || false }}
       cache-diagnostics-job: 26.2-neoforge
