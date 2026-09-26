@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   build:
-    uses: iamkaf/multiloader-conventions/.github/workflows/mod-build.yml@148fe99456670857798c987ac2d1a469e6a9e73f
+    uses: iamkaf/multiloader-conventions/.github/workflows/mod-build.yml@c04ba0b9b350143f6074a3da4a470dbdefff07cc
     with:
       max-parallel: ${{ inputs.max-parallel || 8 }}
       strict-gradle-cache: ${{ inputs.strict-gradle-cache || false }}
