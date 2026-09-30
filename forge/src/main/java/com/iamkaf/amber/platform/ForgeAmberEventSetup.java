@@ -29,6 +29,8 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerRenderGuiEvents();
         ForgeAmberEventHandlers.registerMouseScrollEvents();
         ForgeAmberEventHandlers.registerBlockOutlineRenderEvents();
+        //? if >=1.21.11
+        ForgeClientConnectionEvents.register();
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency
