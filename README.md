@@ -12,7 +12,8 @@ It aims to make multi-loader development feel consistent by abstracting platform
 ## 📦 What Amber Provides
 
 - Registry helpers (deferred registration / suppliers)
-- Event system (common + client events)
+- Event system (common + client events, including client connect and disconnect)
+- Permission checks that defer to each loader's permission system
 - Networking utilities (simple packet/channel helpers)
 - Configuration utilities
 - Commands + small gameplay/dev helpers (HUD, keybind utilities, etc.)

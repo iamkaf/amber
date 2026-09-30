@@ -13,6 +13,8 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         FabricAmberEventHandlers.registerBlockInteractionEvents();
         FabricAmberEventHandlers.registerDefaultItemComponentEvents();
         FabricAmberEventHandlers.registerCreativeTabEvents();
+        //? if >=26.1.2
+        FabricPermissions.register();
     }
 
     @Override
@@ -21,6 +23,8 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         FabricAmberEventHandlers.registerRenderHudEvents();
         FabricAmberEventHandlers.registerStartClientTickEvents();
         FabricAmberEventHandlers.registerEndClientTickEvents();
+        //? if >=1.21.11
+        FabricClientConnectionEvents.register();
     }
 
     @Override

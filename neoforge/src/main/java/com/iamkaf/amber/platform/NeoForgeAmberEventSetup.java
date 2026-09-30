@@ -19,6 +19,8 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         NeoForgeAmberEventHandlers.registerShieldBlockEvents();
         NeoForgeAmberEventHandlers.registerCreativeTabEvents();
         NeoForgeAmberEventHandlers.registerDefaultItemComponentEvents();
+        //? if >=1.21.11
+        NeoForgePermissions.register();
     }
 
     @Override
@@ -27,6 +29,8 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         NeoForgeAmberEventHandlers.registerRenderGuiEvents();
         NeoForgeAmberEventHandlers.registerClientTickEvents();
         NeoForgeAmberEventHandlers.registerKeybindEvents();
+        //? if >=1.21.11
+        NeoForgeClientConnectionEvents.register();
     }
 
     // FIXME: registerServer() called from common init due to EnvExecutor inconsistency

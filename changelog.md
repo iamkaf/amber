@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.5.0
+
+### Added
+
+- Added client connect and disconnect events.
+- Added permission checks that permission mods can override.
+
 ## 11.4.0
 
 ### Added
