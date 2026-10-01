@@ -11,7 +11,16 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
-- Added buttons to `/amber doctor` that open the game and logs folders to improve support.
+- Added buttons to `/amber doctor` that open the game, logs, and crash reports folders to improve support.
+
+  ![Amber Doctor report with folder, upload, and Discord buttons](https://i.kaf.sh/i/b558d01a-7bd7-42db-9702-7eddce4dc893.png)
+
+- Added an `/amber doctor` button that uploads `latest.log` to mclo.gs.
+- Added a Discord link to `/amber doctor`.
+
+### Changed
+
+- Made `/amber doctor` easier to read.
 
 ## 11.5.0
 
