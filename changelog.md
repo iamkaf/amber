@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.6.0
+
+### Added
+
+- Added buttons to `/amber doctor` that open the game folder and copy `latest.log`.
+
 ## 11.5.0
 
 ### Added
