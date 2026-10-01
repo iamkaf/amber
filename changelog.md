@@ -11,7 +11,7 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ### Added
 
-- Added buttons to `/amber doctor` that open the game folder and copy `latest.log` to improve support.
+- Added buttons to `/amber doctor` that open the game and logs folders to improve support.
 
 ## 11.5.0
 

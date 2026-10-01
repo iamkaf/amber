@@ -1,7 +1,6 @@
 //? if >=1.21.11 {
 package com.iamkaf.amber.doctor;
 
-import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.doctor.v1.ClientDoctor;
 import com.iamkaf.amber.api.platform.v1.Platform;
 import com.iamkaf.amber.platform.Services;
@@ -15,14 +14,9 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 /** Local callbacks do not assume the loader's command source type. */
 public final class ClientDoctorCommands {
-    private static final long MAX_COPIED_LOG_BYTES = 10L * 1024 * 1024;
-
     private ClientDoctorCommands() {}
 
     public static void initialize() {
@@ -49,19 +43,9 @@ public final class ClientDoctorCommands {
     }
 
     private static Component actions() {
-        var actions = button("amber.doctor.open_game_folder", new ClickEvent.OpenFile(Platform.getGameFolder()));
-        var log = Platform.getLogsFolder().resolve("latest.log");
-        try {
-            // Copies the log as it was when the report ran. Larger logs stay out of chat history.
-            if (Files.size(log) <= MAX_COPIED_LOG_BYTES) {
-                // Decoding replaces a character cut off by a concurrent write instead of failing.
-                String content = new String(Files.readAllBytes(log), StandardCharsets.UTF_8);
-                actions.append(" ").append(button("amber.doctor.copy_log", new ClickEvent.CopyToClipboard(content)));
-            }
-        } catch (IOException exception) {
-            Constants.LOG.warn("Could not read {} for the Doctor report", log, exception);
-        }
-        return actions;
+        return button("amber.doctor.open_game_folder", new ClickEvent.OpenFile(Platform.getGameFolder()))
+                .append(" ")
+                .append(button("amber.doctor.open_logs_folder", new ClickEvent.OpenFile(Platform.getLogsFolder())));
     }
 
     private static MutableComponent button(String key, ClickEvent click) {
