@@ -43,12 +43,10 @@ public abstract class CraftingPlayerMixin {
     private void amber$onResultTaken(Player player, ItemStack carried,
             CallbackInfo ci
     ) {
-        //? if >=1.19 {
         if (amber$removeCountBeforeCheck <= 0) {
             amber$fireCraftEvent(carried);
         }
         amber$removeCountBeforeCheck = 0;
-        //?}
     }
 
     @Unique

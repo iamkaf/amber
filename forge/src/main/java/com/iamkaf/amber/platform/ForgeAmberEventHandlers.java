@@ -4,7 +4,6 @@ import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientTickEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
-import com.iamkaf.amber.api.event.v1.events.common.client.InputEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
 import com.iamkaf.amber.api.registry.v1.KeybindHelper;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
@@ -28,7 +27,6 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -41,9 +39,9 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 /*import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 *///?}
 //? if >=1.18 && <1.19
 /*import net.minecraftforge.client.ClientRegistry;*/
@@ -68,11 +66,12 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraftforge.event.GatherComponentsEvent;
 //?}
-//? if <1.21.6
-/*import net.minecraftforge.common.MinecraftForge;*/
-
-import static net.minecraft.world.InteractionResult.CONSUME;
-import static net.minecraft.world.InteractionResult.SUCCESS;
+//? if <1.21.6 {
+/*import java.util.function.Predicate;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
+*///?}
 
 final class ForgeAmberEventHandlers {
     private ForgeAmberEventHandlers() {
@@ -84,7 +83,10 @@ final class ForgeAmberEventHandlers {
     }
 
     static void registerEntityInteractEvents() {
+        //? if >=26.1
         PlayerInteractEvent.EntityInteractSpecific.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerEntityInteract);
+        //? if <26.1
+        /*PlayerInteractEvent.EntityInteract.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerEntityInteract);*/
     }
 
     static void registerCommandEvents() {
@@ -133,9 +135,6 @@ final class ForgeAmberEventHandlers {
         ShieldBlockEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onShieldBlock);
     }
 
-    static void registerCraftItemEvents() {
-    }
-
     static void registerCreativeTabEvents() {
         //? if >=1.21.10
         BuildCreativeModeTabContentsEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::buildContents);
@@ -167,9 +166,6 @@ final class ForgeAmberEventHandlers {
     static void registerRenderGuiEvents() {
     }
 
-    static void registerMouseScrollEvents() {
-    }
-
     static void registerBlockOutlineRenderEvents() {
     }
 
@@ -181,6 +177,7 @@ final class ForgeAmberEventHandlers {
     static void registerPlayerLifecycleEvents() {
         PlayerEvent.PlayerLoggedInEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerJoin);
         PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerLeave);
+        PlayerEvent.Clone.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerClone);
         PlayerEvent.PlayerRespawnEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerRespawn);
     }
 
@@ -194,9 +191,7 @@ final class ForgeAmberEventHandlers {
     }
 
     static void registerEntityInteractEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerEntityInteract);
-        //? if <1.19
-        //MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerEntityInteractGeneral);
+        addCancellableListener(PlayerInteractEvent.EntityInteract.class, ForgeAmberEventHandlers.EventHandlerCommon::onPlayerEntityInteract);
     }
 
     static void registerCommandEvents() {
@@ -212,7 +207,7 @@ final class ForgeAmberEventHandlers {
     }
 
     static void registerEntityDamageEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onLivingAttack);
+        addCancellableListener(LivingAttackEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onLivingAttack);
     }
 
     static void registerWorldLifecycleEvents() {
@@ -222,18 +217,18 @@ final class ForgeAmberEventHandlers {
     }
 
     static void registerLightningStrikeEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onLightningStrike);
+        addCancellableListener(EntityStruckByLightningEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onLightningStrike);
     }
 
     static void registerBlockEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onBlockBreak);
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onBlockPlace);
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onBlockInteract);
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onBlockClick);
+        addCancellableListener(BlockEvent.BreakEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onBlockBreak);
+        addCancellableListener(BlockEvent.EntityPlaceEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onBlockPlace);
+        addCancellableListener(PlayerInteractEvent.RightClickBlock.class, ForgeAmberEventHandlers.EventHandlerCommon::onBlockInteract);
+        addCancellableListener(PlayerInteractEvent.LeftClickBlock.class, ForgeAmberEventHandlers.EventHandlerCommon::onBlockClick);
     }
 
     static void registerAnimalEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalTame);
+        addCancellableListener(AnimalTameEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onAnimalTame);
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalBreed);
     }
 
@@ -244,11 +239,6 @@ final class ForgeAmberEventHandlers {
     static void registerShieldBlockEvents() {
         //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onShieldBlock);
-    }
-
-    static void registerCraftItemEvents() {
-        //? if <1.18
-        //MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onItemCrafted);
     }
 
     static void registerCreativeTabEvents() {
@@ -277,8 +267,9 @@ final class ForgeAmberEventHandlers {
     static void registerKeybindEvents() {
         //? if >=1.19
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ForgeAmberEventHandlers.EventHandlerClient::onKeybindRegistration);
+        // Forge has no key mapping registration event before 1.19, so register them during client setup.
         //? if <1.19
-        //ForgeAmberEventHandlers.EventHandlerClient.onKeybindRegistration();
+        //FMLJavaModLoadingContext.get().getModEventBus().addListener(EventPriority.NORMAL, false, FMLClientSetupEvent.class, event -> event.enqueueWork(ForgeAmberEventHandlers.EventHandlerClient::onKeybindRegistration));
     }
 
     static void registerClientTickEvents() {
@@ -291,11 +282,6 @@ final class ForgeAmberEventHandlers {
         //MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerClient::onRenderGuiPost);
         //? if <1.19
         //MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerClient::onRenderGameOverlayPost);
-    }
-
-    static void registerMouseScrollEvents() {
-        //? if <1.19
-        //MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerClient::onMouseScroll);
     }
 
     static void registerBlockOutlineRenderEvents() {
@@ -311,12 +297,22 @@ final class ForgeAmberEventHandlers {
     static void registerPlayerLifecycleEvents() {
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerJoin);
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerLeave);
+        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerClone);
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onPlayerRespawn);
     }
 
     static void registerItemEvents() {
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onItemDrop);
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onItemPickup);
+    }
+
+    // Before EventBus 7, a listener's return value is ignored, so cancel the event explicitly.
+    private static <T extends Event> void addCancellableListener(Class<T> type, Predicate<T> handler) {
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, type, event -> {
+            if (handler.test(event)) {
+                event.setCanceled(true);
+            }
+        });
     }
     *///?}
 
@@ -393,50 +389,40 @@ final class ForgeAmberEventHandlers {
             *///?}
         }
 
+        //? if >=26.1 {
+        // The client posts the interaction from its game mode and again from Player.interactOn with the same
+        // location instance. Remember a passed interaction so listeners run once per click on each side.
+        private static net.minecraft.world.phys.Vec3 passedClientInteractLocation;
+
         public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
+            if (event.getSide().isClient()) {
+                boolean repeated = event.getLocalPos() == passedClientInteractLocation;
+                passedClientInteractLocation = null;
+                if (repeated) {
+                    return false;
+                }
+            }
+        //?} else {
+        /*public static boolean onPlayerEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        *///?}
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
                     //? if >=1.19
                     .interact(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
                     //? if <1.19
                     /*.interact(event.getPlayer(), event.getWorld(), event.getHand(), event.getTarget());*/
 
-            LogicalSide side = event.getSide();
-
-            if (result.equals(InteractionResult.PASS)) {
-                return false;
-            }
-
-            if (side.isClient()) {
-                if (result == SUCCESS) {
-                    event.setCancellationResult(SUCCESS);
-                    return true;
-                } else if (result == CONSUME) {
-                    event.setCancellationResult(CONSUME);
-                    return true;
-                } else {
-                    return true;
+            if (result == InteractionResult.PASS) {
+                //? if >=26.1 {
+                if (event.getSide().isClient()) {
+                    passedClientInteractLocation = event.getLocalPos();
                 }
-            }
-            return false;
-        }
-
-        //? if <1.19 {
-        /*public static boolean onPlayerEntityInteractGeneral(PlayerInteractEvent.EntityInteract event) {
-            InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
-                    .interact(event.getPlayer(), event.getWorld(), event.getHand(), event.getTarget());
-
-            LogicalSide side = event.getSide();
-
-            if (result.equals(InteractionResult.PASS)) {
+                //?}
                 return false;
             }
 
-            event.setCancellationResult(result.equals(SUCCESS) ? SUCCESS : CONSUME);
-            event.setCanceled(true);
-
-            return side.isClient() && result.equals(SUCCESS);
+            event.setCancellationResult(result);
+            return true;
         }
-        *///?}
 
         public static void onCommandRegistration(RegisterCommandsEvent event) {
             CommandEvents.EVENT.invoker()
@@ -444,7 +430,7 @@ final class ForgeAmberEventHandlers {
                             //? if >=1.19
                             event.getBuildContext(), event.getCommandSelection()
                             //? if <1.19
-                            /*legacyBuiltinRegistryAccess(), commandSelectionAll()*/
+                            /*legacyBuiltinRegistryAccess(), event.getEnvironment()*/
                     );
         }
 
@@ -454,10 +440,6 @@ final class ForgeAmberEventHandlers {
             return net.minecraft.core.RegistryAccess.BUILTIN.get();
             //? if <1.18.2
             //return net.minecraft.core.RegistryAccess.builtin();
-        }
-
-        private static net.minecraft.commands.Commands.CommandSelection commandSelectionAll() {
-            return java.lang.Enum.valueOf(net.minecraft.commands.Commands.CommandSelection.class, "ALL");
         }
         *///?}
 
@@ -498,42 +480,8 @@ final class ForgeAmberEventHandlers {
                             //? if <1.19
                             /*event.getEntityLiving(),*/
                             event.getSource(), event.getAmount());
-            if (result != InteractionResult.PASS) {
-                return true;
-            }
-
-            //? if <1.18
-            /*fireLegacyShieldBlock(event);*/
-
-            return false;
+            return result != InteractionResult.PASS;
         }
-
-        //? if <1.18.1 {
-        /*private static void fireLegacyShieldBlock(LivingAttackEvent event) {
-            if (!(event.getEntityLiving() instanceof net.minecraft.world.entity.player.Player player)) {
-                return;
-            }
-
-            if (!legacyIsDamageSourceBlocked(player, event.getSource())) {
-                return;
-            }
-
-            ItemStack shield = player.getUseItem();
-            if (shield.isEmpty() || !legacyIsShieldItem(shield.getItem())) {
-                return;
-            }
-
-            PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, event.getAmount(), event.getSource());
-        }
-
-        private static boolean legacyIsDamageSourceBlocked(net.minecraft.world.entity.player.Player player, net.minecraft.world.damagesource.DamageSource source) {
-            return player.isDamageSourceBlocked(source);
-        }
-
-        private static boolean legacyIsShieldItem(Item item) {
-            return item instanceof net.minecraft.world.item.ShieldItem;
-        }
-        *///?}
 
         public static boolean onBlockBreak(BlockEvent.BreakEvent event) {
             InteractionResult result = BlockEvents.BLOCK_BREAK_BEFORE.invoker().beforeBlockBreak(
@@ -625,9 +573,27 @@ final class ForgeAmberEventHandlers {
             }
         }
 
+        // Forge's respawn event carries only the new player; the clone event just before it has the old one.
+        private static final java.util.Map<net.minecraft.world.entity.player.Player, net.minecraft.server.level.ServerPlayer> RESPAWN_ORIGINALS =
+                java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+        public static void onPlayerClone(PlayerEvent.Clone event) {
+            if (event.getOriginal() instanceof net.minecraft.server.level.ServerPlayer original) {
+                //? if >=1.19
+                RESPAWN_ORIGINALS.put(event.getEntity(), original);
+                //? if <1.19
+                /*RESPAWN_ORIGINALS.put(event.getPlayer(), original);*/
+            }
+        }
+
         public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer newPlayer) {
-                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(newPlayer, newPlayer, !event.isEndConquered());
+            //? if >=1.19
+            net.minecraft.world.entity.player.Player player = event.getEntity();
+            //? if <1.19
+            /*net.minecraft.world.entity.player.Player player = event.getPlayer();*/
+            net.minecraft.server.level.ServerPlayer original = RESPAWN_ORIGINALS.remove(player);
+            if (player instanceof net.minecraft.server.level.ServerPlayer newPlayer) {
+                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(original != null ? original : newPlayer, newPlayer, event.isEndConquered());
             }
         }
 
@@ -674,14 +640,6 @@ final class ForgeAmberEventHandlers {
                 AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
             }
         }
-
-        //? if <1.19 {
-        /*public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
-            if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                PlayerEvents.CRAFT_ITEM.invoker().onCraftItem(serverPlayer, java.util.List.of(event.getCrafting()));
-            }
-        }
-        *///?}
 
         //? if >=1.18.1 {
         public static void onShieldBlock(ShieldBlockEvent event) {
@@ -918,18 +876,7 @@ final class ForgeAmberEventHandlers {
         *///?}
 
         //? if <1.19 {
-        /*public static void onMouseScroll(InputEvent.MouseScrollEvent event) {
-            InteractionResult result = InputEvents.MOUSE_SCROLL_PRE.invoker()
-                    .onMouseScrollPre(event.getMouseX(), event.getMouseY(), 0.0, event.getScrollDelta());
-            if (result != InteractionResult.PASS) {
-                event.setCanceled(true);
-                return;
-            }
-            InputEvents.MOUSE_SCROLL_POST.invoker()
-                    .onMouseScrollPost(event.getMouseX(), event.getMouseY(), 0.0, event.getScrollDelta());
-        }
-
-        public static void onBlockOutlineRender(DrawSelectionEvent.HighlightBlock event) {
+        /*public static void onBlockOutlineRender(DrawSelectionEvent.HighlightBlock event) {
             BlockPos pos = event.getTarget().getBlockPos();
             BlockState state = Minecraft.getInstance().level.getBlockState(pos);
             InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
