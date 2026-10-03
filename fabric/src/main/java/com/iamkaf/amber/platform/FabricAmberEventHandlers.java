@@ -180,84 +180,28 @@ final class FabricAmberEventHandlers {
         //?}
     }
 
+    // Amber-built tabs add their own items in displayItems; MODIFY_ENTRIES fires here once for every tab, including
+    // tabs registered after Amber. Before 1.19.3 the legacy tab classes and CreativeModeTabMixin fire it instead.
     static void registerCreativeTabEvents() {
         //? if >=26.1 {
-        for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
-            net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                    @Override
-                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        output.accept(stack);
-                    }
-                });
-            });
-        }
+        net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.MODIFY_OUTPUT_ALL.register((tab, output) ->
+                net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(tab).ifPresent(tabKey ->
+                        CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, (stack, visibility) ->
+                                output.accept(stack, FabricCreativeModeTabService.toMinecraftVisibility(visibility)))));
         //?} else if >=1.20 {
-        /*for (var tabKey : net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.registryKeySet()) {
-            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                    @Override
-                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        tab.accept(stack);
-                    }
-                });
-            });
-        }
+        /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) ->
+                net.minecraft.core.registries.BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(tab).ifPresent(tabKey ->
+                        CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, (stack, visibility) ->
+                                entries.accept(stack, FabricCreativeModeTabService.toMinecraftVisibility(visibility)))));
         *///?} else if >=1.19.3 {
-        /*ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
-            net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<net.minecraft.world.item.CreativeModeTab>> registryKey =
-                    net.minecraft.resources.ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab"));
-            net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey =
-                    net.minecraft.resources.ResourceKey.create(registryKey, ((IdentifiableItemGroup) tab).getId());
-            CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                @Override
-                public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                    entries.accept(stack);
-                }
-            });
+        /*net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> {
+            ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey = ResourceKey.create(
+                    ResourceKey.createRegistryKey(new Identifier("minecraft", "creative_mode_tab")),
+                    ((net.fabricmc.fabric.api.itemgroup.v1.IdentifiableItemGroup) tab).getId());
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, (stack, visibility) ->
+                    entries.accept(stack, FabricCreativeModeTabService.toMinecraftVisibility(visibility)));
         });
         *///?}
-
-        for (var builder : CreativeModeTabRegistry.getTabBuilders().values()) {
-            net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> tabKey = net.minecraft.resources.ResourceKey.create(
-                //? if >=1.20
-                net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
-                //? if <1.20
-                /*net.minecraft.resources.ResourceKey.createRegistryKey(new net.minecraft.resources.Identifier("minecraft", "creative_mode_tab")),*/
-                builder.getId()
-            );
-
-            //? if >=26.1 {
-            net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents.modifyOutputEvent(tabKey).register((output) -> {
-                for (var itemSupplier : builder.getItems()) {
-                    output.accept(itemSupplier.get());
-                }
-
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                    @Override
-                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        output.accept(stack);
-                    }
-                });
-            });
-            //?} else if >=1.19.3 {
-            /*//? if >=1.20
-            net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(tabKey).register((tab) -> {
-            //? if <1.20
-            //net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(builder.getId()).register((tab) -> {
-                for (var itemSupplier : builder.getItems()) {
-                    tab.accept(itemSupplier.get());
-                }
-
-                CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(tabKey, new CreativeModeTabOutput() {
-                    @Override
-                    public void accept(net.minecraft.world.item.ItemStack stack, CreativeModeTabOutput.TabVisibility visibility) {
-                        tab.accept(stack);
-                    }
-                });
-            });
-            *///?}
-        }
     }
 
     static void registerClientCommandEvents() {

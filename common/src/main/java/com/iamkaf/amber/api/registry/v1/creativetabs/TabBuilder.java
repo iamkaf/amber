@@ -1,24 +1,24 @@
 package com.iamkaf.amber.api.registry.v1.creativetabs;
 
+//? if <1.21
+/*import com.iamkaf.amber.Constants;*/
 import net.minecraft.network.chat.Component;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
-//? if <1.19.3
-/*import net.minecraft.core.NonNullList;*/
+//? if <1.19.3 {
+/*import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
+import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
+import com.iamkaf.amber.platform.Services;
+import net.minecraft.core.NonNullList;
+*///?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-//? if <1.19.3
-/*import java.lang.reflect.Field;*/
 import java.util.ArrayList;
-//? if <1.19.3
-/*import java.util.Arrays;*/
 import java.util.List;
 import java.util.function.Supplier;
-//? if <1.19.3
-/*import sun.misc.Unsafe;*/
 
 /**
  * Builder for creating custom creative mode tabs.
@@ -152,8 +152,9 @@ public class TabBuilder {
     /**
      * Sets the background texture for the tab.
      * <p>
-     * Defaults to the standard items background texture.
-     * 
+     * Defaults to the standard items background texture. Before Minecraft 1.21 only textures named
+     * {@code minecraft:textures/gui/container/creative_inventory/tab_<name>} can be used; others keep the default.
+     *
      * @param backgroundTexture The background texture location
      * @return This builder for chaining
      */
@@ -233,12 +234,12 @@ public class TabBuilder {
 
     /**
      * Sets the type of the tab.
-     * <p>
-     * Defaults to CATEGORY.
-     * 
+     *
      * @param type The tab type
      * @return This builder for chaining
+     * @deprecated Has no effect. Minecraft keeps every type other than {@code CATEGORY} for its own tabs.
      */
+    @Deprecated
     //? if >=1.19.3
     public TabBuilder type(CreativeModeTab.Type type) {
     //? if <1.19.3
@@ -251,19 +252,39 @@ public class TabBuilder {
     /**
      * Builds the creative mode tab.
      * <p>
-     * This is called internally during registration and should not be called directly.
+     * This is called internally during registration and should not be called directly. Before Minecraft 1.19.3
+     * the tab joins the game's tab list as soon as it is built.
      *
      * @return The built creative mode tab
      */
     public CreativeModeTab build() {
         //? if >=1.19.3 {
-        CreativeModeTab.Builder builder = CreativeModeTab.builder(row, column);
+        return applyTo(CreativeModeTab.builder(row, column)).build();
+        //?} else {
+        /*LegacyCreativeModeTab tab = new LegacyCreativeModeTab(Services.CREATIVE_MODE_TABS.legacyTabIndex(), this);
+        if (!showTitle) {
+            tab.hideTitle();
+        }
+        if (!canScroll) {
+            tab.hideScroll();
+        }
+        tab.setBackgroundSuffix(backgroundSuffix());
+        return tab;*/
+        //?}
+    }
 
+    //? if >=1.19.3 {
+    /**
+     * Applies this builder's title, icon, and layout settings to a Minecraft tab builder.
+     * <p>
+     * Used by loader implementations that create the Minecraft builder themselves. Items are not applied here.
+     *
+     * @param builder The Minecraft tab builder to configure
+     * @return The same Minecraft tab builder
+     */
+    public CreativeModeTab.Builder applyTo(CreativeModeTab.Builder builder) {
         builder.title(title);
         builder.icon(icon);
-        //? if <26.1
-        /*// Items are added via MODIFY_ENTRIES in platform-specific implementations.*/
-
         if (alignedRight) {
             builder.alignedRight();
         }
@@ -273,96 +294,62 @@ public class TabBuilder {
         if (!canScroll) {
             builder.noScrollBar();
         }
-        return builder.build();
-        //?} else {
-        /*class LegacyCreativeModeTab extends CreativeModeTab {
-            private final Identifier tabId;
-            private final Supplier<ItemStack> tabIcon;
-            private final List<Supplier<ItemLike>> tabItems;
-
-            private LegacyCreativeModeTab(int index, String name, Identifier tabId, Supplier<ItemStack> tabIcon, List<Supplier<ItemLike>> tabItems) {
-                super(index, name);
-                this.tabId = tabId;
-                this.tabIcon = tabIcon;
-                this.tabItems = tabItems;
-            }
-
-            @Override
-            public ItemStack makeIcon() {
-                return tabIcon.get();
-            }
-
-            @Override
-            public void fillItemList(NonNullList<ItemStack> stacks) {
-                for (Supplier<ItemLike> item : tabItems) {
-                    stacks.add(new ItemStack(item.get()));
-                }
-                com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents.MODIFY_ENTRIES.invoker()
-                        .modifyEntries(
-                                CreativeTabHelper.creativeModeTabKey(tabId),
-                                new com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput() {
-                                    @Override
-                                    public void accept(ItemStack stack, com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput.TabVisibility visibility) {
-                                        stacks.add(stack);
-                                    }
-                                }
-                        );
-            }
-        }
-        return new LegacyCreativeModeTab(nextLegacyTabIndex(), legacyTabName(id), id, icon, items);*/
-        //?}
-    }
-
-    //? if <1.19.3 {
-    /*@SuppressWarnings("deprecation")*/
-    private static int nextLegacyTabIndex() {
-        //? if <1.19.3 {
-        /*CreativeModeTab[] tabs = legacyTabs();
-        int index = tabs.length;
-        setLegacyTabs(Arrays.copyOf(tabs, index + 1));
-        return index;*/
-        //?}
-        //? if >=1.19.3
-        return 0;
-    }
-
-    //? if <1.19.3 {
-    /*private static CreativeModeTab[] legacyTabs() {
-        return legacyTabsReflectively();
-    }
-
-    private static void setLegacyTabs(CreativeModeTab[] tabs) {
-        setLegacyTabsReflectively(tabs);
-    }
-
-    private static CreativeModeTab[] legacyTabsReflectively() {
-        try {
-            Field field = CreativeModeTab.class.getDeclaredField("TABS");
-            field.setAccessible(true);
-            return (CreativeModeTab[]) field.get(null);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to read legacy creative tabs", exception);
-        }
-    }
-
-    private static void setLegacyTabsReflectively(CreativeModeTab[] tabs) {
-        try {
-            Field field = CreativeModeTab.class.getDeclaredField("TABS");
-            field.setAccessible(true);
-            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-            unsafeField.setAccessible(true);
-            Unsafe unsafe = (Unsafe) unsafeField.get(null);
-            unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), tabs);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to resize legacy creative tabs", exception);
-        }
-    }*/
-    //?}
-
-    private static String legacyTabName(Identifier id) {
-        return id.toString().replace(':', '.');
+        //? if >=1.21
+        builder.backgroundTexture(backgroundTexture);
+        //? if <1.21
+        /*builder.backgroundSuffix(backgroundSuffix());*/
+        return builder;
     }
     //?}
+
+    //? if <1.21 {
+    /*private static final String LEGACY_BACKGROUND_PREFIX = "textures/gui/container/creative_inventory/tab_";
+
+    // Older Minecraft only resolves "minecraft:" + LEGACY_BACKGROUND_PREFIX + suffix.
+    private String backgroundSuffix() {
+        String path = backgroundTexture.getPath();
+        if (backgroundTexture.getNamespace().equals("minecraft") && path.startsWith(LEGACY_BACKGROUND_PREFIX)) {
+            return path.substring(LEGACY_BACKGROUND_PREFIX.length());
+        }
+        Constants.LOG.warn("Creative tab {} cannot use background {} before Minecraft 1.21; keeping the default", id, backgroundTexture);
+        return "items.png";
+    }
+    *///?}
+
+    //? if <1.19.3 {
+    /*private static final class LegacyCreativeModeTab extends CreativeModeTab {
+        private final TabBuilder builder;
+
+        private LegacyCreativeModeTab(int index, TabBuilder builder) {
+            super(index, builder.id.toString().replace(':', '.'));
+            this.builder = builder;
+        }
+
+        @Override
+        public ItemStack makeIcon() {
+            return builder.icon.get();
+        }
+
+        @Override
+        public Component getDisplayName() {
+            return builder.title;
+        }
+
+        @Override
+        public boolean isAlignedRight() {
+            return builder.alignedRight;
+        }
+
+        @Override
+        public void fillItemList(NonNullList<ItemStack> stacks) {
+            for (Supplier<ItemLike> item : builder.items) {
+                stacks.add(new ItemStack(item.get()));
+            }
+            CreativeModeTabOutput output = (stack, visibility) -> stacks.add(stack);
+            CreativeModeTabEvents.MODIFY_ENTRIES.invoker().modifyEntries(CreativeTabHelper.creativeModeTabKey(builder.id), output);
+        }
+    }
+    *///?}
 
     /**
      * Gets the ID of this tab.

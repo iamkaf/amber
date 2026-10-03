@@ -13,6 +13,8 @@
     "CraftedItemMixin",
     "CraftingPlayerMixin",
     //? if <1.19.3
+    "CreativeModeTabAccessor",
+    //? if <1.19.3
     "CreativeModeTabMixin",
     "CropBlockMixin",
     "FarmlandBlockMixin",

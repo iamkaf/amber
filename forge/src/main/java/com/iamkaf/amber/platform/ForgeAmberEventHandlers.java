@@ -756,16 +756,7 @@ final class ForgeAmberEventHandlers {
         //?} else if >=1.19.3 {
         /*public static void registerCreativeTabsLegacy(CreativeModeTabEvent.Register event) {
             for (var builder : com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilders().values()) {
-                event.registerCreativeModeTab(builder.getId(), tabBuilder -> {
-                    tabBuilder.title(builder.getTitle());
-                    tabBuilder.icon(builder.getIcon());
-                    if (!builder.shouldShowTitle()) {
-                        tabBuilder.hideTitle();
-                    }
-                    if (!builder.canScroll()) {
-                        tabBuilder.noScrollBar();
-                    }
-                });
+                event.registerCreativeModeTab(builder.getId(), builder::applyTo);
             }
         }
 
