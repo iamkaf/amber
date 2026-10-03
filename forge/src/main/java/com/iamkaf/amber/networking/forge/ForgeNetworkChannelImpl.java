@@ -22,7 +22,8 @@ import net.minecraftforge.network.PacketDistributor;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
+//? if <1.20.2
+/*import java.util.function.Predicate;*/
 
 /**
  * Forge implementation of PlatformNetworkChannel.
@@ -45,17 +46,19 @@ public class ForgeNetworkChannelImpl implements PlatformNetworkChannel {
         this.channelId = channelId;
         this.optional = optional;
         //? if >=1.20.2 {
-        this.channel = ChannelBuilder.named(channelId)
+        ChannelBuilder builder = ChannelBuilder.named(channelId)
             .networkProtocolVersion(PROTOCOL_VERSION)
-            .clientAcceptedVersions(optional ? Channel.VersionTest.exact(PROTOCOL_VERSION).or(Channel.VersionTest.ACCEPT_MISSING).or(Channel.VersionTest.ACCEPT_VANILLA) : Channel.VersionTest.exact(PROTOCOL_VERSION))
-            .serverAcceptedVersions(optional ? Channel.VersionTest.exact(PROTOCOL_VERSION).or(Channel.VersionTest.ACCEPT_MISSING).or(Channel.VersionTest.ACCEPT_VANILLA) : Channel.VersionTest.exact(PROTOCOL_VERSION))
-            .simpleChannel();
+            .acceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION));
+        if (optional) builder = builder.optional();
+        this.channel = builder.simpleChannel();
         //?} else {
         /*String protocolVersion = Integer.toString(PROTOCOL_VERSION);
+        // acceptMissingOr also admits vanilla peers and peers without this channel.
+        Predicate<String> accepted = optional ? NetworkRegistry.acceptMissingOr(protocolVersion) : protocolVersion::equals;
         this.channel = NetworkRegistry.ChannelBuilder.named(channelId)
             .networkProtocolVersion(() -> protocolVersion)
-            .clientAcceptedVersions(version -> protocolVersion.equals(version) || optional && (NetworkRegistry.ABSENT.equals(version) || NetworkRegistry.ACCEPTVANILLA.equals(version)))
-            .serverAcceptedVersions(version -> protocolVersion.equals(version) || optional && (NetworkRegistry.ABSENT.equals(version) || NetworkRegistry.ACCEPTVANILLA.equals(version)))
+            .clientAcceptedVersions(accepted)
+            .serverAcceptedVersions(accepted)
             .simpleChannel();*/
         //?}
     }
