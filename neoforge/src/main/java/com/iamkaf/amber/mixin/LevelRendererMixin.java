@@ -111,16 +111,12 @@ public class LevelRendererMixin {
         }
         //?}
 
-        //? if >=26.1 && <26.2 {
+        // Vanilla draws the outline in only one of the two passes; fire in that pass so cancelling works.
+        //? if >=1.21.9 && <26.2 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
         //?}
-        //? if <26.1 {
-        /*if (translucentPass) {
-            return;
-        }
-        *///?}
 
         if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
@@ -135,6 +131,11 @@ public class LevelRendererMixin {
         //? if <1.21.9
         /*BlockPos pos = blockHitResult.getBlockPos();*/
         BlockState state = minecraft.level.getBlockState(pos);
+        //? if <1.21.9 {
+        /*if (net.neoforged.neoforge.client.ClientHooks.isInTranslucentBlockOutlinePass(minecraft.level, pos, state) != translucentPass) {
+            return;
+        }
+        *///?}
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
                 //? if >=26.2

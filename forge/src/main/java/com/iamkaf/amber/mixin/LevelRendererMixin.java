@@ -133,15 +133,12 @@ public class LevelRendererMixin {
         }
         //?}
 
-        //? if >=26.1 && <26.2 {
+        // Vanilla draws the outline in only one of the two passes; fire in that pass so cancelling works.
+        //? if >=1.21.9 && <26.2 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
-        //?} else if <26.1 {
-        /*if (translucentPass) {
-            return;
-        }
-        *///?}
+        //?}
 
         //? if >=26.2
         Minecraft minecraft = Minecraft.getInstance();
@@ -162,6 +159,11 @@ public class LevelRendererMixin {
         //? if <1.21.9
         /*BlockPos pos = blockHitResult.getBlockPos();*/
         BlockState state = minecraft.level.getBlockState(pos);
+        //? if <1.21.9 {
+        /*if (net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(state).sortOnUpload() != translucentPass) {
+            return;
+        }
+        *///?}
 
         // Fire the Amber BLOCK_OUTLINE_RENDER event with full rendering context
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
