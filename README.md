@@ -14,15 +14,11 @@ It aims to make multi-loader development feel consistent by abstracting platform
 - Registry helpers (deferred registration / suppliers)
 - Event system (common + client events, including client connect and disconnect)
 - Permission checks that defer to each loader's permission system
+- In-world billboards for text, textures, items, and block models
+- `/amber doctor` diagnostics for players and server operators
 - Networking utilities (simple packet/channel helpers)
 - Configuration utilities
 - Commands + small gameplay/dev helpers (HUD, keybind utilities, etc.)
-
-## 📚 Documentation
-
-Docs live in this repo at `docs/` and are published here:
-
-- https://iamkaf.github.io/amber/
 
 ## Repository Structure
 
@@ -34,13 +30,16 @@ amber/
 ├── fabric/           # Fabric implementation
 ├── forge/            # Forge implementation
 ├── neoforge/         # NeoForge implementation
-├── versions/26.2/    # active Minecraft line metadata and overlays
-└── docs/             # documentation site
+└── versions/<mc>/    # per-version metadata
 ```
 
 ## Supported Versions
 
-- 26.2: Fabric, Forge, NeoForge
+Every Minecraft release from 1.17 through 26.3 gets the same features and behavior:
+
+- Fabric on every line
+- Forge on every line Forge supports, from 1.17.1
+- NeoForge from 1.21
 
 ## 🛠️ Building
 
@@ -77,6 +76,5 @@ MIT — see [LICENSE](LICENSE).
 
 ## 🔗 Links
 
-- **Docs**: https://iamkaf.github.io/amber/
 - **Issues**: https://github.com/iamkaf/amber/issues
 - **Modrinth**: https://modrinth.com/mod/amber
