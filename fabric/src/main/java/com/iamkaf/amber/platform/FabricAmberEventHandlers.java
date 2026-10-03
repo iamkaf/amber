@@ -132,7 +132,7 @@ final class FabricAmberEventHandlers {
             CommandEvents.EVENT.invoker().register(
                     commandDispatcher,
                     commandRegistryAccess(),
-                    dedicated ? net.minecraft.commands.Commands.CommandSelection.DEDICATED : net.minecraft.commands.Commands.CommandSelection.ALL
+                    dedicated ? net.minecraft.commands.Commands.CommandSelection.DEDICATED : net.minecraft.commands.Commands.CommandSelection.INTEGRATED
             );
         });
         *///?}
