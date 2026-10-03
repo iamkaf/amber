@@ -209,6 +209,8 @@ final class NeoForgeAmberEventHandlers {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onLivingDeath(LivingDeathEvent event) {
+            // Clients also run death for the entity event the server sends; Amber reports the server's.
+            if (event.getEntity().level().isClientSide()) return;
             EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(event.getEntity(), event.getSource());
         }
 
