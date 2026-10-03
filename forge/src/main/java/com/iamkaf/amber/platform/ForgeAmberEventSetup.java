@@ -19,7 +19,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerShieldBlockEvents();
         ForgeAmberEventHandlers.registerCreativeTabEvents();
         ForgeAmberEventHandlers.registerDefaultItemComponentEvents();
-        //? if >=1.21.11
+        //? if >=1.18.1
         ForgePermissions.register();
     }
 

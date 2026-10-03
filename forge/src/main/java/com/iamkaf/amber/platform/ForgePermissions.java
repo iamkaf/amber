@@ -1,4 +1,4 @@
-//? if >=1.21.11 {
+//? if >=1.18.1 {
 package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.api.permission.v1.PermissionNode;
@@ -7,6 +7,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
+//? if <1.21.6
+/*import net.minecraftforge.common.MinecraftForge;*/
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +22,10 @@ final class ForgePermissions implements PermissionRegistry.Backend {
     }
 
     static void register() {
+        //? if >=1.21.6
         PermissionGatherEvent.Nodes.BUS.addListener(ForgePermissions::gatherNodes);
+        //? if <1.21.6
+        /*MinecraftForge.EVENT_BUS.addListener(ForgePermissions::gatherNodes);*/
         PermissionRegistry.install(new ForgePermissions());
     }
 

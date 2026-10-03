@@ -19,7 +19,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         NeoForgeAmberEventHandlers.registerShieldBlockEvents();
         NeoForgeAmberEventHandlers.registerCreativeTabEvents();
         NeoForgeAmberEventHandlers.registerDefaultItemComponentEvents();
-        //? if >=1.21.11
         NeoForgePermissions.register();
     }
 
