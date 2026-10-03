@@ -35,6 +35,7 @@ import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
+//? if >=26.1.2
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -264,7 +265,10 @@ final class NeoForgeAmberEventHandlers {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
 
+        //? if >=26.1.2
         public static void onBlockBreak(BreakBlockEvent event) {
+        //? if <26.1.2
+        /*public static void onBlockBreak(BlockEvent.BreakEvent event) {*/
 
 
             if (event.getPlayer().level().isClientSide()) {
@@ -281,6 +285,7 @@ final class NeoForgeAmberEventHandlers {
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true);
 
+                //? if >=26.1.2
                 event.setNotifyClient(true);
                 return;
             }
@@ -402,7 +407,10 @@ final class NeoForgeAmberEventHandlers {
 
             com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder =
 
+                //? if >=1.21.11
                 com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().identifier());
+                //? if <1.21.11
+                /*com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().location());*/
 
 
             if (tabBuilder != null) {

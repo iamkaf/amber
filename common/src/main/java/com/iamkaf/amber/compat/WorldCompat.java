@@ -5,6 +5,9 @@ import net.minecraft.core.Direction;
 //? if >=1.18.2
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceKey;
+//? if >=26.1
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.DifficultyInstance;
@@ -15,7 +18,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -32,7 +34,10 @@ public final class WorldCompat {
     }
 
     public static long dayTime(Level level) {
-        return level.getDayTime();
+        //? if >=26.1
+        return level.getDefaultClockTime();
+        //? if <26.1
+        /*return level.getDayTime();*/
     }
 
     public static double vecX(Vec3 vector) {
@@ -93,15 +98,18 @@ public final class WorldCompat {
             float volume,
             float pitch
     ) {
-        //? if >=1.18.2
-        level.playSound(player, x, y, z, sound.value(), source, volume, pitch);
-        //? if <1.18.2
-        /*level.playSound(player, x, y, z, sound, source, volume, pitch);*/
+        //? if >=26.1 {
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.playSeededSound((Entity) player, x, y, z, sound, source, volume, pitch, 0L);
+        }
+        //?} else if >=1.18.2 {
+        /*level.playSound(player, x, y, z, sound.value(), source, volume, pitch);
+        *///?} else {
+        /*level.playSound(player, x, y, z, sound, source, volume, pitch);
+        *///?}
     }
 
-    public static DifficultyInstance currentDifficulty(
-            ServerLevelAccessor level,
-            BlockPos position) {
+    public static DifficultyInstance currentDifficulty(ServerLevelAccessor level, BlockPos position) {
         return level.getCurrentDifficultyAt(position);
     }
 
@@ -110,27 +118,28 @@ public final class WorldCompat {
     }
 
     public static Biome.Precipitation precipitation(Biome biome) {
-        //? if >=1.21
+        //? if >=1.19.4
         return biome.hasPrecipitation() ? Biome.Precipitation.RAIN : Biome.Precipitation.NONE;
-        //? if <1.21
-        /*
-        return biome.getPrecipitation();
-        */
+        //? if <1.19.4
+        /*return biome.getPrecipitation();*/
     }
 
     public static List<Player> players(Level level) {
         return new ArrayList<>(level.players());
     }
 
-//? if >=1.18.2 {
+    //? if >=1.18.2 {
     public static <T> T holderValue(Holder<T> holder) {
         return holder.value();
     }
-//?}
+    //?}
 
     public static String dimensionPath(Level level) {
         ResourceKey<?> key = level.dimension();
-        return key.location().getPath();
+        //? if >=1.21.11
+        return key.identifier().getPath();
+        //? if <1.21.11
+        /*return key.location().getPath();*/
     }
 
     public static int seaLevel(Level level) {

@@ -13,13 +13,27 @@ import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+//? if >=26.3 {
+import net.minecraft.world.level.block.AbstractBedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+//?}
 
 public final class PlayerCompat {
     private PlayerCompat() {
     }
 
     public static void displayClientMessage(Player player, Component message, boolean actionBar) {
-        player.displayClientMessage(message, actionBar);
+        //? if >=26.1 {
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.sendSystemMessage(message, actionBar);
+        } else if (actionBar) {
+            player.sendOverlayMessage(message);
+        } else {
+            player.sendSystemMessage(message);
+        }
+        //?} else {
+        /*player.displayClientMessage(message, actionBar);
+        *///?}
     }
 
     public static Inventory playerInventory(Player player) {
@@ -175,7 +189,14 @@ public final class PlayerCompat {
     }
 
     public static void startSleepInBed(Player player, BlockPos pos) {
-        player.startSleepInBed(pos);
+        //? if >=26.3 {
+        BlockState state = player.level().getBlockState(pos);
+        if (state.getBlock() instanceof AbstractBedBlock bed) {
+            player.startSleepInBed(bed, state, bed.getBedRule(player.level(), pos), pos);
+        }
+        //?} else {
+        /*player.startSleepInBed(pos);
+        *///?}
     }
 
     public static void stopSleeping(Player player) {

@@ -8,7 +8,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+//? if <1.21.2
+/*import net.minecraft.world.item.crafting.Ingredient;*/
 import net.minecraft.world.level.ItemLike;
+//? if >=1.18.2 && <1.20.5
+/*import net.minecraft.core.Holder;*/
+//? if <1.20.5 {
+/*import com.google.common.collect.Multimap;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+*///?}
 
 public final class ItemCompat {
     private ItemCompat() {}
@@ -49,6 +65,12 @@ public final class ItemCompat {
         stack.setDamageValue(damage);
     }
 
+    //? if <1.21.2 {
+    /*public static ItemStack[] ingredientItems(Ingredient ingredient) {
+        return ingredient.getItems();
+    }
+    *///?}
+
     public static String displayNameString(ItemStack stack) {
         return stack.getDisplayName().getString();
     }
@@ -62,7 +84,10 @@ public final class ItemCompat {
     }
 
     public static String modifierIdentity(AttributeModifier modifier) {
+        //? if >=1.20.5
         return modifier.id().toString();
+        //? if <1.20.5
+        /*return modifier.save().getString("Name");*/
     }
 
     public static ItemStack emptyStack() {
@@ -72,4 +97,54 @@ public final class ItemCompat {
     public static NonNullList<ItemStack> nonNullListWithSize(int size, ItemStack defaultValue) {
         return NonNullList.withSize(size, defaultValue);
     }
+
+    //? if <1.20.5 {
+    /*public static Multimap<Attribute, AttributeModifier> stackAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        return stack.getAttributeModifiers(slot);
+    }
+
+    public static Attribute attackDamageAttribute() {
+        return Attributes.ATTACK_DAMAGE;
+    }
+
+    public static ItemStack itemDefaultInstance(Item item) {
+        return item.getDefaultInstance();
+    }
+
+    public static List<CompoundTag> stackEnchantmentTags(ItemStack stack) {
+        ListTag enchantments = stack.getEnchantmentTags();
+        List<CompoundTag> tags = new ArrayList<>(enchantments.size());
+        for (int i = 0; i < enchantments.size(); i++) {
+            tags.add(enchantments.getCompound(i));
+        }
+        return tags;
+    }
+
+    public static String tagString(CompoundTag tag, String key) {
+        return tag.getString(key);
+    }
+
+    public static int tagInt(CompoundTag tag, String key) {
+        return tag.getInt(key);
+    }
+
+    public static int itemEnchantmentLevel(Enchantment enchantment, ItemStack stack) {
+        return EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack);
+    }
+
+    public static void addStackAttributeModifier(ItemStack stack, Attribute attribute,
+            AttributeModifier modifier, EquipmentSlot slot) {
+        stack.addAttributeModifier(attribute, modifier, slot);
+    }
+
+    public static CompoundTag modifierTag(AttributeModifier modifier) {
+        return modifier.save();
+    }
+    *///?}
+
+    //? if >=1.18.2 && <1.20.5 {
+    /*public static Attribute holderValue(Holder<Attribute> holder) {
+        return holder.value();
+    }
+    *///?}
 }
