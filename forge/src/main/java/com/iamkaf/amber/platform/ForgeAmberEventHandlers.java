@@ -270,6 +270,8 @@ final class ForgeAmberEventHandlers {
     static void registerClientCommandEvents() {
         //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerClient::onCommandRegistration);
+        //? if <1.18.1
+        //ForgeChatClientCommands.register();
     }
 
     static void registerKeybindEvents() {
