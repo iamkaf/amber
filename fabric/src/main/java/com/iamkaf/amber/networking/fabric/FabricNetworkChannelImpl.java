@@ -4,10 +4,19 @@ import com.iamkaf.amber.api.networking.v1.*;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
-//? if >=1.20.5
+//? if >=1.20.5 {
 import net.minecraft.network.codec.StreamCodec;
-//? if >=1.20.5
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+//?} else {
+/*import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+*///?}
+//? if <1.20.2 {
+/*import net.fabricmc.fabric.api.networking.v1.S2CPlayChannelEvents;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
+*///?}
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,6 +28,12 @@ import java.util.concurrent.ConcurrentMap;
 public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
     private static final AtomicBoolean SERVER_TRACKING_REGISTERED = new AtomicBoolean();
     private static volatile MinecraftServer currentServer;
+    //? if <1.20.2 {
+    /*// Before 1.20.2, Fabric exchanges play channel lists after join. A player whose list has not
+    // arrived yet is PENDING, not ABSENT.
+    private static final Set<ServerGamePacketListenerImpl> REGISTERED_LISTENERS =
+            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+    *///?}
     private final Identifier channelId;
     private final boolean optional;
     private final ConcurrentMap<Class<?>, PacketEncoder<?>> encoders = new ConcurrentHashMap<>();
@@ -33,6 +48,10 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (SERVER_TRACKING_REGISTERED.compareAndSet(false, true)) {
             ServerLifecycleEvents.SERVER_STARTED.register(server -> currentServer = server);
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> currentServer = null);
+            //? if <1.20.2 {
+            /*S2CPlayChannelEvents.REGISTER.register((listener, sender, server, channels) -> REGISTERED_LISTENERS.add(listener));
+            if (isClientEnvironment()) FabricClientNetworking.trackChannelRegistration();
+            *///?}
         }
     }
 
@@ -67,8 +86,13 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
                 handler.handle(payload.packet, new FabricPacketContext(false, context.player())));
         if (isClientEnvironment()) FabricClientNetworking.registerClientReceiver(type, handler);
         //?} else {
-        /*throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");*/
-        //?}
+        /*// Raw channel handlers run on the network thread: decode there, then hop to the server thread.
+        ServerPlayNetworking.registerGlobalReceiver(packetId, (server, player, listener, buffer, responseSender) -> {
+            T packet = decoder.decode(buffer);
+            server.execute(() -> handler.handle(packet, new FabricPacketContext(false, player)));
+        });
+        if (isClientEnvironment()) FabricClientNetworking.registerClientReceiver(packetId, decoder, handler);
+        *///?}
     }
 
     @Override
@@ -84,6 +108,8 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
     @Override
     public PeerAvailability playerAvailability(ServerPlayer player) {
         if (encoders.isEmpty()) return PeerAvailability.PENDING;
+        //? if <1.20.2
+        /*if (!REGISTERED_LISTENERS.contains(player.connection)) return PeerAvailability.PENDING;*/
         for (Class<?> type : encoders.keySet()) {
             if (!ServerPlayNetworking.canSend(player, packetId(type))) return PeerAvailability.ABSENT;
         }
@@ -99,7 +125,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         FabricClientNetworking.sendToServer(new FabricPacketWrapper<>(packet,
                 new CustomPacketPayload.Type<>(packetId(packet.getClass()))));
         //?} else {
-        /*throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");*/
+        /*FabricClientNetworking.sendToServer(packetId(packet.getClass()), encode(packet, encoder));*/
         //?}
     }
 
@@ -111,7 +137,7 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         ServerPlayNetworking.send(player, new FabricPacketWrapper<>(packet,
                 new CustomPacketPayload.Type<>(packetId(packet.getClass()))));
         //?} else {
-        /*throw new UnsupportedOperationException("Amber networking requires Minecraft 1.20.5+ on Fabric");*/
+        /*ServerPlayNetworking.send(player, packetId(packet.getClass()), encode(packet, encoder));*/
         //?}
     }
 
@@ -138,6 +164,14 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         if (encoder == null) throw new IllegalArgumentException("Packet not registered: " + packet.getClass().getName());
         return encoder;
     }
+
+    //? if <1.20.5 {
+    /*private static <T extends Packet<T>> FriendlyByteBuf encode(T packet, PacketEncoder<T> encoder) {
+        FriendlyByteBuf buffer = PacketByteBufs.create();
+        encoder.encode(packet, buffer);
+        return buffer;
+    }
+    *///?}
 
     private static boolean isClientEnvironment() {
         return net.fabricmc.loader.api.FabricLoader.getInstance().getEnvironmentType() == net.fabricmc.api.EnvType.CLIENT;
