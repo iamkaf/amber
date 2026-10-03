@@ -155,6 +155,7 @@ public final class ClientBillboards {
 
     private static void clear() {
         ACTIVE.clear();
+        BillboardDraw.forgetEntities();
         trackedLevel = null;
         trackedViewer = null;
         activeCountWarningLogged = false;

@@ -63,6 +63,14 @@ public final class BillboardDraw {
     private static @Nullable ClientLevel entitiesLevel;
     *///?}
 
+    /** Forgets cached entity lookups so a world the player left is not kept alive. */
+    static void forgetEntities() {
+        //? if <1.21.5 {
+        /*ENTITIES.clear();
+        entitiesLevel = null;
+        *///?}
+    }
+
     //? if >=1.21.9 {
     private final SubmitNodeCollector output;
     //?} else {

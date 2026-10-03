@@ -176,6 +176,9 @@ public class LevelRendererMixin {
         Minecraft minecraft = Minecraft.getInstance();
         BillboardDraw draw = new BillboardDraw(minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
         ClientBillboards.render(new PoseStack(), draw);
+        // Flush before translucent terrain; vanilla does this itself from 1.21.2.
+        //? if <1.21.2
+        /^minecraft.renderBuffers().bufferSource().endLastBatch();^/
     }
     *///?} else {
     /*// After the entity pass and before block entities, like vanilla name tags.
@@ -192,6 +195,8 @@ public class LevelRendererMixin {
             CallbackInfo ci
     ) {
         ClientBillboards.render(poseStack, new BillboardDraw(Minecraft.getInstance().renderBuffers().bufferSource(), camera));
+        // Flush before translucent terrain so water and glass don't hide the last batch.
+        Minecraft.getInstance().renderBuffers().bufferSource().endLastBatch();
     }
     *///?}
 
