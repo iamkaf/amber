@@ -89,7 +89,12 @@ public class FabricNetworkChannelImpl implements PlatformNetworkChannel {
         /*// Raw channel handlers run on the network thread: decode there, then hop to the server thread.
         ServerPlayNetworking.registerGlobalReceiver(packetId, (server, player, listener, buffer, responseSender) -> {
             T packet = decoder.decode(buffer);
-            server.execute(() -> handler.handle(packet, new FabricPacketContext(false, player)));
+            server.execute(() -> {
+                // Match 1.20.5+, where vanilla drops packets queued after the player disconnected.
+                if (!player.hasDisconnected()) {
+                    handler.handle(packet, new FabricPacketContext(false, player));
+                }
+            });
         });
         if (isClientEnvironment()) FabricClientNetworking.registerClientReceiver(packetId, decoder, handler);
         *///?}

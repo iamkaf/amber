@@ -29,6 +29,8 @@ public class FabricClientNetworking {
 
     static void trackChannelRegistration() {
         C2SPlayChannelEvents.REGISTER.register((listener, sender, client, channels) -> registeredListener = listener);
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register(
+                (listener, client) -> registeredListener = null);
     }
     *///?}
 
@@ -52,7 +54,12 @@ public class FabricClientNetworking {
         // Raw channel handlers run on the network thread: decode there, then hop to the client thread.
         ClientPlayNetworking.registerGlobalReceiver(packetId, (client, listener, buffer, responseSender) -> {
             T packet = decoder.decode(buffer);
-            client.execute(() -> handler.handle(packet, new FabricPacketContext(true, client.player)));
+            client.execute(() -> {
+                // Match 1.20.5+, where vanilla drops packets queued after the connection closed.
+                if (listener.getConnection().isConnected()) {
+                    handler.handle(packet, new FabricPacketContext(true, client.player));
+                }
+            });
         });
     }
 
