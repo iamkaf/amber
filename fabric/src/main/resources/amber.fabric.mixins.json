@@ -25,6 +25,8 @@
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
     "PlayerMixin",
+    //? if <1.19.2
+    //"ServerEntityInteractionMixin",
     "ServerPlayerDeathMixin",
     "ServerLevelMixin",
     "SheepMixin",
