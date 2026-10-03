@@ -262,7 +262,8 @@ final class ForgeAmberEventHandlers {
     static void registerClientCommandEvents() {
         //? if >=1.18.1
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerClient::onCommandRegistration);
-        //? if <1.18.1
+        // Forge 1.18.1 and 1.18.2 keep their command event for suggestions; these run the commands.
+        //? if <1.19
         //ForgeChatClientCommands.register();
     }
 
@@ -437,7 +438,7 @@ final class ForgeAmberEventHandlers {
         }
 
         //? if <1.19 {
-        /*private static net.minecraft.core.RegistryAccess legacyBuiltinRegistryAccess() {
+        /*static net.minecraft.core.RegistryAccess legacyBuiltinRegistryAccess() {
             //? if >=1.18.2
             return net.minecraft.core.RegistryAccess.BUILTIN.get();
             //? if <1.18.2

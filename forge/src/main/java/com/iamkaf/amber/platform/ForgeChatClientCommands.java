@@ -1,4 +1,4 @@
-//? if <1.18.1 {
+//? if <1.19 {
 /*package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.Constants;
@@ -14,7 +14,6 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
@@ -25,11 +24,14 @@ import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 /^*
- * Runs {@link ClientCommandEvents} commands on Forge versions that have no client command API.
+ * Runs {@link ClientCommandEvents} commands before Forge 1.19.
  *
- * <p>Forge fires {@link ClientChatEvent} for typed chat and for clicked chat commands before the
- * message reaches the server. Commands whose root is not registered here go to the server
- * unchanged, as they do with Forge's own client commands from 1.18.1.</p>
+ * <p>Forge 1.17.1 and 1.18 have no client command API. Forge 1.18.1 and 1.18.2 have one, but they
+ * merge server commands into the same tree, so a client command that shares a path with a server
+ * command, such as {@code /amber doctor}, is sent to the server instead. Forge fires
+ * {@link ClientChatEvent} for typed chat and for clicked chat commands before either happens, so
+ * this dispatcher runs the client commands first. Commands it does not know go on unchanged, as
+ * they do with Forge's own client commands.</p>
  ^/
 final class ForgeChatClientCommands {
     private static CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
@@ -45,7 +47,8 @@ final class ForgeChatClientCommands {
     /^* Collects commands on every login, as Forge does from 1.18.1. ^/
     private static void collect() {
         CommandDispatcher<CommandSourceStack> commands = new CommandDispatcher<>();
-        ClientCommandEvents.EVENT.invoker().register(commands, RegistryAccess.builtin());
+        ClientCommandEvents.EVENT.invoker().register(commands,
+                ForgeAmberEventHandlers.EventHandlerCommon.legacyBuiltinRegistryAccess());
         dispatcher = commands;
     }
 
@@ -60,7 +63,8 @@ final class ForgeChatClientCommands {
         try {
             dispatcher.execute(reader, source);
         } catch (CommandSyntaxException exception) {
-            if (exception.getType() == CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand()) {
+            if (exception.getType() == CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand()
+                    || exception.getType() == CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument()) {
                 return;
             }
             source.sendFailure(syntaxError(exception));
