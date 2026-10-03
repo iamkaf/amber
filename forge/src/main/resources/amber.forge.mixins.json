@@ -20,6 +20,8 @@
     "LivingEntityAfterDamageMixin"
   ],
   "client": [
+    //? if >=1.19.1 && <1.21.6
+    //"ClientCommandClickMixin",
     "GuiMixin",
     "LevelRendererMixin",
     //? if >=1.19

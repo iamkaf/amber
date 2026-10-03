@@ -16,6 +16,8 @@
     "NeoForgeShearsItemMixin"
   ],
   "client": [
+    //? if <1.21.5
+    //"ClientCommandClickMixin",
     "LevelRendererMixin",
     "MouseHandlerMixin"
   ],
