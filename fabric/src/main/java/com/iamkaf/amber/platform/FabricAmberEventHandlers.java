@@ -270,7 +270,7 @@ final class FabricAmberEventHandlers {
         //?} else {
         /*@SuppressWarnings("unchecked")
         CommandDispatcher<CommandSourceStack> commandsTemp = (CommandDispatcher<CommandSourceStack>) (CommandDispatcher<?>) ClientCommandManager.DISPATCHER;
-        ClientCommandEvents.EVENT.invoker().register(commandsTemp, commandRegistryAccess());
+        // Fabric's v1 dispatcher is static, so register once, after every mod's client initializer has run.
         boolean[] amber$clientCommandsRegistered = {false};
         ClientTickEvents.START_CLIENT_TICK.register((client) -> {
             if (amber$clientCommandsRegistered[0]) {
