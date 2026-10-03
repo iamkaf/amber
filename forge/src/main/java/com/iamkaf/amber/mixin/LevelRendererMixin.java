@@ -13,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 //? if >=1.21.11 || >=26.1
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//? if >=1.15 && <26.2
+//? if <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;

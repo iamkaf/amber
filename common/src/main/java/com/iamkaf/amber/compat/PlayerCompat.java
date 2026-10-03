@@ -23,17 +23,11 @@ public final class PlayerCompat {
     }
 
     public static Inventory playerInventory(Player player) {
-        //? if >=1.17
         return player.getInventory();
-        //? if <1.17
-        /*return player.inventory;*/
     }
 
     public static Abilities playerAbilities(Player player) {
-        //? if >=1.17
         return player.getAbilities();
-        //? if <1.17
-        /*return player.abilities;*/
     }
 
     public static void updateAbilities(Player player) {

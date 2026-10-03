@@ -14,10 +14,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-//? if >=1.16
 import net.minecraft.world.entity.ai.attributes.Attributes;
-//? if <1.16
-/*import net.minecraft.world.entity.monster.SharedMonsterAttributes;*/
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 //? if <1.21.2
@@ -324,10 +321,8 @@ public final class ItemFunctions {
         //? if <1.20.5 {
         //? if >=1.18.2
         addStackAttributeModifier(stack, holderValue(attribute), modifier, slotGroup);
-        //? if <1.18.2 && >=1.16
+        //? if <1.18.2
         /*stack.addAttributeModifier(attribute, modifier, slotGroup);*/
-        //? if <1.16
-        /*stack.addAttributeModifier(attribute.getName(), modifier, slotGroup);*/
         //?} else {
         var modifiers = restoreDefaultAttributeModifiers(stack);
         var replacement = new ItemAttributeModifiers.Entry(attribute, modifier, slotGroup);
@@ -346,10 +341,7 @@ public final class ItemFunctions {
         //? if <1.20.5 {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (stackAttributeModifiers(stack, slot).entries().stream()
-                    //? if >=1.16
                     .anyMatch(entry -> tagString(modifierTag(entry.getValue()), "Name").equals(id.toString()))) {
-                    //? if <1.16
-                    /*.anyMatch(entry -> entry.getValue().getName().equals(id.toString()))) {*/
                 return true;
             }
         }
@@ -604,9 +596,7 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(ItemStack stack) {
-        //? if <1.16
-        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());*/
-        //? if <1.20.5 && >=1.16
+        //? if <1.20.5
         /*return stackAttributeModifiers(stack, EquipmentSlot.MAINHAND).containsKey(attackDamageAttribute());*/
         //? if >=1.20.5 {
         //? if >=1.21.5

@@ -10,12 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 //? if <1.19
 /*import net.minecraft.network.chat.TextComponent;*/
-//? if >=1.17 {
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
-//?} else
-/*import net.minecraft.network.protocol.game.ClientboundSetTitlesPacket;*/
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
@@ -379,10 +376,7 @@ public final class PlayerFunctions {
      * @param stack The item stack to set.
      */
     public static void setOffhandItem(Player player, ItemStack stack) {
-        //? if >=1.17
         inventorySetItem(playerInventory(player), offhandSlot(), stack);
-        //? if <1.17
-        /*player.inventory.offhand.set(0, stack);*/
     }
 
     /**
@@ -394,10 +388,8 @@ public final class PlayerFunctions {
     public static int getSelectedSlot(Player player) {
         //? if >=1.21.5
         return player.getInventory().getSelectedSlot();
-        //? if <1.21.5 && >=1.17
+        //? if <1.21.5
         /*return selectedSlot(playerInventory(player));*/
-        //? if <1.17
-        /*return player.inventory.selected;*/
     }
 
     /**
@@ -412,10 +404,8 @@ public final class PlayerFunctions {
             player.getInventory().setSelectedSlot(slot);
             //? if <1.21.5 && >=1.21.2
             /*player.getInventory().setSelectedHotbarSlot(slot);*/
-            //? if <1.21.2 && >=1.17
+            //? if <1.21.2
             /*setSelectedSlot(playerInventory(player), slot);*/
-            //? if <1.17
-            /*player.inventory.selected = slot;*/
         }
     }
 
@@ -428,10 +418,7 @@ public final class PlayerFunctions {
      */
     public static ItemStack getHotbarItem(Player player, int slot) {
         if (slot >= 0 && slot <= 8) {
-            //? if >=1.17
             return inventoryItem(playerInventory(player), slot);
-            //? if <1.17
-            /*return player.inventory.getItem(slot);*/
         }
         return emptyStack();
     }
@@ -445,10 +432,7 @@ public final class PlayerFunctions {
      */
     public static void setHotbarItem(Player player, int slot, ItemStack stack) {
         if (slot >= 0 && slot <= 8) {
-            //? if >=1.17
             inventorySetItem(playerInventory(player), slot, stack);
-            //? if <1.17
-            /*player.inventory.setItem(slot, stack);*/
         }
     }
 
@@ -536,7 +520,6 @@ public final class PlayerFunctions {
     public static void sendTitle(Player player, @Nullable Component title, @Nullable Component subtitle,
                                  int fadeIn, int stay, int fadeOut) {
         if (player instanceof ServerPlayer serverPlayer) {
-            //? if >=1.17 {
             ClientboundSetTitlesAnimationPacket timesPacket = new ClientboundSetTitlesAnimationPacket(fadeIn, stay, fadeOut);
             sendPacket(serverPlayer, timesPacket);
 
@@ -549,17 +532,6 @@ public final class PlayerFunctions {
                 ClientboundSetSubtitleTextPacket subtitlePacket = new ClientboundSetSubtitleTextPacket(subtitle);
                 sendPacket(serverPlayer, subtitlePacket);
             }
-            //?} else {
-            /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(fadeIn, stay, fadeOut));
-
-            if (title != null) {
-                serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.TITLE, title));
-            }
-
-            if (subtitle != null) {
-                serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.SUBTITLE, subtitle));
-            }*/
-            //?}
         }
     }
 
@@ -582,15 +554,9 @@ public final class PlayerFunctions {
     public static void clearTitle(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             // Send empty title packets to clear the title
-            //? if >=1.17 {
             sendPacket(serverPlayer, new ClientboundSetTitleTextPacket(emptyComponent()));
             sendPacket(serverPlayer, new ClientboundSetSubtitleTextPacket(emptyComponent()));
             sendPacket(serverPlayer, new ClientboundSetTitlesAnimationPacket(0, 0, 0));
-            //?} else {
-            /*serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.TITLE, emptyComponent()));
-            serverPlayer.connection.send(new ClientboundSetTitlesPacket(ClientboundSetTitlesPacket.Type.SUBTITLE, emptyComponent()));
-            serverPlayer.connection.send(new ClientboundSetTitlesPacket(0, 0, 0));*/
-            //?}
         }
     }
 
@@ -656,23 +622,13 @@ public final class PlayerFunctions {
                     //? if >=1.19 && <1.20
                     /*player.level.getRandom().nextLong()*/
             ));
-            //?} else if >=1.15 {
+            //?} else {
             /*serverPlayer.connection.send(new ClientboundSoundPacket(
                     sound,
                     source,
                     player.getX(),
                     player.getY(),
                     player.getZ(),
-                    volume,
-                    pitch
-            ));*/
-            //?} else {
-            /*serverPlayer.connection.send(new ClientboundSoundPacket(
-                    sound,
-                    source,
-                    player.x,
-                    player.y,
-                    player.z,
                     volume,
                     pitch
             ));*/

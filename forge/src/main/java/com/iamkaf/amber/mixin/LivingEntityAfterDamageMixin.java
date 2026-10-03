@@ -132,10 +132,7 @@ public abstract class LivingEntityAfterDamageMixin {
             at = @At(
                     value = "INVOKE",
                     target =
-                    //? if >=1.17
                     "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
-                    //? if <1.17
-                    /^"Lnet/minecraft/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"^/
             )
     )
     private void amber$fireLegacyShieldBlock(

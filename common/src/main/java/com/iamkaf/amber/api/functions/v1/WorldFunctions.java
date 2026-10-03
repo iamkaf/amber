@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-//? if >=1.16
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.Entity;
@@ -23,22 +22,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-//? if >=1.16.2
 import net.minecraft.world.level.ServerLevelAccessor;
-//? if <1.16.2
-/*import net.minecraft.world.level.LevelAccessor;*/
-//? if <1.16
-/*import net.minecraft.world.level.dimension.DimensionType;*/
 import net.minecraft.world.level.biome.Biome;
-//? if >=1.17
-import net.minecraft.world.level.entity.EntityTypeTest;
 //? if >=1.19
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,12 +115,7 @@ public final class WorldFunctions {
      */
     public static void dropItem(Level level, ItemStack stack, Vec3 pos, Vec3 delta) {
         if (level == null) return;
-        //? if >=1.17
         var itemEntity = new ItemEntity(level, vecX(pos), vecY(pos), vecZ(pos), stack, vecX(delta), vecY(delta), vecZ(delta));
-        //? if <1.17 {
-        /*var itemEntity = new ItemEntity(level, pos.x(), pos.y(), pos.z(), stack);
-        itemEntity.setDeltaMovement(delta);*/
-        //?}
         addFreshEntity(level, itemEntity);
     }
 
@@ -158,10 +144,7 @@ public final class WorldFunctions {
      * @return The result of the raytrace.
      */
     public static @NotNull BlockHitResult raytrace(Level level, Player player) {
-        //? if >=1.17
         Vec3 eyePosition = playerEyePosition(player);
-        //? if <1.17
-        /*Vec3 eyePosition = player.getEyePosition(1.0F);*/
         Vec3 rotation = playerViewVector(player, 1.0f);
         //? if >=1.20.5
         double reach = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE);
@@ -292,10 +275,7 @@ public final class WorldFunctions {
      * @return true if the level is the Overworld, false otherwise.
      */
     public static boolean isOverworld(Level level) {
-        //? if >=1.16
         return dimensionPath(level).equals("overworld");
-        //? if <1.16
-        /*return level.dimension.getType() == DimensionType.OVERWORLD;*/
     }
 
     /**
@@ -305,10 +285,7 @@ public final class WorldFunctions {
      * @return true if the level is the Nether, false otherwise.
      */
     public static boolean isNether(Level level) {
-        //? if >=1.16
         return dimensionPath(level).equals("the_nether");
-        //? if <1.16
-        /*return level.dimension.getType() == DimensionType.NETHER;*/
     }
 
     /**
@@ -318,10 +295,7 @@ public final class WorldFunctions {
      * @return true if the level is the End, false otherwise.
      */
     public static boolean isEnd(Level level) {
-        //? if >=1.16
         return dimensionPath(level).equals("the_end");
-        //? if <1.16
-        /*return level.dimension.getType() == DimensionType.THE_END;*/
     }
 
     // ==================== DISTANCE UTILITIES ====================
@@ -492,10 +466,7 @@ public final class WorldFunctions {
      * @return The difficulty instance at the position.
      */
     public static DifficultyInstance getCurrentDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             BlockPos position) {
         return currentDifficulty(level, position);
     }
@@ -508,10 +479,7 @@ public final class WorldFunctions {
      * @return The difficulty instance at the position.
      */
     public static DifficultyInstance getCurrentDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             Vec3 position) {
         //? if >=1.19.4
         return currentDifficulty(level, BlockPos.containing(position));
@@ -527,15 +495,9 @@ public final class WorldFunctions {
      * @return true if difficulty is hard or harder, false otherwise.
      */
     public static boolean isHardDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             BlockPos position) {
-        //? if >=1.17
         return isDifficultyHard(getCurrentDifficulty(level, position));
-        //? if <1.17
-        /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
 
     /**
@@ -546,15 +508,9 @@ public final class WorldFunctions {
      * @return true if difficulty is hard or harder, false otherwise.
      */
     public static boolean isHardDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             Vec3 position) {
-        //? if >=1.17
         return isDifficultyHard(getCurrentDifficulty(level, position));
-        //? if <1.17
-        /*return getCurrentDifficulty(level, position).getDifficulty() == Difficulty.HARD;*/
     }
 
     // ==================== ENTITY UTILITIES ====================
@@ -600,10 +556,7 @@ public final class WorldFunctions {
                 vecX(center) - radius, vecY(center) - radius, vecZ(center) - radius,
                 vecX(center) + radius, vecY(center) + radius, vecZ(center) + radius
         );
-        //? if >=1.15
         return typedEntities(level, entityType, boundingBox, entity -> true);
-        //? if <1.15
-        /*return (List<T>) (List<?>) level.getEntities(entityType, boundingBox, entity -> true);*/
     }
 
     /**
@@ -632,10 +585,7 @@ public final class WorldFunctions {
      * @return A list of entities within the radius.
      */
     public static List<Entity> getEntitiesInRadius(Level level, BlockPos center, double radius) {
-        //? if >=1.16
         return getEntitiesInRadius(level, blockCenter(center), radius);
-        //? if <1.16
-        /*return getEntitiesInRadius(level, blockCenter(center), radius);*/
     }
 
     /**
@@ -649,10 +599,7 @@ public final class WorldFunctions {
      * @return A list of entities of the specified type within the radius.
      */
     public static <T extends Entity> List<T> getEntitiesInRadius(Level level, BlockPos center, double radius, EntityType<T> entityType) {
-        //? if >=1.16
         return getEntitiesInRadius(level, blockCenter(center), radius, entityType);
-        //? if <1.16
-        /*return getEntitiesInRadius(level, blockCenter(center), radius, entityType);*/
     }
 
     /**
@@ -919,10 +866,7 @@ public final class WorldFunctions {
     }
 
     private static DifficultyInstance currentDifficulty(
-            //? if >=1.16.2
             ServerLevelAccessor level,
-            //? if <1.16.2
-            /*LevelAccessor level,*/
             BlockPos position) {
         return WorldCompat.currentDifficulty(level, position);
     }

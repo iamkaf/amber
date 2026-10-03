@@ -78,7 +78,7 @@ public abstract class FarmlandBlockMixin extends Block {
             super.fallOn(level, state, pos, entity, fallDistance);
         }
     }
-    *///?} else if >=1.17 {
+    *///?} else {
     /*@Inject(
             method = "fallOn",
             at = @At(
@@ -92,22 +92,6 @@ public abstract class FarmlandBlockMixin extends Block {
         amber$handleFarmlandTrample(level, state, pos, entity, fallDistance, ci);
         if (ci.isCancelled()) {
             super.fallOn(level, state, pos, entity, fallDistance);
-        }
-    }
-    *///?} else {
-    /*@Inject(
-            method = "fallOn",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/FarmBlock;turnToDirt(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"
-            ),
-            cancellable = true
-    )
-    private void amber$farmlandTrample(Level level, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
-        BlockState state = level.getBlockState(pos);
-        amber$handleFarmlandTrample(level, state, pos, entity, fallDistance, ci);
-        if (ci.isCancelled()) {
-            super.fallOn(level, pos, entity, fallDistance);
         }
     }
     *///?}

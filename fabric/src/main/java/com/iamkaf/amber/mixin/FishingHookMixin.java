@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(targets =
-        //? if >=1.16
         "net.minecraft.world.entity.projectile.FishingHook"
-        //? if <1.16
-        /*"net.minecraft.world.entity.fishing.FishingHook"*/
 )
 public abstract class FishingHookMixin {
     static {
@@ -26,10 +23,7 @@ public abstract class FishingHookMixin {
     }
 
     @Shadow
-    //? if >=1.16
     public abstract Player getPlayerOwner();
-    //? if <1.16
-    /*public abstract Player getOwner();*/
 
     @ModifyVariable(
             method = "retrieve(Lnet/minecraft/world/item/ItemStack;)I",
@@ -54,9 +48,6 @@ public abstract class FishingHookMixin {
     }
 
     private Player amber$getPlayerOwner() {
-        //? if >=1.16
         return getPlayerOwner();
-        //? if <1.16
-        /*return getOwner();*/
     }
 }

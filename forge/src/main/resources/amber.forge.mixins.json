@@ -5,7 +5,6 @@
   "compatibilityLevel": "${mixin_compat_forge}",
   "mixins": [
     "BoneMealItemMixin",
-    //? if >=1.16
     "CraftedItemMixin",
     //? if >=1.19
     "CraftingPlayerMixin",
@@ -18,8 +17,6 @@
     "LootTableAccessor",
     //? if >=1.20.5
     "ItemAccessor",
-    //? if <1.17
-    "LivingEntityAccessor",
     "LivingEntityAfterDamageMixin"
   ],
   "client": [
