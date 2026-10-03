@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
 import com.iamkaf.amber.client.billboard.ClientBillboards;
@@ -285,4 +284,3 @@ public final class Billboards {
         return player.hasDisconnected() || player.isRemoved();
     }
 }
-//?}

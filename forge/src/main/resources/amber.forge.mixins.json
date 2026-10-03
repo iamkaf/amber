@@ -21,7 +21,6 @@
   ],
   "client": [
     "GuiMixin",
-    //? if >=1.19
     "LevelRendererMixin",
     //? if >=1.19
     "MouseHandlerMixin"

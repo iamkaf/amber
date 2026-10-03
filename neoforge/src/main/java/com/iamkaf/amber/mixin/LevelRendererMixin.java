@@ -2,8 +2,10 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
-//? if >=1.21.11 || >=26.1
+import com.iamkaf.amber.client.billboard.BillboardDraw;
 import com.iamkaf.amber.client.billboard.ClientBillboards;
+//? if <1.19.3
+/*import com.mojang.math.Matrix4f;*/
 //? if <1.21.2
 /*import com.mojang.blaze3d.vertex.VertexConsumer;*/
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -11,7 +13,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-//? if >=1.21.11 || >=26.1
+//? if <1.20.5 {
+/*import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
+*///?}
+//? if >=1.21.9
 import net.minecraft.client.renderer.SubmitNodeCollector;
 //? if <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,6 +32,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+//? if >=1.19.3 && <1.20.5
+/*import org.joml.Matrix4f;*/
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -148,7 +156,7 @@ public class LevelRendererMixin {
         //?}
     }
 
-    //? if >=1.21.11 || >=26.1 {
+    //? if >=1.21.9 {
     @Inject(method = "submitEntities", at = @At("TAIL"))
     private void amber$submitBillboards(
             PoseStack poseStack,
@@ -156,10 +164,36 @@ public class LevelRendererMixin {
             SubmitNodeCollector output,
             CallbackInfo ci
     ) {
-        ClientBillboards.render(poseStack, output, levelRenderState.cameraRenderState);
+        ClientBillboards.render(poseStack, new BillboardDraw(output, levelRenderState.cameraRenderState));
     }
-
-    //?}
+    //?} else if >=1.20.5 {
+    /*// Entities draw with a fresh pose stack here; the camera rotation is in the model-view matrix.
+    //? if >=1.21.2
+    @Inject(method = "renderEntities", at = @At("TAIL"))
+    //? if <1.21.2
+    /^@Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=blockentities"))^/
+    private void amber$renderBillboards(CallbackInfo ci) {
+        Minecraft minecraft = Minecraft.getInstance();
+        BillboardDraw draw = new BillboardDraw(minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
+        ClientBillboards.render(new PoseStack(), draw);
+    }
+    *///?} else {
+    /*// After the entity pass and before block entities, like vanilla name tags.
+    @Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=blockentities"))
+    private void amber$renderBillboards(
+            PoseStack poseStack,
+            float partialTick,
+            long finishNanoTime,
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            LightTexture lightTexture,
+            Matrix4f projection,
+            CallbackInfo ci
+    ) {
+        ClientBillboards.render(poseStack, new BillboardDraw(Minecraft.getInstance().renderBuffers().bufferSource(), camera));
+    }
+    *///?}
 
     static {
         AmberMod.AMBER_MIXINS.add("LevelRendererMixin");

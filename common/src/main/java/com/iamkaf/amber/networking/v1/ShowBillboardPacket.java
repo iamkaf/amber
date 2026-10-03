@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.networking.v1;
 
 import com.iamkaf.amber.api.billboard.v1.Billboard;
@@ -21,4 +20,3 @@ public record ShowBillboardPacket(Billboard billboard) implements Packet<ShowBil
         }
     };
 }
-//?}
