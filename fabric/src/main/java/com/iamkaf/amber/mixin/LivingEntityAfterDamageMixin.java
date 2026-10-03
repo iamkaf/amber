@@ -65,6 +65,8 @@ public abstract class LivingEntityAfterDamageMixin {
             )
     )
     private void amber$fireEntityDeath(DamageSource source, CallbackInfo ci) {
+        // Clients run death too when the server announces it; report the server's, as later versions do.
+        if (((LivingEntity) (Object) this).level.isClientSide) return;
         EntityEvent.ENTITY_DEATH.invoker().onEntityDeath((LivingEntity) (Object) this, source);
     }
     *///?}
