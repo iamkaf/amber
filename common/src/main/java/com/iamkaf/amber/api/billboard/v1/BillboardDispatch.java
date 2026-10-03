@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
 /** Describes how a side-safe billboard operation reached the client. */
@@ -10,4 +9,3 @@ public enum BillboardDispatch {
     /** The caller was on the logical server, so Amber sent a clientbound packet. */
     CLIENTBOUND_PACKET
 }
-//?}

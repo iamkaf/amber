@@ -1,7 +1,10 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
+//? if >=1.19.3 {
 import net.minecraft.core.registries.BuiltInRegistries;
+//?} else {
+/*import net.minecraft.core.Registry;
+*///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -63,7 +66,7 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
 
     public static Billboard item(Vec3 position, Item item, float scale) {
         Objects.requireNonNull(item, "item");
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        Identifier itemId = itemKey(item);
         if (itemId == null) {
             throw new IllegalArgumentException("item must be registered");
         }
@@ -73,7 +76,7 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
     /** Creates a world-oriented item object using the dropped-item model transform. */
     public static Billboard itemObject(Vec3 position, Item item, float scale) {
         Objects.requireNonNull(item, "item");
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        Identifier itemId = itemKey(item);
         if (itemId == null) {
             throw new IllegalArgumentException("item must be registered");
         }
@@ -83,7 +86,7 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
     /** Creates a world-oriented block object from its registered block item model. */
     public static Billboard blockObject(Vec3 position, Block block, float scale) {
         Objects.requireNonNull(block, "block");
-        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
+        Identifier blockId = blockKey(block);
         if (blockId == null) {
             throw new IllegalArgumentException("block must be registered");
         }
@@ -394,6 +397,20 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
         }
     }
 
+    private static Identifier itemKey(Item item) {
+        //? if >=1.19.3
+        return BuiltInRegistries.ITEM.getKey(item);
+        //? if <1.19.3
+        /*return Registry.ITEM.getKey(item);*/
+    }
+
+    private static Identifier blockKey(Block block) {
+        //? if >=1.19.3
+        return BuiltInRegistries.BLOCK.getKey(block);
+        //? if <1.19.3
+        /*return Registry.BLOCK.getKey(block);*/
+    }
+
     private static Vec3 unitScale() {
         return new Vec3(1.0D, 1.0D, 1.0D);
     }
@@ -419,4 +436,3 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
         }
     }
 }
-//?}

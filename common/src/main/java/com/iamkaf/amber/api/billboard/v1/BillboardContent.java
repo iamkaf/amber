@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
 import net.minecraft.network.chat.Component;
@@ -9,7 +8,10 @@ import java.util.Objects;
 /**
  * The visual content of an in-world {@link Billboard}.
  */
+//? if >=1.18
 public sealed interface BillboardContent permits BillboardContent.Texture, BillboardContent.Item, BillboardContent.Text, BillboardContent.ItemObject, BillboardContent.BlockObject {
+//? if <1.18
+/*public interface BillboardContent {*/
     /**
      * A textured quad backed by a resource-pack PNG.
      *
@@ -78,4 +80,3 @@ public sealed interface BillboardContent permits BillboardContent.Texture, Billb
         }
     }
 }
-//?}
