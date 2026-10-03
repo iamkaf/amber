@@ -2,8 +2,6 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerLevel;
@@ -14,12 +12,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 //? if >=1.21.2 {
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.function.BiConsumer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.LootTable;
 //?} else {
 /*import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.ItemLike;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 *///?}
 //? if >=26.1
 import net.minecraft.world.item.ItemInstance;
@@ -38,6 +38,8 @@ public abstract class SheepMixin {
     @Unique
     private final List<ItemStack> amber$capturedShearDrops = new ArrayList<>();
 
+    // Fabric Loader bundles MixinExtras only from 0.15, and lines before 1.21.2 still run on older
+    // loaders, so they capture each drop with a plain injector as shear() stores its ItemEntity.
     //? if >=1.21.2 {
     @WrapOperation(
             method = "shear",
@@ -63,15 +65,8 @@ public abstract class SheepMixin {
         });
     }
     //?} else {
-    /*@WrapOperation(
-            method = "shear",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/animal/Sheep;spawnAtLocation(Lnet/minecraft/world/level/ItemLike;I)Lnet/minecraft/world/entity/item/ItemEntity;"
-            )
-    )
-    private ItemEntity amber$captureShearDrops(Sheep sheep, ItemLike item, int offsetY, Operation<ItemEntity> original) {
-        ItemEntity drop = original.call(sheep, item, offsetY);
+    /*@ModifyVariable(method = "shear", at = @At("STORE"))
+    private ItemEntity amber$captureShearDrop(ItemEntity drop) {
         if (drop != null) {
             amber$capturedShearDrops.add(drop.getItem());
         }
