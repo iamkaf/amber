@@ -29,8 +29,9 @@ import java.util.function.Supplier;
 public class ForgeRegistrarManager implements IRegistrarManager {
     private final Map<String, Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>>> registers = new HashMap<>();
 
+    // Forge constructs mods in parallel.
     @SuppressWarnings({"unchecked", "removal"})
-    private DeferredRegister getRegister(String modId, ResourceKey<? extends Registry<?>> key) {
+    private synchronized DeferredRegister getRegister(String modId, ResourceKey<? extends Registry<?>> key) {
         Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> map = registers.computeIfAbsent(modId, m -> new HashMap<>());
         return map.computeIfAbsent(key, k -> {
             DeferredRegister reg = DeferredRegister.create(
@@ -90,7 +91,7 @@ public class ForgeRegistrarManager implements IRegistrarManager {
             //? if <1.21.2 && >=1.19.3
             /*return registry().getHolder(ResourceKey.create(key, id));*/
             //? if <1.19.3 && >=1.18.2
-            /*return Optional.empty();*/
+            /*return registry().getHolder(ResourceKey.create(key, id)).flatMap(holder -> holder instanceof Holder.Reference<T> reference ? Optional.of(reference) : Optional.empty());*/
         }
         //?}
         //? if <1.18.2 {

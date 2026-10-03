@@ -63,7 +63,7 @@ public class FabricRegistrarManager implements IRegistrarManager {
             //? if <1.21.2 && >=1.19.3
             /*return registry().getHolder(ResourceKey.create(key, id));*/
             //? if <1.19.3 && >=1.18.2
-            /*return Optional.empty();*/
+            /*return registry().getHolder(ResourceKey.create(key, id)).flatMap(holder -> holder instanceof Holder.Reference<T> reference ? Optional.of(reference) : Optional.empty());*/
         }
         //?}
         //? if <1.18.2 {
