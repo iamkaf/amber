@@ -3,9 +3,7 @@ package com.iamkaf.amber.platform;
 import com.iamkaf.amber.api.event.v1.events.common.*;
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientCommandEvents;
 import com.iamkaf.amber.api.event.v1.events.common.client.HudEvents;
-import com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry;
 import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabEvents;
-import com.iamkaf.amber.api.event.v1.events.common.CreativeModeTabOutput;
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.platform.services.IAmberEventSetup;
 import com.mojang.brigadier.CommandDispatcher;
@@ -32,10 +30,6 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 *///?}
 //? if >=1.19.2
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-//? if >=1.19.3 && <1.20 {
-/*import net.fabricmc.fabric.api.itemgroup.v1.IdentifiableItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-*///?}
 //? if >=1.21 {
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;

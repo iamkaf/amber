@@ -29,6 +29,9 @@ public class AmberMod {
         Services.AMBER_EVENT_SETUP.registerCommon();
         Services.AMBER_EVENT_SETUP.registerServer(); // TODO: move these to common
         EnvExecutor.runInEnv(Env.CLIENT, () -> Services.AMBER_EVENT_SETUP::registerClient);
+        // Minecraft records the last death location itself from 1.19.
+        //? if <1.19
+        /*com.iamkaf.amber.compat.PlayerCompat.trackLastDeathLocations();*/
 
         // Init Amber's own features
         AmberNetworking.initialize();
