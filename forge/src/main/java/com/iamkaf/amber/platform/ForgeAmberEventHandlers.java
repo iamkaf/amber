@@ -66,6 +66,8 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraftforge.event.GatherComponentsEvent;
 //?}
+//? if >=1.21.6
+import net.minecraftforge.common.util.Result;
 //? if <1.21.6 {
 /*import java.util.function.Predicate;
 import net.minecraftforge.common.MinecraftForge;
@@ -498,6 +500,10 @@ final class ForgeAmberEventHandlers {
                     /*event.getWorld().getBlockEntity(event.getPos())*/
             );
             if (result != InteractionResult.PASS) {
+                //? if >=1.21.6 {
+                // Forge checks the result, not cancellation, before breaking the block.
+                event.setResult(Result.DENY);
+                //?}
                 return true;
             }
 
