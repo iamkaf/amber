@@ -57,7 +57,6 @@ public class AmberNetworking {
                 PongPacket.HANDLER
             );
 
-            //? if >=1.21.11 || >=26.1 {
             CHANNEL.register(
                 ShowBillboardPacket.class,
                 ShowBillboardPacket.ENCODER,
@@ -82,7 +81,6 @@ public class AmberNetworking {
                 ScaleBillboardPacket.DECODER,
                 ScaleBillboardPacket.HANDLER
             );
-            //?}
             
             initialized = true;
             Constants.LOG.info("Amber internal networking initialized");
