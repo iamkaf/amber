@@ -23,7 +23,6 @@ public class FabricAmberEventSetup implements IAmberEventSetup {
         FabricAmberEventHandlers.registerRenderHudEvents();
         FabricAmberEventHandlers.registerStartClientTickEvents();
         FabricAmberEventHandlers.registerEndClientTickEvents();
-        //? if >=1.21.11
         FabricClientConnectionEvents.register();
     }
 

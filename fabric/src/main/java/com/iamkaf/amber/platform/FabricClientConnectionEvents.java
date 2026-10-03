@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.event.ClientConnectionDispatcher;
@@ -14,4 +13,3 @@ final class FabricClientConnectionEvents {
         ClientPlayConnectionEvents.DISCONNECT.register((listener, client) -> client.execute(ClientConnectionDispatcher::disconnected));
     }
 }
-//?}
