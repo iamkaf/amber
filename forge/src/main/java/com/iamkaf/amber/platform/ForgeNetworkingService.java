@@ -16,7 +16,7 @@ public class ForgeNetworkingService implements INetworkingService {
     private final List<ForgeNetworkChannelImpl> channels = new ArrayList<>();
     
     @Override
-    public PlatformNetworkChannel createChannel(Identifier channelId) {
+    public synchronized PlatformNetworkChannel createChannel(Identifier channelId) {
         ForgeNetworkChannelImpl channel = new ForgeNetworkChannelImpl(channelId);
         channels.add(channel);
         return channel;
@@ -25,7 +25,7 @@ public class ForgeNetworkingService implements INetworkingService {
     /**
      * Gets all created channels for potential future networking setup.
      */
-    public List<ForgeNetworkChannelImpl> getChannels() {
+    public synchronized List<ForgeNetworkChannelImpl> getChannels() {
         return new ArrayList<>(channels);
     }
     @Override
