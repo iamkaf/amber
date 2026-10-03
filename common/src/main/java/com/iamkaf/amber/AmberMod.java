@@ -3,7 +3,7 @@ package com.iamkaf.amber;
 import com.iamkaf.amber.api.core.v2.AmberInitializer;
 import com.iamkaf.amber.api.core.v2.AmberModInfo;
 import com.iamkaf.amber.api.platform.v1.Platform;
-import com.iamkaf.amber.command.AmberCommands;
+import com.iamkaf.amber.doctor.AmberDoctorCommands;
 import com.iamkaf.amber.networking.v1.AmberNetworking;
 import com.iamkaf.amber.platform.Services;
 import com.iamkaf.amber.util.Env;
@@ -32,7 +32,7 @@ public class AmberMod {
 
         // Init Amber's own features
         AmberNetworking.initialize();
-        AmberCommands.initialize();
+        AmberDoctorCommands.initialize();
     }
 
     /**

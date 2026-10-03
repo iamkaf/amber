@@ -1,12 +1,9 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.doctor;
 
 import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.commands.v1.SimpleCommands;
 import com.iamkaf.amber.api.doctor.v1.Doctor;
 import com.iamkaf.amber.api.event.v1.events.common.CommandEvents;
-import com.iamkaf.amber.doctor.DoctorReports;
-import com.iamkaf.amber.doctor.ClientDoctorCommands;
 import com.iamkaf.amber.util.Env;
 import com.iamkaf.amber.util.EnvExecutor;
 import net.minecraft.commands.CommandSourceStack;
@@ -22,21 +19,27 @@ public final class AmberDoctorCommands {
         Doctor.registerServer(DoctorReports.amberInfo(), (context, section) -> DoctorReports.amber(section));
         CommandEvents.EVENT.register((dispatcher, registryAccess, environment) -> {
             var server = Commands.literal("server")
-                    .executes(context -> inspect(context.getSource(), Optional.ofNullable(context.getSource().getPlayer())))
+                    .executes(context -> inspect(context.getSource(), player(context.getSource())))
                     .then(Commands.argument("player", EntityArgument.player())
                             //? if >=1.21.11
                             .requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
                             //? if <1.21.11
-                            /*.requires(source -> source.hasPermission(2))*/
+                            /*.requires(source -> source.hasPermission(Commands.LEVEL_ADMINS))*/
                             .executes(context -> inspect(context.getSource(),
                                     Optional.of(EntityArgument.getPlayer(context, "player")))));
             dispatcher.register(SimpleCommands.createBaseCommand(Constants.MOD_ID)
                     .then(Commands.literal("doctor")
-                            .executes(context -> inspect(context.getSource(),
-                                    Optional.ofNullable(context.getSource().getPlayer())))
+                            .executes(context -> inspect(context.getSource(), player(context.getSource())))
                             .then(server)));
         });
         EnvExecutor.runInEnv(Env.CLIENT, () -> ClientDoctorCommands::initialize);
+    }
+
+    private static Optional<ServerPlayer> player(CommandSourceStack source) {
+        //? if >=1.19
+        return Optional.ofNullable(source.getPlayer());
+        //? if <1.19
+        /*return source.getEntity() instanceof ServerPlayer player ? Optional.of(player) : Optional.empty();*/
     }
 
     private static int inspect(CommandSourceStack source, Optional<ServerPlayer> player) {
@@ -49,4 +52,3 @@ public final class AmberDoctorCommands {
         return 1;
     }
 }
-//?}
