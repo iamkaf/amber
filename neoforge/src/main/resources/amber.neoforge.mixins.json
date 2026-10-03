@@ -10,8 +10,8 @@
     "CropBlockMixin",
     "FarmlandBlockMixin",
     "LivingEntityAfterDamageMixin",
-    //? if <1.21.2
-    "NeoForgeLegacySheepMixin",
+    //? if <1.21.1
+    //"NeoForgeLegacyShearMixin",
     "NeoForgeShearsDispenseItemBehaviorMixin",
     "NeoForgeShearsItemMixin"
   ],

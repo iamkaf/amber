@@ -2,39 +2,32 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
-//? if >=1.21.2
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-//? if >=1.21.2
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-//? if >=1.21.2
 import java.util.ArrayList;
-//? if >=1.21.2
-import java.util.function.BiConsumer;
 import java.util.List;
-//? if >=1.21.2
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-//? if <1.21.2
-/*import net.minecraft.world.item.DyeColor;*/
-//? if <1.21.2
-/*import net.minecraft.world.item.Items;*/
-//? if >=26.1
-import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-//? if >=1.21.2
+//? if >=1.21.2 {
+import java.util.function.BiConsumer;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.LootTable;
+//?} else {
+/*import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.ItemLike;
+*///?}
+//? if >=26.1
+import net.minecraft.world.item.ItemInstance;
 //? if >=1.21.5
 import net.minecraft.world.entity.animal.sheep.Sheep;
 //? if <1.21.5
 /*import net.minecraft.world.entity.animal.Sheep;*/
 import org.spongepowered.asm.mixin.Mixin;
-//? if >=1.21.2
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -42,10 +35,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Sheep.class)
 public abstract class SheepMixin {
-    //? if >=1.21.2 {
     @Unique
     private final List<ItemStack> amber$capturedShearDrops = new ArrayList<>();
 
+    //? if >=1.21.2 {
     @WrapOperation(
             method = "shear",
             at = @At(
@@ -69,6 +62,22 @@ public abstract class SheepMixin {
             dropConsumer.accept(dropLevel, drop);
         });
     }
+    //?} else {
+    /*@WrapOperation(
+            method = "shear",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/animal/Sheep;spawnAtLocation(Lnet/minecraft/world/level/ItemLike;I)Lnet/minecraft/world/entity/item/ItemEntity;"
+            )
+    )
+    private ItemEntity amber$captureShearDrops(Sheep sheep, ItemLike item, int offsetY, Operation<ItemEntity> original) {
+        ItemEntity drop = original.call(sheep, item, offsetY);
+        if (drop != null) {
+            amber$capturedShearDrops.add(drop.getItem());
+        }
+        return drop;
+    }
+    *///?}
 
     @Inject(
             method = "mobInteract",
@@ -76,8 +85,10 @@ public abstract class SheepMixin {
                     value = "INVOKE",
                     //? if >=1.21.5
                     target = "Lnet/minecraft/world/entity/animal/sheep/Sheep;shear(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/sounds/SoundSource;Lnet/minecraft/world/item/ItemStack;)V",
-                    //? if <1.21.5
+                    //? if <1.21.5 && >=1.21.2
                     /*target = "Lnet/minecraft/world/entity/animal/Sheep;shear(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/sounds/SoundSource;Lnet/minecraft/world/item/ItemStack;)V",*/
+                    //? if <1.21.2
+                    /*target = "Lnet/minecraft/world/entity/animal/Sheep;shear(Lnet/minecraft/sounds/SoundSource;)V",*/
                     shift = At.Shift.BEFORE
             )
     )
@@ -92,8 +103,10 @@ public abstract class SheepMixin {
                     value = "INVOKE",
                     //? if >=1.21.5
                     target = "Lnet/minecraft/world/entity/animal/sheep/Sheep;shear(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/sounds/SoundSource;Lnet/minecraft/world/item/ItemStack;)V",
-                    //? if <1.21.5
+                    //? if <1.21.5 && >=1.21.2
                     /*target = "Lnet/minecraft/world/entity/animal/Sheep;shear(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/sounds/SoundSource;Lnet/minecraft/world/item/ItemStack;)V",*/
+                    //? if <1.21.2
+                    /*target = "Lnet/minecraft/world/entity/animal/Sheep;shear(Lnet/minecraft/sounds/SoundSource;)V",*/
                     shift = At.Shift.AFTER
             )
     )
@@ -118,64 +131,6 @@ public abstract class SheepMixin {
         );
         amber$capturedShearDrops.clear();
     }
-    //?}
-
-    //? if <1.21.2 {
-    @Inject(
-            method = "mobInteract",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/animal/Sheep;shear(Lnet/minecraft/sounds/SoundSource;)V",
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void amber$fireLegacyShear(Player player, InteractionHand hand,
-            CallbackInfoReturnable<InteractionResult> cir) {
-        amber$fireLegacyShearCommon(player, hand);
-    }
-
-    private void amber$fireLegacyShearCommon(Player player, InteractionHand hand) {
-        Sheep sheep = (Sheep) (Object) this;
-        ItemStack shears = player.getItemInHand(hand);
-        if (!(amber$level(sheep) instanceof ServerLevel level)) {
-            return;
-        }
-
-        EntityEvent.SHEAR.invoker().shear(
-                new EntityEvent.SimpleShearingContext(
-                        player instanceof ServerPlayer serverPlayer ? serverPlayer : null,
-                        shears,
-                        sheep,
-                        level,
-                        EntityEvent.ShearTarget.SHEEP,
-                        List.of(new ItemStack(amber$woolItem(sheep.getColor()))),
-                        true,
-                        EntityEvent.ShearSource.PLAYER
-                )
-        );
-    }
-
-    private static net.minecraft.world.item.Item amber$woolItem(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Items.WHITE_WOOL;
-            case ORANGE -> Items.ORANGE_WOOL;
-            case MAGENTA -> Items.MAGENTA_WOOL;
-            case LIGHT_BLUE -> Items.LIGHT_BLUE_WOOL;
-            case YELLOW -> Items.YELLOW_WOOL;
-            case LIME -> Items.LIME_WOOL;
-            case PINK -> Items.PINK_WOOL;
-            case GRAY -> Items.GRAY_WOOL;
-            case LIGHT_GRAY -> Items.LIGHT_GRAY_WOOL;
-            case CYAN -> Items.CYAN_WOOL;
-            case PURPLE -> Items.PURPLE_WOOL;
-            case BLUE -> Items.BLUE_WOOL;
-            case BROWN -> Items.BROWN_WOOL;
-            case GREEN -> Items.GREEN_WOOL;
-            case RED -> Items.RED_WOOL;
-            case BLACK -> Items.BLACK_WOOL;
-        };
-    }
-    //?}
 
     private static Level amber$level(Sheep sheep) {
         //? if >=1.20

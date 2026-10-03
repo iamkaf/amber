@@ -101,9 +101,11 @@ public abstract class ForgeSheepMixin {
     //?}
 
     //? if <26.2 {
+    // onSheared is Forge's own method, so it keeps its name in production.
     @Inject(
             method = "onSheared",
-            at = @At("RETURN")
+            at = @At("RETURN"),
+            remap = false
     )
     private void amber$fireShear(Player player, ItemStack stack, Level level, BlockPos pos, int fortune,
             CallbackInfoReturnable<List<ItemStack>> cir) {
