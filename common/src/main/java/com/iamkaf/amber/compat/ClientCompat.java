@@ -121,10 +121,28 @@ public final class ClientCompat {
 
     public static void renderTooltip(PoseStack guiGraphics, ItemStack stack, int x, int y) {
         Minecraft minecraft = minecraft();
-        Screen screen = minecraft == null ? null : minecraft.screen;
-        if (screen != null) {
+        if (minecraft != null) {
+            Screen screen = tooltipScreen(minecraft);
             screen.renderComponentTooltip(guiGraphics, screen.getTooltipFromItem(stack), x, y);
         }
+    }
+
+    private static Screen hudTooltipScreen;
+
+    // Tooltips need a Screen before GuiGraphics, so the HUD borrows a blank one sized to the window.
+    private static Screen tooltipScreen(Minecraft minecraft) {
+        if (minecraft.screen != null) {
+            return minecraft.screen;
+        }
+        if (hudTooltipScreen == null) {
+            hudTooltipScreen = new Screen(Component.nullToEmpty("")) {};
+        }
+        int width = minecraft.getWindow().getGuiScaledWidth();
+        int height = minecraft.getWindow().getGuiScaledHeight();
+        if (hudTooltipScreen.width != width || hudTooltipScreen.height != height) {
+            hudTooltipScreen.init(minecraft, width, height);
+        }
+        return hudTooltipScreen;
     }
     *///?}
 }

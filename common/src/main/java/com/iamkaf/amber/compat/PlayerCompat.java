@@ -17,10 +17,43 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.AbstractBedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 //?}
+//? if <1.19 {
+/*import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import net.minecraft.core.GlobalPos;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+*///?}
 
 public final class PlayerCompat {
+    //? if <1.19 {
+    /*// Minecraft records the last death location itself from 1.19. Keyed by UUID because respawning creates a new
+    // player object; like the rest of this emulation, it does not survive a server restart.
+    private static final Map<UUID, GlobalPos> LAST_DEATH_LOCATIONS = new ConcurrentHashMap<>();
+    *///?}
+
     private PlayerCompat() {
     }
+
+    //? if <1.19 {
+    /*public static void trackLastDeathLocations() {
+        EntityEvent.ENTITY_DEATH.register((entity, source) -> {
+            if (entity instanceof Player player && !player.level.isClientSide) {
+                setLastDeathLocation(player, GlobalPos.of(player.level.dimension(), player.blockPosition()));
+            }
+        });
+    }
+
+    public static Optional<GlobalPos> lastDeathLocation(Player player) {
+        return Optional.ofNullable(LAST_DEATH_LOCATIONS.get(player.getUUID()));
+    }
+
+    public static void setLastDeathLocation(Player player, GlobalPos position) {
+        LAST_DEATH_LOCATIONS.put(player.getUUID(), position);
+    }
+    *///?}
 
     public static void displayClientMessage(Player player, Component message, boolean actionBar) {
         //? if >=26.1 {

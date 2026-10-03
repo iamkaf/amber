@@ -721,9 +721,9 @@ public final class WorldFunctions {
         //? if <1.21.2 && >=1.19.4
         /*return level.getBiome(position).value().getPrecipitationAt(position) == precipitation;*/
         //? if <1.19.4 && >=1.18.2
-        /*return precipitation(holderValue(biome(level, position))) == precipitation;*/
+        /*return WorldCompat.precipitationAt(holderValue(biome(level, position)), position) == precipitation;*/
         //? if <1.18.2
-        /*return level.getBiome(position).getPrecipitation() == precipitation;*/
+        /*return WorldCompat.precipitationAt(level.getBiome(position), position) == precipitation;*/
     }
 
     /**
@@ -873,10 +873,6 @@ public final class WorldFunctions {
 
     private static boolean isDifficultyHard(DifficultyInstance difficulty) {
         return WorldCompat.isDifficultyHard(difficulty);
-    }
-
-    private static Biome.Precipitation precipitation(Biome biome) {
-        return WorldCompat.precipitation(biome);
     }
 
     private static List<Player> players(Level level) {

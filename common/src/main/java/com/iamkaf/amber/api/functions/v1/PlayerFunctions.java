@@ -29,11 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.Nullable;
 
-//? if <1.19
-/*import java.util.Map;*/
 import java.util.Optional;
-//? if <1.19
-/*import java.util.WeakHashMap;*/
 
 /**
  * Consolidated utility class for player-specific operations and mechanics.
@@ -42,9 +38,6 @@ import java.util.Optional;
  * @since 8.3.0
  */
 public final class PlayerFunctions {
-    //? if <1.19
-    /*private static final Map<Player, GlobalPos> LAST_DEATH_LOCATIONS = new WeakHashMap<>();*/
-
     private PlayerFunctions() {
         // Utility class - prevent instantiation
     }
@@ -647,6 +640,8 @@ public final class PlayerFunctions {
 
     /**
      * Gets the player's last death location.
+     * <p>
+     * Before Minecraft 1.19 Amber records it on the server only, and forgets it when the server stops.
      *
      * @param player The player to get the death location for.
      * @return The player's last death location, or empty if none set.
@@ -655,7 +650,7 @@ public final class PlayerFunctions {
         //? if >=1.19
         return player.getLastDeathLocation();
         //? if <1.19
-        /*return Optional.ofNullable(LAST_DEATH_LOCATIONS.get(player));*/
+        /*return PlayerCompat.lastDeathLocation(player);*/
     }
 
     /**
@@ -668,7 +663,7 @@ public final class PlayerFunctions {
         //? if >=1.19
         player.setLastDeathLocation(Optional.of(position));
         //? if <1.19
-        /*LAST_DEATH_LOCATIONS.put(player, position);*/
+        /*PlayerCompat.setLastDeathLocation(player, position);*/
     }
 
     /**

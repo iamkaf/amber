@@ -117,12 +117,19 @@ public final class WorldCompat {
         return difficulty.isHard();
     }
 
-    public static Biome.Precipitation precipitation(Biome biome) {
-        //? if >=1.19.4
-        return biome.hasPrecipitation() ? Biome.Precipitation.RAIN : Biome.Precipitation.NONE;
-        //? if <1.19.4
-        /*return biome.getPrecipitation();*/
+    //? if <1.19.4 {
+    /*// Matches 1.19.4+ Biome.getPrecipitationAt: a biome with precipitation snows where it is cold enough.
+    public static Biome.Precipitation precipitationAt(Biome biome, BlockPos position) {
+        if (biome.getPrecipitation() == Biome.Precipitation.NONE) {
+            return Biome.Precipitation.NONE;
+        }
+        //? if >=1.18
+        boolean snow = biome.coldEnoughToSnow(position);
+        //? if <1.18
+        //boolean snow = biome.getTemperature(position) < 0.15F;
+        return snow ? Biome.Precipitation.SNOW : Biome.Precipitation.RAIN;
     }
+    *///?}
 
     public static List<Player> players(Level level) {
         return new ArrayList<>(level.players());
