@@ -9,7 +9,7 @@ import java.util.Objects;
  * The visual content of an in-world {@link Billboard}.
  */
 //? if >=1.18
-public sealed interface BillboardContent permits BillboardContent.Texture, BillboardContent.Item, BillboardContent.Text, BillboardContent.ItemObject, BillboardContent.BlockObject {
+public sealed interface BillboardContent permits BillboardContent.Texture, BillboardContent.UprightTexture, BillboardContent.Item, BillboardContent.Text, BillboardContent.ItemObject, BillboardContent.BlockObject {
 //? if <1.18
 /*public interface BillboardContent {*/
     /**
@@ -21,6 +21,22 @@ public sealed interface BillboardContent permits BillboardContent.Texture, Billb
      */
     record Texture(Identifier texture, float width, float height) implements BillboardContent {
         public Texture {
+            Objects.requireNonNull(texture, "texture");
+            requirePositiveFinite(width, "width");
+            requirePositiveFinite(height, "height");
+        }
+    }
+
+    /**
+     * A textured quad that stays upright and turns only around the world's vertical axis to face the
+     * camera, like a beam or a signpost.
+     *
+     * @param texture the texture resource, such as {@code my_mod:textures/billboards/beam.png}
+     * @param width   width in world blocks
+     * @param height  height in world blocks
+     */
+    record UprightTexture(Identifier texture, float width, float height) implements BillboardContent {
+        public UprightTexture {
             Objects.requireNonNull(texture, "texture");
             requirePositiveFinite(width, "width");
             requirePositiveFinite(height, "height");

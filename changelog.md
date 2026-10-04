@@ -9,6 +9,10 @@ See the full changelog at https://github.com/iamkaf/amber
 
 ## 11.7.0
 
+### Added
+
+- `Billboard.uprightTexture` shows a texture that stays upright and turns only around the vertical axis to face the player, for beams and signposts.
+
 ### Changed
 
 - Billboards, Doctor, permission checks, client connection events, and optional networking now ship on every supported line, from Minecraft 1.17 up.
