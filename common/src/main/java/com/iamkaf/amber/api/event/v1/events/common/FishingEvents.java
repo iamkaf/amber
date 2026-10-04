@@ -9,6 +9,11 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public final class FishingEvents {
+    /**
+     * Fired on the server when a player reels in a catch, before the hook pulls it in. Listeners may add, remove, or
+     * change stacks in {@code drops}; the resulting stacks are pulled to the player as usual, with the catch's
+     * experience, statistics, and advancement triggers. {@code rod} is the fishing rod being reeled in.
+     */
     public static final Event<ModifyCatch> MODIFY_CATCH = EventFactory.createArrayBacked(
             ModifyCatch.class,
             callbacks -> (player, hook, rod, drops) -> {

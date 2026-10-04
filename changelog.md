@@ -25,6 +25,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - `BlockEvents.BLOCK_BREAK_BEFORE` can cancel breaking on Forge.
 - `EntityEvent.ENTITY_DEATH` fires once, from the server, on Forge and NeoForge.
 - Client disconnect events are no longer lost on Fabric.
+- `FishingEvents.MODIFY_CATCH` keeps the catch's item drop, experience, and statistics on Forge and NeoForge.
 
 ### Deprecated
 

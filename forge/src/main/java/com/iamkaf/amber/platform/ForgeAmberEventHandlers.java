@@ -18,7 +18,6 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
@@ -129,10 +128,6 @@ final class ForgeAmberEventHandlers {
         BabyEntitySpawnEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalBreed);
     }
 
-    static void registerFishingEvents() {
-        ItemFishedEvent.BUS.addListener(true, ForgeAmberEventHandlers.EventHandlerCommon::onItemFished);
-    }
-
     static void registerShieldBlockEvents() {
         ShieldBlockEvent.BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onShieldBlock);
     }
@@ -232,10 +227,6 @@ final class ForgeAmberEventHandlers {
     static void registerAnimalEvents() {
         addCancellableListener(AnimalTameEvent.class, ForgeAmberEventHandlers.EventHandlerCommon::onAnimalTame);
         MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onAnimalBreed);
-    }
-
-    static void registerFishingEvents() {
-        MinecraftForge.EVENT_BUS.addListener(ForgeAmberEventHandlers.EventHandlerCommon::onItemFished);
     }
 
     static void registerShieldBlockEvents() {
@@ -364,33 +355,6 @@ final class ForgeAmberEventHandlers {
             accessor.amber$setPools(pools);
         }
         *///?}
-
-        public static void onItemFished(ItemFishedEvent event) {
-            //? if >=1.19 {
-            FishingEvents.MODIFY_CATCH.invoker().modify(
-                    (net.minecraft.server.level.ServerPlayer) event.getEntity(),
-                    event.getHookEntity(),
-                    event.getEntity().getMainHandItem(),
-                    event.getDrops()
-            );
-            //? if <1.21.6
-            /*event.setCanceled(true);*/
-            for (ItemStack drop : event.getDrops()) {
-                event.getEntity().addItem(drop.copy());
-            }
-            //?} else {
-            /*FishingEvents.MODIFY_CATCH.invoker().modify(
-                    (net.minecraft.server.level.ServerPlayer) event.getPlayer(),
-                    event.getHookEntity(),
-                    event.getPlayer().getMainHandItem(),
-                    event.getDrops()
-            );
-            event.setCanceled(true);
-            for (ItemStack drop : event.getDrops()) {
-                event.getPlayer().addItem(drop.copy());
-            }
-            *///?}
-        }
 
         //? if >=26.1 {
         // The client posts the interaction from its game mode and again from Player.interactOn with the same

@@ -15,7 +15,6 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerLightningStrikeEvents();
         ForgeAmberEventHandlers.registerBlockEvents();
         ForgeAmberEventHandlers.registerAnimalEvents();
-        ForgeAmberEventHandlers.registerFishingEvents();
         ForgeAmberEventHandlers.registerShieldBlockEvents();
         ForgeAmberEventHandlers.registerCreativeTabEvents();
         ForgeAmberEventHandlers.registerDefaultItemComponentEvents();

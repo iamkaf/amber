@@ -9,6 +9,7 @@
     "CraftingPlayerMixin",
     "CropBlockMixin",
     "FarmlandBlockMixin",
+    "FishingHookMixin",
     "LivingEntityAfterDamageMixin",
     //? if <1.21.1
     //"NeoForgeLegacyShearMixin",

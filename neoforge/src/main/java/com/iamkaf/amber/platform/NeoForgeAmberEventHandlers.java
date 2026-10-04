@@ -30,7 +30,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
@@ -126,10 +125,6 @@ final class NeoForgeAmberEventHandlers {
     static void registerAnimalEvents() {
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerCommonNeoForge::onAnimalTame);
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerCommonNeoForge::onAnimalBreed);
-    }
-
-    static void registerFishingEvents() {
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerCommonNeoForge::onItemFished);
     }
 
     static void registerShieldBlockEvents() {
@@ -359,25 +354,6 @@ final class NeoForgeAmberEventHandlers {
         public static void onAnimalBreed(BabyEntitySpawnEvent event) {
             if (event.getParentA() instanceof net.minecraft.world.entity.animal.Animal parentA && event.getParentB() instanceof net.minecraft.world.entity.animal.Animal parentB) {
                 AnimalEvents.ANIMAL_BREED.invoker().onAnimalBreed(parentA, parentB, event.getChild());
-            }
-        }
-
-        @SubscribeEvent(priority = EventPriority.HIGH)
-        public static void onItemFished(ItemFishedEvent event) {
-            if (!(event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
-                return;
-            }
-
-            FishingEvents.MODIFY_CATCH.invoker().modify(
-                    serverPlayer,
-                    event.getHookEntity(),
-                    serverPlayer.getMainHandItem(),
-                    event.getDrops()
-            );
-
-            event.setCanceled(true);
-            for (net.minecraft.world.item.ItemStack drop : event.getDrops()) {
-                event.getEntity().addItem(drop.copy());
             }
         }
 
