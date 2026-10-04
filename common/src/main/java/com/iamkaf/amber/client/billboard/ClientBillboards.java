@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -239,6 +240,8 @@ public final class ClientBillboards {
         );
         if (isCameraFacing(billboard.content())) {
             draw.faceCamera(poseStack);
+        } else if (billboard.content() instanceof BillboardContent.UprightTexture) {
+            BillboardDraw.rotate(poseStack, new Vec3(0.0D, yawToward(position, cameraPosition), 0.0D));
         }
         BillboardDraw.rotate(poseStack, rotation);
         poseStack.scale(
@@ -249,7 +252,9 @@ public final class ClientBillboards {
         try {
             BillboardContent content = billboard.content();
             if (content instanceof BillboardContent.Texture texture) {
-                submitTexture(texture, opacity, throughWalls, poseStack, draw);
+                submitTexture(texture.texture(), texture.width(), texture.height(), opacity, throughWalls, poseStack, draw);
+            } else if (content instanceof BillboardContent.UprightTexture texture) {
+                submitTexture(texture.texture(), texture.width(), texture.height(), opacity, throughWalls, poseStack, draw);
             } else if (content instanceof BillboardContent.Item item) {
                 submitItemModel(BillboardDraw.itemById(item.item()), item.scale(), false, opacity, throughWalls, poseStack, draw);
             } else if (content instanceof BillboardContent.ItemObject item) {
@@ -272,8 +277,13 @@ public final class ClientBillboards {
         }
     }
 
-    private static void submitTexture(BillboardContent.Texture texture, float opacity, boolean throughWalls, PoseStack poseStack, BillboardDraw draw) {
-        draw.texture(poseStack, texture.texture(), texture.width() / 2.0F, texture.height() / 2.0F, white(opacity), throughWalls);
+    private static void submitTexture(Identifier texture, float width, float height, float opacity, boolean throughWalls, PoseStack poseStack, BillboardDraw draw) {
+        draw.texture(poseStack, texture, width / 2.0F, height / 2.0F, white(opacity), throughWalls);
+    }
+
+    /** Degrees around the world Y axis that turn a quad's +Z face from {@code position} toward {@code camera}. */
+    private static double yawToward(Vec3 position, Vec3 camera) {
+        return Math.toDegrees(Math.atan2(camera.x - position.x, camera.z - position.z));
     }
 
     private static void submitItemModel(Item item, float itemScale, boolean worldOriented, float opacity, boolean throughWalls, PoseStack poseStack, BillboardDraw draw) {

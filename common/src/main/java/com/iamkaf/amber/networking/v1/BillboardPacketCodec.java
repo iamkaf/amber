@@ -21,6 +21,7 @@ final class BillboardPacketCodec {
     private static final int TEXT = 2;
     private static final int ITEM_OBJECT = 3;
     private static final int BLOCK_OBJECT = 4;
+    private static final int UPRIGHT_TEXTURE = 5;
     private static final int ANCHOR_WORLD = 0;
     private static final int ANCHOR_ENTITY = 1;
     private static final int ANIMATION_NONE = 0;
@@ -126,6 +127,11 @@ final class BillboardPacketCodec {
             buffer.writeIdentifier(texture.texture());
             buffer.writeFloat(texture.width());
             buffer.writeFloat(texture.height());
+        } else if (content instanceof BillboardContent.UprightTexture texture) {
+            buffer.writeVarInt(UPRIGHT_TEXTURE);
+            buffer.writeIdentifier(texture.texture());
+            buffer.writeFloat(texture.width());
+            buffer.writeFloat(texture.height());
         } else if (content instanceof BillboardContent.Item item) {
             buffer.writeVarInt(ITEM);
             buffer.writeIdentifier(item.item());
@@ -174,6 +180,7 @@ final class BillboardPacketCodec {
         };
         BillboardContent content = switch (buffer.readVarInt()) {
             case TEXTURE -> new BillboardContent.Texture(buffer.readIdentifier(), buffer.readFloat(), buffer.readFloat());
+            case UPRIGHT_TEXTURE -> new BillboardContent.UprightTexture(buffer.readIdentifier(), buffer.readFloat(), buffer.readFloat());
             case ITEM -> new BillboardContent.Item(buffer.readIdentifier(), buffer.readFloat());
             case TEXT -> {
                 //? if >=1.20.5

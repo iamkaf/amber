@@ -16,7 +16,8 @@ import java.util.UUID;
 
 /**
  * An immutable visual placed in the world. Texture, item, and text content face the camera;
- * item-object and block-object content retain world orientation.
+ * upright textures turn only around the world's vertical axis; item-object and block-object content
+ * retain world orientation.
  *
  * <p>Billboards last for five seconds by default. Lifetimes use a smooth client presentation
  * clock at 20 ticks per second and are unaffected by server time synchronization. Use
@@ -62,6 +63,11 @@ public record Billboard(UUID id, BillboardAnchor anchor, BillboardContent conten
 
     public static Billboard texture(Vec3 position, Identifier texture, float width, float height) {
         return new Billboard(UUID.randomUUID(), BillboardAnchor.world(position), new BillboardContent.Texture(texture, width, height), Vec3.ZERO, unitScale(), 1.0F, BillboardDepthMode.DEPTH_TESTED, DEFAULT_DURATION_TICKS, BillboardAnimation.NONE);
+    }
+
+    /** Creates a texture that stays upright and turns only around the world's vertical axis to face the camera. */
+    public static Billboard uprightTexture(Vec3 position, Identifier texture, float width, float height) {
+        return new Billboard(UUID.randomUUID(), BillboardAnchor.world(position), new BillboardContent.UprightTexture(texture, width, height), Vec3.ZERO, unitScale(), 1.0F, BillboardDepthMode.DEPTH_TESTED, DEFAULT_DURATION_TICKS, BillboardAnimation.NONE);
     }
 
     public static Billboard item(Vec3 position, Item item, float scale) {
