@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.networking.v1;
 
 import com.iamkaf.amber.api.billboard.v1.Billboards;
@@ -22,4 +21,3 @@ public record HideBillboardPacket(UUID billboardId) implements Packet<HideBillbo
         }
     };
 }
-//?}

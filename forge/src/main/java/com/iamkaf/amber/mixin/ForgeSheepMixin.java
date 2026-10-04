@@ -12,10 +12,8 @@ import net.minecraft.world.item.ItemStack;
 
 //? if >=1.21.5
 import net.minecraft.world.entity.animal.sheep.Sheep;
-//? if <1.21.5 && >=1.17
+//? if <1.21.5
 /*import net.minecraft.world.entity.animal.Sheep;*/
-//? if <1.17
-/*import net.minecraft.entity.passive.SheepEntity;*/
 
 //? if <26.2 {
 import net.minecraft.core.BlockPos;
@@ -38,10 +36,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//? if >=1.17
 @Mixin(Sheep.class)
-//? if <1.17
-/*@Mixin(SheepEntity.class)*/
 public abstract class ForgeSheepMixin {
     //? if >=26.2 {
     @Unique
@@ -106,9 +101,11 @@ public abstract class ForgeSheepMixin {
     //?}
 
     //? if <26.2 {
+    // onSheared is Forge's own method, so it keeps its name in production.
     @Inject(
             method = "onSheared",
-            at = @At("RETURN")
+            at = @At("RETURN"),
+            remap = false
     )
     private void amber$fireShear(Player player, ItemStack stack, Level level, BlockPos pos, int fortune,
             CallbackInfoReturnable<List<ItemStack>> cir) {
@@ -121,10 +118,7 @@ public abstract class ForgeSheepMixin {
                 new EntityEvent.SimpleShearingContext(
                         player instanceof ServerPlayer serverPlayer ? serverPlayer : null,
                         stack,
-                        //? if >=1.17
                         (Sheep) (Object) this,
-                        //? if <1.17
-                        /*(SheepEntity) (Object) this,*/
                         serverLevel,
                         EntityEvent.ShearTarget.SHEEP,
                         drops,

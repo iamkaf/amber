@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.7.0
+
+### Changed
+
+- Billboards, Doctor, permission checks, client connection events, and optional networking now ship on every supported line, from Minecraft 1.17 up.
+- Events, creative tabs, and helpers behave the same on every line and loader.
+- Players and servers without Amber can connect to ones with it on every line.
+
+### Fixed
+
+- `RenderEvents.BLOCK_OUTLINE_RENDER` can cancel outlines on glass and other translucent blocks.
+- `PlayerEvents.PLAYER_RESPAWN` reports `alive` and the old player correctly on Forge and NeoForge.
+- `PlayerEvents.ENTITY_INTERACT` honors server-side results on Forge and NeoForge.
+- Creative tab entries reach tabs that other mods register after Amber on Fabric.
+- World load and unload events no longer fire for client-only worlds on NeoForge.
+- `BlockEvents.BLOCK_BREAK_BEFORE` can cancel breaking on Forge.
+- `EntityEvent.ENTITY_DEATH` fires once, from the server, on Forge and NeoForge.
+- Client disconnect events are no longer lost on Fabric.
+
+### Deprecated
+
+- `TabBuilder.type()`, which never had an effect.
+
+### Removed
+
+- Minecraft 1.14.4 through 1.16.5.
+
 ## 11.6.0
 
 ### Added

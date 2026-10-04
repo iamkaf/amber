@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.doctor;
 
 import com.iamkaf.amber.AmberMod;
@@ -10,7 +9,6 @@ import com.iamkaf.amber.networking.v1.AmberNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -39,7 +37,7 @@ public final class DoctorReports {
         section.information("mixins", DoctorText.translatable("amber.doctor.mixins"),
                 DoctorText.literal(String.valueOf(AmberMod.AMBER_MIXINS.size())).withStyle(style -> style
                         .withUnderlined(true)
-                        .withHoverEvent(new HoverEvent.ShowText(DoctorText.literal(String.join("\n", AmberMod.AMBER_MIXINS))))));
+                        .withHoverEvent(DoctorText.showText(DoctorText.literal(String.join("\n", AmberMod.AMBER_MIXINS))))));
         String mods = AmberMod.AMBER_MODS.stream().sorted(java.util.Comparator.comparing(AmberModInfo::id))
                 .map(mod -> mod.name() + " " + mod.version()).collect(java.util.stream.Collectors.joining(", "));
         section.information("mods", DoctorText.translatable("amber.doctor.mods"), DoctorText.literal(mods));
@@ -73,4 +71,3 @@ public final class DoctorReports {
         return DoctorText.translatable("amber.doctor.status." + status.name().toLowerCase(Locale.ROOT)).withStyle(color);
     }
 }
-//?}

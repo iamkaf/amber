@@ -5,16 +5,15 @@
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "${mixin_compat_fabric}",
   "mixins": [
-    //? if >=1.16
     "AnimalMixin",
-    //? if <1.16
-    "BreedGoalMixin",
     "BlockItemMixin",
     "BoneMealItemMixin",
     //? if >=1.20.5
     "BuiltInRegistriesMixin",
     "CraftedItemMixin",
     "CraftingPlayerMixin",
+    //? if <1.19.3
+    "CreativeModeTabAccessor",
     //? if <1.19.3
     "CreativeModeTabMixin",
     "CropBlockMixin",
@@ -23,20 +22,17 @@
     //? if >=1.20.5
     "ItemAccessor",
     "ItemEntityMixin",
-    //? if >=1.16 && <1.16.2
-    "SmithingMenuMixin",
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
     "PlayerMixin",
-    "PlayerListRespawnMixin",
+    //? if <1.19.2
+    //"ServerEntityInteractionMixin",
     "ServerPlayerDeathMixin",
     "ServerLevelMixin",
     "SheepMixin",
     "TamableAnimalMixin"
   ],
   "client": [
-    //? if <1.15
-    "GuiMixin",
     "LevelRendererMixin",
     "MouseHandlerMixin"
   ],

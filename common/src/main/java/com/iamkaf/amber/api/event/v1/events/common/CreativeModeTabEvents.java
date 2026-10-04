@@ -25,6 +25,9 @@ public final class CreativeModeTabEvents {
      * <p>
      * The event is fired during the tab's content building phase, which happens
      * when the creative inventory is opened or needs to be refreshed.
+     * <p>
+     * Before Minecraft 1.19.3 tabs have no ids, so the event reaches only Amber-built tabs and vanilla tabs (keyed by
+     * their old names, such as {@code minecraft:brewing}), ignores the visibility, and never feeds the search tab.
      */
     public static final Event<ModifyEntries> MODIFY_ENTRIES = EventFactory.createArrayBacked(
         ModifyEntries.class, callbacks -> (tabKey, output) -> {

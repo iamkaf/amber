@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.api.doctor.v1;
 
 import com.iamkaf.amber.api.core.v2.AmberModInfo;
@@ -31,4 +30,3 @@ public final class ClientDoctor {
         }
     }
 }
-//?}

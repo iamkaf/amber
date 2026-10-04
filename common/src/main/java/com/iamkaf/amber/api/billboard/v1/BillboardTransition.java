@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
 import java.util.Objects;
@@ -15,4 +14,3 @@ public record BillboardTransition(
         }
     }
 }
-//?}

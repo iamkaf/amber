@@ -2,6 +2,7 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.platform.NeoForgeShearTargets;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.List;
@@ -41,7 +42,7 @@ public abstract class NeoForgeShearsItemMixin {
                             stack,
                             entity,
                             level,
-                            amber$getShearTarget(entity),
+                            NeoForgeShearTargets.of(entity),
                             drops,
                             !drops.isEmpty(),
                             EntityEvent.ShearSource.PLAYER
@@ -50,17 +51,6 @@ public abstract class NeoForgeShearsItemMixin {
         }
 
         return drops;
-    }
-
-    private static EntityEvent.ShearTarget amber$getShearTarget(Entity entity) {
-        return switch (entity.getClass().getName()) {
-            case "net.minecraft.world.entity.animal.sheep.Sheep" -> EntityEvent.ShearTarget.SHEEP;
-            case "net.minecraft.world.entity.animal.cow.MushroomCow" -> EntityEvent.ShearTarget.MUSHROOM_COW;
-            case "net.minecraft.world.entity.animal.golem.SnowGolem" -> EntityEvent.ShearTarget.SNOW_GOLEM;
-            case "net.minecraft.world.entity.monster.skeleton.Bogged" -> EntityEvent.ShearTarget.BOGGED;
-            case "net.minecraft.world.entity.animal.golem.CopperGolem" -> EntityEvent.ShearTarget.COPPER_GOLEM;
-            default -> EntityEvent.ShearTarget.OTHER;
-        };
     }
 
     static {

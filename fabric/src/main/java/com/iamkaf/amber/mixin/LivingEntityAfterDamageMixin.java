@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 //? if <1.19.2
 /*import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;*/
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityAfterDamageMixin {
@@ -66,6 +65,8 @@ public abstract class LivingEntityAfterDamageMixin {
             )
     )
     private void amber$fireEntityDeath(DamageSource source, CallbackInfo ci) {
+        // Clients run death too when the server announces it; report the server's, as later versions do.
+        if (((LivingEntity) (Object) this).level.isClientSide) return;
         EntityEvent.ENTITY_DEATH.invoker().onEntityDeath((LivingEntity) (Object) this, source);
     }
     *///?}
@@ -92,6 +93,7 @@ public abstract class LivingEntityAfterDamageMixin {
         this.amber$shieldBlockedDamage = 0.0F;
     }
 
+    // A blocked hit is reported at the end of hurt, after the damage cooldown has had its say.
     //? if >=1.21.5 {
     @Inject(
             method = "applyItemBlocking",
@@ -103,21 +105,25 @@ public abstract class LivingEntityAfterDamageMixin {
             float damage,
             CallbackInfoReturnable<Float> cir
     ) {
-        float damageBlocked = cir.getReturnValueF();
-        this.amber$shieldBlockPending = damageBlocked > 0.0F;
+        boolean blocked = cir.getReturnValueF() > 0.0F;
+        this.amber$blocked = blocked;
+        this.amber$shieldBlockPending = blocked;
         this.amber$shieldBlockedDamage = damage;
     }
-    //?}
-
-    //? if <1.21.5 && >=1.21.2 {
-    /*@Inject(
+    //?} else {
+    /*// Before 1.21.5 a blocked hit deals no damage and hurt returns false, so the after-damage event never reports a block.
+    @Inject(
+            //? if >=1.21.2
             method = "hurtServer",
+            //? if <1.21.2
+            //method = "hurt",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
             )
     )
     private void amber$captureLegacyShieldBlock(
+            //? if >=1.21.2
             ServerLevel level,
             DamageSource source,
             float damage,
@@ -125,28 +131,6 @@ public abstract class LivingEntityAfterDamageMixin {
     ) {
         this.amber$shieldBlockPending = true;
         this.amber$shieldBlockedDamage = damage;
-    }
-    *///?}
-
-    //? if <1.21.2 {
-    /*@Inject(
-            method = "hurt",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"
-            )
-    )
-    private void amber$captureLegacyShieldBlock(
-            DamageSource source,
-            float damage,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
-        if ((LivingEntity) (Object) this instanceof Player player) {
-            ItemStack shield = amber$findCarriedShield(player);
-            if (!shield.isEmpty()) {
-                PlayerEvents.SHIELD_BLOCK.invoker().onShieldBlock(player, shield, damage, source);
-            }
-        }
     }
     *///?}
 
@@ -164,8 +148,6 @@ public abstract class LivingEntityAfterDamageMixin {
                     /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 0
             )
-            //? if >=1.21.9
-            , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureReducedDamage(
             //? if >=1.21.2
@@ -173,18 +155,8 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir
-            //? if >=1.21.9 {
-            ,
-            float reducedDamage,
-            ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
-            //?}
     ) {
-        //? if >=1.21.9
-        this.amber$armAfterDamage(damage - this.lastHurt, damage, blocked);
-        //? if <1.21.9
-        /*this.amber$armAfterDamage(damage - this.lastHurt, damage, false);*/
+        this.amber$armAfterDamage(damage - this.lastHurt, damage);
     }
 
     @Inject(
@@ -201,8 +173,6 @@ public abstract class LivingEntityAfterDamageMixin {
                     /*"Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V",*/
                     ordinal = 1
             )
-            //? if >=1.21.9
-            , locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void amber$captureFullDamage(
             //? if >=1.21.2
@@ -210,18 +180,8 @@ public abstract class LivingEntityAfterDamageMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> cir
-            //? if >=1.21.9 {
-            ,
-            float reducedDamage,
-            ItemStack itemInUse,
-            float damageBlocked,
-            boolean blocked
-            //?}
     ) {
-        //? if >=1.21.9
-        this.amber$armAfterDamage(damage, damage, blocked);
-        //? if <1.21.9
-        /*this.amber$armAfterDamage(damage, damage, false);*/
+        this.amber$armAfterDamage(damage, damage);
     }
 
     @Inject(
@@ -258,11 +218,10 @@ public abstract class LivingEntityAfterDamageMixin {
     }
 
     @Unique
-    private void amber$armAfterDamage(float baseDamageTaken, float damageTaken, boolean blocked) {
+    private void amber$armAfterDamage(float baseDamageTaken, float damageTaken) {
         this.amber$afterDamagePending = true;
         this.amber$baseDamageTaken = baseDamageTaken;
         this.amber$damageTaken = damageTaken;
-        this.amber$blocked = blocked;
     }
 
     @Unique

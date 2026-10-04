@@ -14,14 +14,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-//? if >=1.16
 import net.minecraft.world.entity.ai.attributes.Attributes;
-//? if <1.16
-/*import net.minecraft.world.entity.monster.SharedMonsterAttributes;*/
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-//? if <1.21.2
-/*import net.minecraft.world.item.ArmorItem;*/
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -324,10 +319,8 @@ public final class ItemFunctions {
         //? if <1.20.5 {
         //? if >=1.18.2
         addStackAttributeModifier(stack, holderValue(attribute), modifier, slotGroup);
-        //? if <1.18.2 && >=1.16
-        /*stack.addAttributeModifier(attribute, modifier, slotGroup);*/
-        //? if <1.16
-        /*stack.addAttributeModifier(attribute.getName(), modifier, slotGroup);*/
+        //? if <1.18.2
+        /*addStackAttributeModifier(stack, attribute, modifier, slotGroup);*/
         //?} else {
         var modifiers = restoreDefaultAttributeModifiers(stack);
         var replacement = new ItemAttributeModifiers.Entry(attribute, modifier, slotGroup);
@@ -346,10 +339,7 @@ public final class ItemFunctions {
         //? if <1.20.5 {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (stackAttributeModifiers(stack, slot).entries().stream()
-                    //? if >=1.16
                     .anyMatch(entry -> tagString(modifierTag(entry.getValue()), "Name").equals(id.toString()))) {
-                    //? if <1.16
-                    /*.anyMatch(entry -> entry.getValue().getName().equals(id.toString()))) {*/
                 return true;
             }
         }
@@ -568,6 +558,7 @@ public final class ItemFunctions {
     /**
      * Checks if the ItemStack is a tool using the modern Minecraft 1.21.7+ DataComponents system.
      * Uses DataComponents.TOOL to identify tools like pickaxes, axes, shovels, etc.
+     * Before 1.20.5, which has no TOOL component, tiered tools, swords, and shears count.
      *
      * @param stack The ItemStack to check.
      * @return true if the item has tool properties, false otherwise.
@@ -575,7 +566,7 @@ public final class ItemFunctions {
      */
     public static boolean isTool(ItemStack stack) {
         //? if <1.20.5
-        /*return stackItem(stack) instanceof net.minecraft.world.item.TieredItem;*/
+        /*return isTool(stackItem(stack));*/
         //? if >=1.20.5
         return stack.has(DataComponents.TOOL);
     }
@@ -590,7 +581,7 @@ public final class ItemFunctions {
      */
     public static boolean isTool(Item item) {
         //? if <1.20.5
-        /*return item instanceof net.minecraft.world.item.TieredItem;*/
+        /*return item instanceof net.minecraft.world.item.TieredItem || item instanceof net.minecraft.world.item.ShearsItem;*/
         //? if >=1.20.5
         return item.getDefaultInstance().has(DataComponents.TOOL);
     }
@@ -604,9 +595,7 @@ public final class ItemFunctions {
      * @since 8.3.0
      */
     public static boolean isWeapon(ItemStack stack) {
-        //? if <1.16
-        /*return stack.getAttributeModifiers(EquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName());*/
-        //? if <1.20.5 && >=1.16
+        //? if <1.20.5
         /*return stackAttributeModifiers(stack, EquipmentSlot.MAINHAND).containsKey(attackDamageAttribute());*/
         //? if >=1.20.5 {
         //? if >=1.21.5
@@ -644,6 +633,7 @@ public final class ItemFunctions {
      * Checks if the ItemStack is armor using the modern Minecraft 1.21.7+ DataComponents system.
      * Uses DataComponents.EQUIPPABLE to identify armor and other equippable items.
      * Note: This assumes all EQUIPPABLE items are armor for practical purposes.
+     * Before 1.21.2, which has no EQUIPPABLE component, an item counts if Minecraft would equip it outside the hands.
      *
      * @param stack The ItemStack to check.
      * @return true if the item can be equipped, false otherwise.
@@ -653,7 +643,7 @@ public final class ItemFunctions {
         //? if >=1.21.2
         return stack.has(DataComponents.EQUIPPABLE);
         //? if <1.21.2
-        /*return stackItem(stack) instanceof ArmorItem;*/
+        /*return equipmentSlot(stack).getType() != EquipmentSlot.Type.HAND;*/
     }
 
     /**
@@ -669,7 +659,7 @@ public final class ItemFunctions {
         //? if >=1.21.2
         return item.getDefaultInstance().has(DataComponents.EQUIPPABLE);
         //? if <1.21.2
-        /*return item instanceof ArmorItem;*/
+        /*return isArmor(item.getDefaultInstance());*/
     }
 
     // ==================== ARMOR TIER OPERATIONS ====================

@@ -10,12 +10,14 @@
     "CropBlockMixin",
     "FarmlandBlockMixin",
     "LivingEntityAfterDamageMixin",
-    //? if <1.21.2
-    "NeoForgeLegacySheepMixin",
+    //? if <1.21.1
+    //"NeoForgeLegacyShearMixin",
     "NeoForgeShearsDispenseItemBehaviorMixin",
     "NeoForgeShearsItemMixin"
   ],
   "client": [
+    //? if <1.21.5
+    //"ClientCommandClickMixin",
     "LevelRendererMixin",
     "MouseHandlerMixin"
   ],

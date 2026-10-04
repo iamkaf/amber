@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.networking.v1;
 
 import com.iamkaf.amber.api.billboard.v1.Billboard;
@@ -9,6 +8,7 @@ import com.iamkaf.amber.api.billboard.v1.BillboardDepthMode;
 import com.iamkaf.amber.api.billboard.v1.BillboardTransition;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+//? if >=1.20.5
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
@@ -120,34 +120,34 @@ final class BillboardPacketCodec {
             }
         }
 
-        switch (billboard.content()) {
-            case BillboardContent.Texture texture -> {
-                buffer.writeVarInt(TEXTURE);
-                buffer.writeIdentifier(texture.texture());
-                buffer.writeFloat(texture.width());
-                buffer.writeFloat(texture.height());
-            }
-            case BillboardContent.Item item -> {
-                buffer.writeVarInt(ITEM);
-                buffer.writeIdentifier(item.item());
-                buffer.writeFloat(item.scale());
-            }
-            case BillboardContent.Text text -> {
-                buffer.writeVarInt(TEXT);
-                ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.encode(buffer, text.text());
-                buffer.writeFloat(text.scale());
-                buffer.writeInt(text.color());
-            }
-            case BillboardContent.ItemObject item -> {
-                buffer.writeVarInt(ITEM_OBJECT);
-                buffer.writeIdentifier(item.item());
-                buffer.writeFloat(item.scale());
-            }
-            case BillboardContent.BlockObject block -> {
-                buffer.writeVarInt(BLOCK_OBJECT);
-                buffer.writeIdentifier(block.block());
-                buffer.writeFloat(block.scale());
-            }
+        BillboardContent content = billboard.content();
+        if (content instanceof BillboardContent.Texture texture) {
+            buffer.writeVarInt(TEXTURE);
+            buffer.writeIdentifier(texture.texture());
+            buffer.writeFloat(texture.width());
+            buffer.writeFloat(texture.height());
+        } else if (content instanceof BillboardContent.Item item) {
+            buffer.writeVarInt(ITEM);
+            buffer.writeIdentifier(item.item());
+            buffer.writeFloat(item.scale());
+        } else if (content instanceof BillboardContent.Text text) {
+            buffer.writeVarInt(TEXT);
+            //? if >=1.20.5
+            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.encode(buffer, text.text());
+            //? if <1.20.5
+            /*buffer.writeComponent(text.text());*/
+            buffer.writeFloat(text.scale());
+            buffer.writeInt(text.color());
+        } else if (content instanceof BillboardContent.ItemObject item) {
+            buffer.writeVarInt(ITEM_OBJECT);
+            buffer.writeIdentifier(item.item());
+            buffer.writeFloat(item.scale());
+        } else if (content instanceof BillboardContent.BlockObject block) {
+            buffer.writeVarInt(BLOCK_OBJECT);
+            buffer.writeIdentifier(block.block());
+            buffer.writeFloat(block.scale());
+        } else {
+            throw new IllegalArgumentException("Unknown billboard content type: " + content.getClass().getName());
         }
     }
 
@@ -176,7 +176,12 @@ final class BillboardPacketCodec {
             case TEXTURE -> new BillboardContent.Texture(buffer.readIdentifier(), buffer.readFloat(), buffer.readFloat());
             case ITEM -> new BillboardContent.Item(buffer.readIdentifier(), buffer.readFloat());
             case TEXT -> {
+                //? if >=1.20.5
                 Component component = ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC.decode(buffer);
+                //? if >=1.20.3 && <1.20.5
+                /*Component component = buffer.readComponentTrusted();*/
+                //? if <1.20.3
+                /*Component component = buffer.readComponent();*/
                 yield new BillboardContent.Text(component, buffer.readFloat(), buffer.readInt());
             }
             case ITEM_OBJECT -> new BillboardContent.ItemObject(buffer.readIdentifier(), buffer.readFloat());
@@ -187,16 +192,15 @@ final class BillboardPacketCodec {
     }
 
     static void encodeAnchor(BillboardAnchor anchor, FriendlyByteBuf buffer) {
-        switch (anchor) {
-            case BillboardAnchor.World world -> {
-                buffer.writeVarInt(ANCHOR_WORLD);
-                writeVec3(buffer, world.position());
-            }
-            case BillboardAnchor.Entity entity -> {
-                buffer.writeVarInt(ANCHOR_ENTITY);
-                buffer.writeUUID(entity.entityId());
-                writeVec3(buffer, entity.offset());
-            }
+        if (anchor instanceof BillboardAnchor.World world) {
+            buffer.writeVarInt(ANCHOR_WORLD);
+            writeVec3(buffer, world.position());
+        } else if (anchor instanceof BillboardAnchor.Entity entity) {
+            buffer.writeVarInt(ANCHOR_ENTITY);
+            buffer.writeUUID(entity.entityId());
+            writeVec3(buffer, entity.offset());
+        } else {
+            throw new IllegalArgumentException("Unknown billboard anchor type: " + anchor.getClass().getName());
         }
     }
 
@@ -310,4 +314,3 @@ final class BillboardPacketCodec {
         };
     }
 }
-//?}

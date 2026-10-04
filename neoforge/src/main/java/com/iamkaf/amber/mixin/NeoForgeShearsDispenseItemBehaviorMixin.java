@@ -2,6 +2,7 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import com.iamkaf.amber.platform.NeoForgeShearTargets;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.ShearsDispenseItemBehavior;
@@ -17,8 +18,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ShearsDispenseItemBehavior.class)
 public abstract class NeoForgeShearsDispenseItemBehaviorMixin {
     @Redirect(
+            //? if >=1.21.6
             method = "tryShearEntity",
-            require = 0,
+            //? if <1.21.6
+            /*method = "tryShearLivingEntity",*/
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/neoforged/neoforge/common/IShearable;onSheared(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Ljava/util/List;"
@@ -40,7 +43,7 @@ public abstract class NeoForgeShearsDispenseItemBehaviorMixin {
                             stack,
                             entity,
                             level,
-                            amber$getShearTarget(entity),
+                            NeoForgeShearTargets.of(entity),
                             drops,
                             !drops.isEmpty(),
                             EntityEvent.ShearSource.DISPENSER
@@ -49,17 +52,6 @@ public abstract class NeoForgeShearsDispenseItemBehaviorMixin {
         }
 
         return drops;
-    }
-
-    private static EntityEvent.ShearTarget amber$getShearTarget(Entity entity) {
-        return switch (entity.getClass().getName()) {
-            case "net.minecraft.world.entity.animal.sheep.Sheep" -> EntityEvent.ShearTarget.SHEEP;
-            case "net.minecraft.world.entity.animal.cow.MushroomCow" -> EntityEvent.ShearTarget.MUSHROOM_COW;
-            case "net.minecraft.world.entity.animal.golem.SnowGolem" -> EntityEvent.ShearTarget.SNOW_GOLEM;
-            case "net.minecraft.world.entity.monster.skeleton.Bogged" -> EntityEvent.ShearTarget.BOGGED;
-            case "net.minecraft.world.entity.animal.golem.CopperGolem" -> EntityEvent.ShearTarget.COPPER_GOLEM;
-            default -> EntityEvent.ShearTarget.OTHER;
-        };
     }
 
     static {

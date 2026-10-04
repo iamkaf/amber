@@ -52,7 +52,6 @@ boot-check node timeout="120":
   @if ! just list-nodes | grep -Fxq "{{node}}"; then echo "Unknown node: {{node}}"; exit 1; fi
   @node="{{node}}"; version="${node%-*}"; loader="${node##*-}"; \
     task=":$loader:$version:runClient"; \
-    if [ "$node" = "1.16.5-forge" ]; then task=":forge:1.16.5:runLegacyClient"; fi; \
     log="/tmp/amber-$node.boot.log"; \
     status=0; timeout --kill-after=10s "{{timeout}}s" ./gradlew --configure-on-demand --no-daemon "$task" --console=plain \
       -Damber.withTeaKit=true -Dteakit.autoExitTitle=true -Dteakit.autoExitTitleDelayMs=2500 > "$log" 2>&1 || status=$?; \

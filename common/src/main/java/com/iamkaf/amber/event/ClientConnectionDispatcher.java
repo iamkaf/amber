@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.event;
 
 import com.iamkaf.amber.api.event.v1.events.common.client.ClientConnectionEvents;
@@ -32,4 +31,3 @@ public final class ClientConnectionDispatcher {
         ClientConnectionEvents.DISCONNECT.invoker().onDisconnect();
     }
 }
-//?}

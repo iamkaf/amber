@@ -19,7 +19,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerShieldBlockEvents();
         ForgeAmberEventHandlers.registerCreativeTabEvents();
         ForgeAmberEventHandlers.registerDefaultItemComponentEvents();
-        //? if >=1.21.11
+        //? if >=1.18.1
         ForgePermissions.register();
     }
 
@@ -29,9 +29,7 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerKeybindEvents();
         ForgeAmberEventHandlers.registerClientTickEvents();
         ForgeAmberEventHandlers.registerRenderGuiEvents();
-        ForgeAmberEventHandlers.registerMouseScrollEvents();
         ForgeAmberEventHandlers.registerBlockOutlineRenderEvents();
-        //? if >=1.21.11
         ForgeClientConnectionEvents.register();
     }
 
@@ -42,6 +40,5 @@ public class ForgeAmberEventSetup implements IAmberEventSetup {
         ForgeAmberEventHandlers.registerServerTickEvents();
         ForgeAmberEventHandlers.registerPlayerLifecycleEvents();
         ForgeAmberEventHandlers.registerItemEvents();
-        ForgeAmberEventHandlers.registerCraftItemEvents();
     }
 }

@@ -13,13 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AmberNetworking {
     
-    // Network channel for internal Amber networking
-    //? if >=1.21.11
-    public static final NetworkChannel CHANNEL = NetworkChannel.createOptional(
-    //? if <1.21.11
-    /*public static final NetworkChannel CHANNEL = NetworkChannel.create(*/
-        id(Constants.MOD_ID, "internal")
-    );
+    // Optional, so players and servers without Amber can still connect.
+    public static final NetworkChannel CHANNEL = NetworkChannel.createOptional(id(Constants.MOD_ID, "internal"));
 
     private static Identifier id(String namespace, String path) {
         //? if >=1.21
@@ -62,7 +57,6 @@ public class AmberNetworking {
                 PongPacket.HANDLER
             );
 
-            //? if >=1.21.11 || >=26.1 {
             CHANNEL.register(
                 ShowBillboardPacket.class,
                 ShowBillboardPacket.ENCODER,
@@ -87,7 +81,6 @@ public class AmberNetworking {
                 ScaleBillboardPacket.DECODER,
                 ScaleBillboardPacket.HANDLER
             );
-            //?}
             
             initialized = true;
             Constants.LOG.info("Amber internal networking initialized");

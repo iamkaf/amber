@@ -35,14 +35,9 @@ public abstract class FarmBlockMixin {
         handleFarmlandTrample(level, state, pos, entity, (float) fallDistance, ci);
     }
     //?}
-    //? if <1.21.5 && >=1.17 {
+    //? if <1.21.5 {
     /*private void onFarmlandTrample(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
         handleFarmlandTrample(level, state, pos, entity, fallDistance, ci);
-    }
-    *///?}
-    //? if <1.17 {
-    /*private void onFarmlandTrample(Level level, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
-        handleFarmlandTrample(level, level.getBlockState(pos), pos, entity, fallDistance, ci);
     }
     *///?}
 

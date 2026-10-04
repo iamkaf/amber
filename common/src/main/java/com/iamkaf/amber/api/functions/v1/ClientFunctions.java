@@ -1,7 +1,7 @@
 package com.iamkaf.amber.api.functions.v1;
 
 import com.iamkaf.amber.compat.ClientCompat;
-//? if <1.20 && >=1.15
+//? if <1.20
 /*import com.mojang.blaze3d.vertex.PoseStack;*/
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -65,15 +65,9 @@ public final class ClientFunctions {
     //?} else if >=1.20 {
     /*public static void renderText(GuiGraphics context, Font font, Component message, int x, int y, int color) {
         ClientCompat.renderText(context, font, message, x, y, color);*/
-    //?} else if >=1.16 {
-    /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
-        ClientCompat.renderText(context, font, message, x, y, color);*/
-    //?} else if >=1.15 {
-    /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
-        ClientCompat.renderText(context, font, message, x, y, color);*/
     //?} else {
-    /*public static void renderText(Object context, Font font, Component message, int x, int y, int color) {
-        ClientCompat.renderText(font, message, x, y, color);*/
+    /*public static void renderText(PoseStack context, Font font, Component message, int x, int y, int color) {
+        ClientCompat.renderText(context, font, message, x, y, color);*/
     //?}
     }
 
@@ -89,18 +83,13 @@ public final class ClientFunctions {
     public static void renderTooltip(GuiGraphicsExtractor guiGraphics, ItemStack stack, int x, int y) {
     //? if <26.1 && >=1.20
     /*public static void renderTooltip(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {*/
-    //? if <1.20 && >=1.15
+    //? if <1.20
     /*public static void renderTooltip(PoseStack guiGraphics, ItemStack stack, int x, int y) {*/
-    //? if <1.15
-    /*public static void renderTooltip(Object guiGraphics, ItemStack stack, int x, int y) {*/
         if (stack == null || ClientCompat.isEmpty(stack)) {
             return;
         }
 
-        //? if >=1.15
         ClientCompat.renderTooltip(guiGraphics, stack, x, y);
-        //? if <1.15
-        /*ClientCompat.renderTooltip(stack, x, y);*/
     }
 
     // ==================== SMART TOOLTIP OPERATIONS ====================
@@ -222,10 +211,8 @@ public final class ClientFunctions {
         private final GuiGraphicsExtractor context;
         //? if <26.1 && >=1.20
         /*private final GuiGraphics context;*/
-        //? if <1.20 && >=1.15
+        //? if <1.20
         /*private final PoseStack context;*/
-        //? if <1.15
-        /*private final Object context;*/
         private final Font font;
 
         private int cursorX = 0; // Current cursor X position
@@ -244,10 +231,8 @@ public final class ClientFunctions {
         public TextWriter(GuiGraphicsExtractor context, Font font) {
         //? if <26.1 && >=1.20
         /*public TextWriter(GuiGraphics context, Font font) {*/
-        //? if <1.20 && >=1.15
+        //? if <1.20
         /*public TextWriter(PoseStack context, Font font) {*/
-        //? if <1.15
-        /*public TextWriter(Object context, Font font) {*/
             this.context = context;
             this.font = font;
         }
@@ -264,10 +249,8 @@ public final class ClientFunctions {
         public TextWriter(GuiGraphicsExtractor context, Font font, int x, int y) {
         //? if <26.1 && >=1.20
         /*public TextWriter(GuiGraphics context, Font font, int x, int y) {*/
-        //? if <1.20 && >=1.15
+        //? if <1.20
         /*public TextWriter(PoseStack context, Font font, int x, int y) {*/
-        //? if <1.15
-        /*public TextWriter(Object context, Font font, int x, int y) {*/
             this(context, font);
             this.cursorX = x;
             this.cursorY = y;

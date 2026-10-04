@@ -5,13 +5,12 @@ import com.iamkaf.amber.api.event.v1.EventFactory;
 import net.minecraft.client.Camera;
 //? if >=26.2
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//? if >=1.15 && <26.2
+//? if <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-//? if >=1.15
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class RenderEvents {
@@ -57,14 +56,9 @@ public class RenderEvents {
         InteractionResult onBlockOutlineRender(Camera camera,
                                              //? if >=26.2
                                              SubmitNodeCollector bufferSource,
-                                             //? if >=1.15 && <26.2
+                                             //? if <26.2
                                              MultiBufferSource bufferSource,
-                                             //? if <1.15
-                                             /*Object bufferSource,*/
-                                             //? if >=1.15
                                              PoseStack poseStack,
-                                             //? if <1.15
-                                             /*Object poseStack,*/
                                              BlockHitResult hitResult, BlockPos pos, BlockState state);
     }
 }

@@ -11,8 +11,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+//? if <1.20 {
+/*import java.util.Optional;
+import java.util.function.Supplier;
+*///?}
 
 /**
  * Registry for creating and managing custom creative mode tabs.
@@ -32,7 +36,8 @@ import java.util.Map;
  * }</pre>
  */
 public final class CreativeModeTabRegistry {
-    private static final Map<Identifier, TabBuilder> TAB_BUILDERS = new HashMap<>();
+    // Forge and NeoForge construct mods in parallel.
+    private static final Map<Identifier, TabBuilder> TAB_BUILDERS = new LinkedHashMap<>();
     
     private CreativeModeTabRegistry() {}
     
@@ -77,23 +82,25 @@ public final class CreativeModeTabRegistry {
      * @return A RegistrySupplier for the tab
      */
     public static RegistrySupplier<CreativeModeTab> register(TabBuilder builder) {
-        TAB_BUILDERS.put(builder.getId(), builder);
+        synchronized (TAB_BUILDERS) {
+            TAB_BUILDERS.put(builder.getId(), builder);
+        }
         //? if >=1.20 {
         return com.iamkaf.amber.api.registry.v1.RegistrarManager.get(builder.getId().getNamespace())
             .get(Registries.CREATIVE_MODE_TAB)
             .register(builder.getId(), () -> Services.CREATIVE_MODE_TABS.build(builder));
         //?} else {
-        /*CreativeModeTab tab = com.iamkaf.amber.platform.Services.CREATIVE_MODE_TABS.build(builder);
+        /*Supplier<Optional<CreativeModeTab>> tab = Services.CREATIVE_MODE_TABS.register(builder);
         Identifier registryId = id("minecraft", "creative_mode_tab");
         return new RegistrySupplier<>() {
             @Override
             public boolean isPresent() {
-                return true;
+                return tab.get().isPresent();
             }
 
             @Override
             public CreativeModeTab get() {
-                return tab;
+                return tab.get().orElseThrow(() -> new NullPointerException("Registry object not present: " + builder.getId()));
             }
 
             @Override
@@ -144,10 +151,12 @@ public final class CreativeModeTabRegistry {
      * This is used by platform-specific implementations to access
      * the tab builders for event registration.
      * 
-     * @return An unmodifiable map of all registered tab builders
+     * @return An unmodifiable snapshot of all registered tab builders, in registration order
      */
     public static Map<Identifier, TabBuilder> getTabBuilders() {
-        return Collections.unmodifiableMap(TAB_BUILDERS);
+        synchronized (TAB_BUILDERS) {
+            return Collections.unmodifiableMap(new LinkedHashMap<>(TAB_BUILDERS));
+        }
     }
     
     /**
@@ -157,7 +166,9 @@ public final class CreativeModeTabRegistry {
      * @return The tab builder, or null if not found
      */
     public static TabBuilder getTabBuilder(Identifier id) {
-        return TAB_BUILDERS.get(id);
+        synchronized (TAB_BUILDERS) {
+            return TAB_BUILDERS.get(id);
+        }
     }
     
     /**
@@ -167,6 +178,8 @@ public final class CreativeModeTabRegistry {
      * @return True if the tab is registered, false otherwise
      */
     public static boolean isTabRegistered(Identifier id) {
-        return TAB_BUILDERS.containsKey(id);
+        synchronized (TAB_BUILDERS) {
+            return TAB_BUILDERS.containsKey(id);
+        }
     }
 }

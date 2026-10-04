@@ -2,19 +2,24 @@ package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.client.RenderEvents;
-//? if >=1.21.11 || >=26.1
+import com.iamkaf.amber.client.billboard.BillboardDraw;
 import com.iamkaf.amber.client.billboard.ClientBillboards;
-//? if <1.21.2 && >=1.15
+//? if <1.19.3
+/*import com.mojang.math.Matrix4f;*/
+//? if <1.21.2
 /*import com.mojang.blaze3d.vertex.VertexConsumer;*/
-//? if >=1.15
 import com.mojang.blaze3d.vertex.PoseStack;
 //? if <1.21.9
 /*import net.minecraft.client.Camera;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-//? if >=1.21.11 || >=26.1
+//? if <1.20.5 {
+/*import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
+*///?}
+//? if >=1.21.9
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//? if >=1.15 && <26.2
+//? if <26.2
 import net.minecraft.client.renderer.MultiBufferSource;
 //? if >=26.1
 import net.minecraft.client.renderer.state.level.LevelRenderState;
@@ -27,6 +32,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+//? if >=1.19.3 && <1.20.5
+/*import org.joml.Matrix4f;*/
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,16 +53,7 @@ public class LevelRendererMixin {
         cancellable = true
     )
     private void onRenderBlockOutline(
-            //? if <1.15 {
-            /*Object poseStack,
-            Object vertexConsumer,
-            Entity entity,
-            double cameraX,
-            double cameraY,
-            double cameraZ,
-            BlockPos outlinePos,
-            BlockState outlineState,
-            *///?} else if <1.21.2 {
+            //? if <1.21.2 {
             /*PoseStack poseStack,
             VertexConsumer vertexConsumer,
             Entity entity,
@@ -82,8 +80,7 @@ public class LevelRendererMixin {
         Minecraft minecraft = Minecraft.getInstance();
 
         //? if <1.21.2 {
-        /*//? if >=1.15 {
-        if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
+        /*if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
         }
 
@@ -94,7 +91,7 @@ public class LevelRendererMixin {
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
                 minecraft.gameRenderer.getMainCamera(),
                 minecraft.renderBuffers().bufferSource(),
-                (PoseStack) poseStack,
+                poseStack,
                 blockHitResult,
                 outlinePos,
                 outlineState
@@ -103,7 +100,6 @@ public class LevelRendererMixin {
         if (result != InteractionResult.PASS) {
             ci.cancel();
         }
-        //?}
         *///?} else {
         //? if >=26.2 {
         if (levelRenderState.blockOutlineRenderState == null) {
@@ -115,16 +111,12 @@ public class LevelRendererMixin {
         }
         //?}
 
-        //? if >=26.1 && <26.2 {
+        // Vanilla draws the outline in only one of the two passes; fire in that pass so cancelling works.
+        //? if >=1.21.9 && <26.2 {
         if (levelRenderState.blockOutlineRenderState.isTranslucent() != translucentPass) {
             return;
         }
         //?}
-        //? if <26.1 {
-        /*if (translucentPass) {
-            return;
-        }
-        *///?}
 
         if (!(minecraft.hitResult instanceof BlockHitResult blockHitResult)) {
             return;
@@ -139,6 +131,11 @@ public class LevelRendererMixin {
         //? if <1.21.9
         /*BlockPos pos = blockHitResult.getBlockPos();*/
         BlockState state = minecraft.level.getBlockState(pos);
+        //? if <1.21.9 {
+        /*if (net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(state).sortOnUpload() != translucentPass) {
+            return;
+        }
+        *///?}
 
         InteractionResult result = RenderEvents.BLOCK_OUTLINE_RENDER.invoker().onBlockOutlineRender(
                 //? if >=26.2
@@ -160,7 +157,7 @@ public class LevelRendererMixin {
         //?}
     }
 
-    //? if >=1.21.11 || >=26.1 {
+    //? if >=1.21.9 {
     @Inject(method = "submitEntities", at = @At("TAIL"))
     private void amber$submitBillboards(
             PoseStack poseStack,
@@ -168,10 +165,41 @@ public class LevelRendererMixin {
             SubmitNodeCollector output,
             CallbackInfo ci
     ) {
-        ClientBillboards.render(poseStack, output, levelRenderState.cameraRenderState);
+        ClientBillboards.render(poseStack, new BillboardDraw(output, levelRenderState.cameraRenderState));
     }
-
-    //?}
+    //?} else if >=1.20.5 {
+    /*// Entities draw with a fresh pose stack here; the camera rotation is in the model-view matrix.
+    //? if >=1.21.2
+    @Inject(method = "renderEntities", at = @At("TAIL"))
+    //? if <1.21.2
+    /^@Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=blockentities"))^/
+    private void amber$renderBillboards(CallbackInfo ci) {
+        Minecraft minecraft = Minecraft.getInstance();
+        BillboardDraw draw = new BillboardDraw(minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
+        ClientBillboards.render(new PoseStack(), draw);
+        // Flush before translucent terrain; vanilla does this itself from 1.21.2.
+        //? if <1.21.2
+        /^minecraft.renderBuffers().bufferSource().endLastBatch();^/
+    }
+    *///?} else {
+    /*// After the entity pass and before block entities, like vanilla name tags.
+    @Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=blockentities"))
+    private void amber$renderBillboards(
+            PoseStack poseStack,
+            float partialTick,
+            long finishNanoTime,
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            LightTexture lightTexture,
+            Matrix4f projection,
+            CallbackInfo ci
+    ) {
+        ClientBillboards.render(poseStack, new BillboardDraw(Minecraft.getInstance().renderBuffers().bufferSource(), camera));
+        // Flush before translucent terrain so water and glass don't hide the last batch.
+        Minecraft.getInstance().renderBuffers().bufferSource().endLastBatch();
+    }
+    *///?}
 
     static {
         AmberMod.AMBER_MIXINS.add("LevelRendererMixin");

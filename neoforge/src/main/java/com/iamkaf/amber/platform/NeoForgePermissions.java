@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.platform;
 
 import com.iamkaf.amber.api.permission.v1.PermissionNode;
@@ -46,4 +45,3 @@ final class NeoForgePermissions implements PermissionRegistry.Backend {
         return PermissionAPI.getPermission(player, nativeNode);
     }
 }
-//?}

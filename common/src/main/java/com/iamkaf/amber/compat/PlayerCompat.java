@@ -13,27 +13,68 @@ import net.minecraft.world.food.FoodData;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+//? if >=26.3 {
+import net.minecraft.world.level.block.AbstractBedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+//?}
+//? if <1.19 {
+/*import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
+import net.minecraft.core.GlobalPos;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+*///?}
 
 public final class PlayerCompat {
+    //? if <1.19 {
+    /*// Minecraft records the last death location itself from 1.19. Keyed by UUID because respawning creates a new
+    // player object; like the rest of this emulation, it does not survive a server restart.
+    private static final Map<UUID, GlobalPos> LAST_DEATH_LOCATIONS = new ConcurrentHashMap<>();
+    *///?}
+
     private PlayerCompat() {
     }
 
+    //? if <1.19 {
+    /*public static void trackLastDeathLocations() {
+        EntityEvent.ENTITY_DEATH.register((entity, source) -> {
+            if (entity instanceof Player player && !player.level.isClientSide) {
+                setLastDeathLocation(player, GlobalPos.of(player.level.dimension(), player.blockPosition()));
+            }
+        });
+    }
+
+    public static Optional<GlobalPos> lastDeathLocation(Player player) {
+        return Optional.ofNullable(LAST_DEATH_LOCATIONS.get(player.getUUID()));
+    }
+
+    public static void setLastDeathLocation(Player player, GlobalPos position) {
+        LAST_DEATH_LOCATIONS.put(player.getUUID(), position);
+    }
+    *///?}
+
     public static void displayClientMessage(Player player, Component message, boolean actionBar) {
-        player.displayClientMessage(message, actionBar);
+        //? if >=26.1 {
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.sendSystemMessage(message, actionBar);
+        } else if (actionBar) {
+            player.sendOverlayMessage(message);
+        } else {
+            player.sendSystemMessage(message);
+        }
+        //?} else {
+        /*player.displayClientMessage(message, actionBar);
+        *///?}
     }
 
     public static Inventory playerInventory(Player player) {
-        //? if >=1.17
         return player.getInventory();
-        //? if <1.17
-        /*return player.inventory;*/
     }
 
     public static Abilities playerAbilities(Player player) {
-        //? if >=1.17
         return player.getAbilities();
-        //? if <1.17
-        /*return player.abilities;*/
     }
 
     public static void updateAbilities(Player player) {
@@ -181,7 +222,14 @@ public final class PlayerCompat {
     }
 
     public static void startSleepInBed(Player player, BlockPos pos) {
-        player.startSleepInBed(pos);
+        //? if >=26.3 {
+        BlockState state = player.level().getBlockState(pos);
+        if (state.getBlock() instanceof AbstractBedBlock bed) {
+            player.startSleepInBed(bed, state, bed.getBedRule(player.level(), pos), pos);
+        }
+        //?} else {
+        /*player.startSleepInBed(pos);
+        *///?}
     }
 
     public static void stopSleeping(Player player) {

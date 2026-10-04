@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.api.doctor.v1;
 
 import net.minecraft.network.chat.Component;
@@ -65,4 +64,3 @@ public final class DoctorSection {
         }
     }
 }
-//?}

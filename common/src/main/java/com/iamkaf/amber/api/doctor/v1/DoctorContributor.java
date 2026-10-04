@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.api.doctor.v1;
 
 /**
@@ -9,4 +8,3 @@ package com.iamkaf.amber.api.doctor.v1;
 public interface DoctorContributor<C> {
     void contribute(C context, DoctorSection section);
 }
-//?}

@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.doctor;
 
 import com.google.gson.JsonObject;
@@ -7,8 +6,6 @@ import com.iamkaf.amber.Constants;
 import com.iamkaf.amber.api.platform.v1.Platform;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -40,8 +37,8 @@ final class DoctorLogUpload {
     static int offer() {
         ClientDoctorCommands.message(DoctorText.translatable("amber.doctor.upload.notice").append(" ")
                 .append(ClientDoctorCommands.button("amber.doctor.upload.confirm",
-                        new ClickEvent.RunCommand("/amber doctor upload confirm")).withStyle(style -> style.withHoverEvent(
-                                new HoverEvent.ShowText(DoctorText.translatable("amber.doctor.upload.scrubbed"))))));
+                        DoctorText.runCommand("/amber doctor upload confirm")).withStyle(style -> style.withHoverEvent(
+                                DoctorText.showText(DoctorText.translatable("amber.doctor.upload.scrubbed"))))));
         return 1;
     }
 
@@ -69,7 +66,7 @@ final class DoctorLogUpload {
                         client.keyboardHandler.setClipboard(url.toString());
                         ClientDoctorCommands.message(DoctorText.translatable("amber.doctor.upload.done",
                                 DoctorText.literal(url.toString()).withStyle(style -> style.withColor(ChatFormatting.AQUA)
-                                        .withUnderlined(true).withClickEvent(new ClickEvent.OpenUrl(url)))));
+                                        .withUnderlined(true).withClickEvent(DoctorText.openUrl(url)))));
                     } else {
                         Throwable cause = error instanceof CompletionException && error.getCause() != null ? error.getCause() : error;
                         Constants.LOG.warn("Could not upload {}", log, cause);
@@ -122,7 +119,10 @@ final class DoctorLogUpload {
                 .thenApply(response -> {
                     JsonObject body;
                     try {
+                        //? if >=1.18
                         body = JsonParser.parseString(response.body()).getAsJsonObject();
+                        //? if <1.18
+                        /*body = new JsonParser().parse(response.body()).getAsJsonObject();*/
                     } catch (RuntimeException exception) {
                         throw new IllegalStateException("mclo.gs answered " + response.statusCode(), exception);
                     }
@@ -134,4 +134,3 @@ final class DoctorLogUpload {
                 });
     }
 }
-//?}

@@ -1,9 +1,9 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.api.permission.v1;
 
 import com.iamkaf.amber.permission.PermissionRegistry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=1.21.11
 import net.minecraft.server.permissions.PermissionLevel;
 
 import java.util.Objects;
@@ -13,8 +13,12 @@ import java.util.Objects;
  *
  * <p>Register each node once during mod initialization, usually in a static field. A check asks
  * the loader's permission system first: Fabric API's permission API on Minecraft 26.1.2 and
- * newer, and {@code PermissionAPI} on NeoForge and Forge. When nothing overrides the node, the
- * player has it if their vanilla permission level is at least the node's default level.</p>
+ * newer, and {@code PermissionAPI} on NeoForge and on Forge 1.18.1 and newer. When nothing
+ * overrides the node, the player has it if their vanilla permission level is at least the node's
+ * default level.</p>
+ *
+ * <p>Minecraft 1.21.11 and newer take a {@code PermissionLevel}. Older versions take the vanilla
+ * permission level as an {@code int} from 0 to 4.</p>
  *
  * <pre>{@code
  * public static final PermissionNode TELEPORT = AmberPermissions.register(
@@ -29,6 +33,7 @@ public final class AmberPermissions {
     private AmberPermissions() {
     }
 
+    //? if >=1.21.11 {
     /**
      * Registers a permission node.
      *
@@ -46,10 +51,31 @@ public final class AmberPermissions {
         PermissionRegistry.add(node);
         return node;
     }
+    //?} else {
+    /*/^*
+     * Registers a permission node.
+     *
+     * <p>NeoForge and Forge collect nodes when a server starts, so a node registered later keeps
+     * its default until the next server start.</p>
+     *
+     * @param id           the node identifier, usually namespaced by the owning mod
+     * @param defaultLevel the vanilla permission level, 0 to 4, that grants the node by default;
+     *                     0 grants it to every player
+     * @throws IllegalArgumentException if {@code defaultLevel} is outside 0 to 4, or a node with
+     *                                  this identifier is already registered
+     ^/
+    public static PermissionNode register(Identifier id, int defaultLevel) {
+        if (defaultLevel < 0 || defaultLevel > 4) {
+            throw new IllegalArgumentException("Permission level must be 0 to 4, got " + defaultLevel);
+        }
+        PermissionNode node = new PermissionNode(Objects.requireNonNull(id, "id"), defaultLevel);
+        PermissionRegistry.add(node);
+        return node;
+    }
+    *///?}
 
     /** Returns whether {@code player} has {@code node}. */
     public static boolean check(ServerPlayer player, PermissionNode node) {
         return PermissionRegistry.check(Objects.requireNonNull(player, "player"), Objects.requireNonNull(node, "node"));
     }
 }
-//?}

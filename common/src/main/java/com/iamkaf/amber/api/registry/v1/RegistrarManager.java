@@ -4,17 +4,18 @@ import com.iamkaf.amber.platform.Services;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple manager for registry access.
  */
 public final class RegistrarManager {
-    private static final Map<String, RegistrarManager> MANAGER = new HashMap<>();
+    // Forge and NeoForge construct mods in parallel.
+    private static final Map<String, RegistrarManager> MANAGER = new ConcurrentHashMap<>();
 
     private final String modId;
-    private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrars = new HashMap<>();
+    private final Map<ResourceKey<? extends Registry<?>>, Registrar<?>> registrars = new ConcurrentHashMap<>();
 
     private RegistrarManager(String modId) {
         this.modId = modId;

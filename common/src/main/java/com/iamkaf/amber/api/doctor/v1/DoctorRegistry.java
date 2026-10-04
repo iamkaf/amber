@@ -1,4 +1,3 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.api.doctor.v1;
 
 import com.iamkaf.amber.Constants;
@@ -45,4 +44,3 @@ final class DoctorRegistry<C> {
     private record Registration<C>(AmberModInfo mod, DoctorContributor<C> contributor) {
     }
 }
-//?}

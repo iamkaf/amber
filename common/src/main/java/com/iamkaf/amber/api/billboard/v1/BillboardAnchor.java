@@ -1,4 +1,3 @@
-//? if >=1.21.11 || >=26.1 {
 package com.iamkaf.amber.api.billboard.v1;
 
 import net.minecraft.world.phys.Vec3;
@@ -13,7 +12,10 @@ import java.util.UUID;
  * the viewer's current client level and add their offset to its smoothly interpolated position.
  * An entity-bound billboard is suspended while that UUID is not tracked.</p>
  */
+//? if >=1.18
 public sealed interface BillboardAnchor permits BillboardAnchor.World, BillboardAnchor.Entity {
+//? if <1.18
+/*public interface BillboardAnchor {*/
     static World world(Vec3 position) {
         return new World(position);
     }
@@ -45,4 +47,3 @@ public sealed interface BillboardAnchor permits BillboardAnchor.World, Billboard
         }
     }
 }
-//?}

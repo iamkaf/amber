@@ -1,9 +1,9 @@
-//? if >=1.21.11 {
 package com.iamkaf.amber.permission;
 
 import com.iamkaf.amber.api.permission.v1.PermissionNode;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+//? if >=1.21.11
 import net.minecraft.server.permissions.Permission;
 
 import java.util.List;
@@ -39,7 +39,10 @@ public final class PermissionRegistry {
 
     /** The vanilla answer used when no permission system overrides the node. */
     public static boolean hasDefault(ServerPlayer player, PermissionNode node) {
+        //? if >=1.21.11
         return player.permissions().hasPermission(new Permission.HasCommandLevel(node.defaultLevel()));
+        //? if <1.21.11
+        /*return player.hasPermissions(node.defaultLevel());*/
     }
 
     @FunctionalInterface
@@ -47,4 +50,3 @@ public final class PermissionRegistry {
         boolean check(ServerPlayer player, PermissionNode node);
     }
 }
-//?}

@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.LogicalSide;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -35,6 +34,7 @@ import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
+//? if >=26.1.2
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -46,9 +46,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.ArrayList;
-
-import static net.minecraft.world.InteractionResult.CONSUME;
-import static net.minecraft.world.InteractionResult.SUCCESS;
 
 final class NeoForgeAmberEventHandlers {
 
@@ -173,6 +170,7 @@ final class NeoForgeAmberEventHandlers {
     static void registerPlayerLifecycleEvents() {
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerServer::onPlayerJoin);
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerServer::onPlayerLeave);
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerServer::onPlayerClone);
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, EventHandlerServer::onPlayerRespawn);
     }
 
@@ -192,24 +190,9 @@ final class NeoForgeAmberEventHandlers {
             InteractionResult result = PlayerEvents.ENTITY_INTERACT.invoker()
                     .interact(event.getEntity(), event.getLevel(), event.getHand(), event.getTarget());
 
-            LogicalSide side = event.getSide();
-
-            if (result.equals(InteractionResult.PASS)) {
-                return;
-            }
-
-
-            if (side.isClient()) {
-                if (result == SUCCESS) {
-                    event.setCancellationResult(SUCCESS);
-                    event.setCanceled(true);
-                } else if (result == CONSUME) {
-                    event.setCancellationResult(CONSUME);
-                    event.setCanceled(true);
-                } else {
-
-                    event.setCanceled(true);
-                }
+            if (result != InteractionResult.PASS) {
+                event.setCancellationResult(result);
+                event.setCanceled(true);
             }
         }
 
@@ -226,6 +209,8 @@ final class NeoForgeAmberEventHandlers {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onLivingDeath(LivingDeathEvent event) {
+            // Clients also run death for the entity event the server sends; Amber reports the server's.
+            if (event.getEntity().level().isClientSide()) return;
             EntityEvent.ENTITY_DEATH.invoker().onEntityDeath(event.getEntity(), event.getSource());
         }
 
@@ -240,17 +225,29 @@ final class NeoForgeAmberEventHandlers {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onWorldLoad(LevelEvent.Load event) {
-            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(event.getLevel().getServer(), event.getLevel());
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_LOAD.invoker().onWorldLoad(server, event.getLevel());
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onWorldUnload(LevelEvent.Unload event) {
-            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(event.getLevel().getServer(), event.getLevel());
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_UNLOAD.invoker().onWorldUnload(server, event.getLevel());
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onWorldSave(LevelEvent.Save event) {
-            WorldEvents.WORLD_SAVE.invoker().onWorldSave(event.getLevel().getServer(), event.getLevel());
+            net.minecraft.server.MinecraftServer server = event.getLevel().getServer();
+            if (server == null) {
+                return;
+            }
+            WorldEvents.WORLD_SAVE.invoker().onWorldSave(server, event.getLevel());
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
@@ -264,7 +261,10 @@ final class NeoForgeAmberEventHandlers {
 
         @SubscribeEvent(priority = EventPriority.HIGH)
 
+        //? if >=26.1.2
         public static void onBlockBreak(BreakBlockEvent event) {
+        //? if <26.1.2
+        /*public static void onBlockBreak(BlockEvent.BreakEvent event) {*/
 
 
             if (event.getPlayer().level().isClientSide()) {
@@ -281,6 +281,7 @@ final class NeoForgeAmberEventHandlers {
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true);
 
+                //? if >=26.1.2
                 event.setNotifyClient(true);
                 return;
             }
@@ -402,7 +403,10 @@ final class NeoForgeAmberEventHandlers {
 
             com.iamkaf.amber.api.registry.v1.creativetabs.TabBuilder tabBuilder =
 
+                //? if >=1.21.11
                 com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().identifier());
+                //? if <1.21.11
+                /*com.iamkaf.amber.api.registry.v1.creativetabs.CreativeModeTabRegistry.getTabBuilder(event.getTabKey().location());*/
 
 
             if (tabBuilder != null) {
@@ -493,12 +497,22 @@ final class NeoForgeAmberEventHandlers {
             }
         }
 
+        // NeoForge's respawn event carries only the new player; the clone event just before it has the old one.
+        private static final java.util.Map<net.minecraft.world.entity.player.Player, net.minecraft.server.level.ServerPlayer> RESPAWN_ORIGINALS =
+                java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onPlayerClone(PlayerEvent.Clone event) {
+            if (event.getOriginal() instanceof net.minecraft.server.level.ServerPlayer original) {
+                RESPAWN_ORIGINALS.put(event.getEntity(), original);
+            }
+        }
+
         @SubscribeEvent(priority = EventPriority.HIGH)
         public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+            net.minecraft.server.level.ServerPlayer original = RESPAWN_ORIGINALS.remove(event.getEntity());
             if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer newPlayer) {
-
-
-                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(newPlayer, newPlayer, !event.isEndConquered());
+                PlayerEvents.PLAYER_RESPAWN.invoker().onPlayerRespawn(original != null ? original : newPlayer, newPlayer, event.isEndConquered());
             }
         }
 
