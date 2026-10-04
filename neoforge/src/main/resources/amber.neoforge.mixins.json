@@ -8,13 +8,20 @@
     "CraftedItemMixin",
     "CraftingPlayerMixin",
     "CropBlockMixin",
+    //? if >=1.21.6
+    "EntityShearMixin",
     "FarmlandBlockMixin",
     "FishingHookMixin",
     "LivingEntityAfterDamageMixin",
-    //? if <1.21.1
-    //"NeoForgeLegacyShearMixin",
-    "NeoForgeShearsDispenseItemBehaviorMixin",
-    "NeoForgeShearsItemMixin"
+    //? if >=26.2
+    "MobShearMixin",
+    "NeoForgeShearsItemMixin",
+    "PlayerShearMixin",
+    //? if <1.21.6
+    //"WolfShearMixin",
+    "ServerLevelMixin",
+    "ShearableMobMixin",
+    "ShearsDispenseItemBehaviorMixin"
   ],
   "client": [
     //? if <1.21.5

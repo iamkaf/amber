@@ -1,56 +1,33 @@
 package com.iamkaf.amber.mixin;
 
 import com.iamkaf.amber.AmberMod;
-import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
-import com.iamkaf.amber.platform.NeoForgeShearTargets;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
+import com.iamkaf.amber.event.EntityShearing;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.IShearable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * NeoForge shears every {@code IShearable} a player uses shears on here, including modded ones.
+ */
 @Mixin(ShearsItem.class)
 public abstract class NeoForgeShearsItemMixin {
-    @WrapOperation(
+    @Inject(
             method = "interactLivingEntity",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/neoforged/neoforge/common/IShearable;onSheared(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Ljava/util/List;"
             )
     )
-    private List<ItemStack> amber$onPlayerShear(
-            IShearable shearable,
-            Player player,
-            ItemStack stack,
-            Level level,
-            BlockPos pos,
-            Operation<List<ItemStack>> original
-    ) {
-        List<ItemStack> drops = original.call(shearable, player, stack, level, pos);
-
-        if (!level.isClientSide() && shearable instanceof Entity entity) {
-            EntityEvent.SHEAR.invoker().shear(
-                    new EntityEvent.SimpleShearingContext(
-                            player instanceof net.minecraft.server.level.ServerPlayer serverPlayer ? serverPlayer : null,
-                            stack,
-                            entity,
-                            level,
-                            NeoForgeShearTargets.of(entity),
-                            drops,
-                            !drops.isEmpty(),
-                            EntityEvent.ShearSource.PLAYER
-                    )
-            );
-        }
-
-        return drops;
+    private void amber$reportShear(ItemStack shears, Player player, LivingEntity entity, InteractionHand hand,
+            CallbackInfoReturnable<InteractionResult> cir) {
+        EntityShearing.sheared(entity);
     }
 
     static {

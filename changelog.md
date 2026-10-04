@@ -26,6 +26,7 @@ See the full changelog at https://github.com/iamkaf/amber
 - `EntityEvent.ENTITY_DEATH` fires once, from the server, on Forge and NeoForge.
 - Client disconnect events are no longer lost on Fabric.
 - `FishingEvents.MODIFY_CATCH` keeps the catch's item drop, experience, and statistics on Forge and NeoForge.
+- `EntityEvent.SHEAR` fires once for every use of shears on an entity, on every loader.
 
 ### Deprecated
 

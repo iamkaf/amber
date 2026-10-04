@@ -17,6 +17,8 @@
     //? if <1.19.3
     "CreativeModeTabMixin",
     "CropBlockMixin",
+    //? if >=1.21.6
+    "EntityShearMixin",
     "FarmlandBlockMixin",
     "FishingHookMixin",
     //? if >=1.20.5
@@ -24,12 +26,18 @@
     "ItemEntityMixin",
     "LightningBoltMixin",
     "LivingEntityAfterDamageMixin",
+    //? if >=26.2
+    "MobShearMixin",
     "PlayerMixin",
+    "PlayerShearMixin",
     //? if <1.19.2
     //"ServerEntityInteractionMixin",
-    "ServerPlayerDeathMixin",
+    //? if >=1.20.5 && <1.21.6
+    //"WolfShearMixin",
     "ServerLevelMixin",
-    "SheepMixin",
+    "ServerPlayerDeathMixin",
+    "ShearableMobMixin",
+    "ShearsDispenseItemBehaviorMixin",
     "TamableAnimalMixin"
   ],
   "client": [

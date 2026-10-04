@@ -78,7 +78,9 @@ public class EntityEvent {
     );
 
     /**
-     * An informational event fired after an entity has been sheared.
+     * An informational event fired on the server once for each successful use of shears on an entity, by a player
+     * or a dispenser. Shearing covers anything shears take off an entity: wool, mushrooms, a snow golem's pumpkin,
+     * a saddle, harness, or other equipment, and leads. The drops are the item stacks that were spawned.
      */
     public static final Event<Shear> SHEAR = EventFactory.createArrayBacked(
             Shear.class, callbacks -> context -> {
