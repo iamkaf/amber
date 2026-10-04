@@ -15,7 +15,6 @@ public class NeoForgeAmberEventSetup implements IAmberEventSetup {
         NeoForgeAmberEventHandlers.registerLightningStrikeEvents();
         NeoForgeAmberEventHandlers.registerBlockEvents();
         NeoForgeAmberEventHandlers.registerAnimalEvents();
-        NeoForgeAmberEventHandlers.registerFishingEvents();
         NeoForgeAmberEventHandlers.registerShieldBlockEvents();
         NeoForgeAmberEventHandlers.registerCreativeTabEvents();
         NeoForgeAmberEventHandlers.registerDefaultItemComponentEvents();

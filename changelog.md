@@ -25,6 +25,8 @@ See the full changelog at https://github.com/iamkaf/amber
 - `BlockEvents.BLOCK_BREAK_BEFORE` can cancel breaking on Forge.
 - `EntityEvent.ENTITY_DEATH` fires once, from the server, on Forge and NeoForge.
 - Client disconnect events are no longer lost on Fabric.
+- Fishing on Forge and NeoForge gives experience and counts statistics again, and no longer loses catches with a full inventory.
+- `EntityEvent.SHEAR` fires once for every use of shears on an entity, on every loader.
 
 ### Deprecated
 

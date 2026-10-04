@@ -3,6 +3,7 @@ package com.iamkaf.amber.mixin;
 import com.iamkaf.amber.AmberMod;
 import com.iamkaf.amber.api.event.v1.events.common.EntityEvent;
 import com.iamkaf.amber.api.event.v1.events.common.WorldEvents;
+import com.iamkaf.amber.event.EntityShearing;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -34,5 +35,12 @@ public class ServerLevelMixin {
     private void onEntitySpawn(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         // Fire the entity spawn event when entities are added to the world
         EntityEvent.ENTITY_SPAWN.invoker().onEntitySpawn(entity, (ServerLevel) (Object) this);
+    }
+
+    @Inject(method = "addFreshEntity", at = @At("RETURN"))
+    private void amber$recordShearDrop(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValueZ()) {
+            EntityShearing.spawned((ServerLevel) (Object) this, entity);
+        }
     }
 }

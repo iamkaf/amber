@@ -7,16 +7,26 @@
     "BoneMealItemMixin",
     "CraftedItemMixin",
     "CraftingPlayerMixin",
-    "CropBlockMixin",
     //? if <1.19.3
     "CreativeModeTabMixin",
+    "CropBlockMixin",
+    //? if >=1.21.6
+    "EntityShearMixin",
     "FarmBlockMixin",
-    "ForgeSheepMixin",
-    //? if <1.20.1
-    "LootTableAccessor",
+    "FishingHookMixin",
+    //? if <26.2
+    //"ForgeShearsItemMixin",
     //? if >=1.20.5
     "ItemAccessor",
-    "LivingEntityAfterDamageMixin"
+    "LivingEntityAfterDamageMixin",
+    //? if <1.20.1
+    "LootTableAccessor",
+    //? if >=26.2
+    "MobShearMixin",
+    "PlayerShearMixin",
+    "ServerLevelMixin",
+    "ShearableMobMixin",
+    "ShearsDispenseItemBehaviorMixin"
   ],
   "client": [
     //? if >=1.19.1 && <1.21.6
