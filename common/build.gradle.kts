@@ -6,9 +6,12 @@ plugins {
 
 val minecraftVersion = project.name
 
+// Graph-only builds skip ModDevGradle, so the extension exists only when the plugin is applied.
 if (minecraftVersion == "26.3") {
-    extensions.configure<NeoForgeExtension> {
-        accessTransformers.from(rootProject.file("versions/$minecraftVersion/common/src/main/resources/META-INF/accesstransformer.cfg"))
+    pluginManager.withPlugin("net.neoforged.moddev") {
+        extensions.configure<NeoForgeExtension> {
+            accessTransformers.from(rootProject.file("versions/$minecraftVersion/common/src/main/resources/META-INF/accesstransformer.cfg"))
+        }
     }
 }
 
