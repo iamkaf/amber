@@ -369,7 +369,13 @@ public final class ItemFunctions {
 
         ItemStack defaultInstance = item.getDefaultInstance();
 
+        //? if <1.21.2 {
+        /*// Before 1.21.2 armor keeps its defaults on the item, not on its components, as vanilla's own fallback does.
+        ItemAttributeModifiers modifiers = defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        return modifiers.modifiers().isEmpty() ? item.getDefaultAttributeModifiers() : modifiers;
+        *///?} else {
         return defaultInstance.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        //?}
     }
 
     /**
