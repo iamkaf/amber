@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 See the full changelog at https://github.com/iamkaf/amber
 
+## 11.7.1
+
+### Fixed
+
+- `ItemFunctions.getDefaultAttributeModifiers` and `ItemFunctions.restoreDefaultAttributeModifiers` include armor's default armor and toughness on Minecraft 1.20.5 through 1.21.1.
+
 ## 11.7.0
 
 ### Added
